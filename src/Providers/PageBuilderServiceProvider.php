@@ -8,6 +8,7 @@ use Coderstm\PageBuilder\Facades\Block;
 use Coderstm\PageBuilder\Facades\Page;
 use Coderstm\PageBuilder\Facades\Section;
 use Coderstm\PageBuilder\Http\Middleware\RequestThemeMiddleware;
+use Coderstm\PageBuilder\Http\Middleware\ThemeMiddleware;
 use Coderstm\PageBuilder\Registry\BlockRegistry;
 use Coderstm\PageBuilder\Registry\LayoutParser;
 use Coderstm\PageBuilder\Registry\SchemaExtractor;
@@ -21,7 +22,7 @@ use Coderstm\PageBuilder\Services\PageStorage;
 use Coderstm\PageBuilder\Services\Theme;
 use Coderstm\PageBuilder\Services\ThemeSettings;
 use Coderstm\PageBuilder\Support\Mix;
-use Illuminate\Foundation\Http\Kernel;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -112,8 +113,10 @@ class PageBuilderServiceProvider extends ServiceProvider
         }
 
         // Register theme middleware
+        /** @var \Illuminate\Foundation\Http\Kernel $kernel */
         $kernel = $this->app->make(Kernel::class);
         $kernel->pushMiddleware(RequestThemeMiddleware::class);
+        Route::aliasMiddleware('theme', ThemeMiddleware::class);
 
         // Routes
         Route::middleware(config('pagebuilder.middleware', ['web']))

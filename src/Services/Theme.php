@@ -53,10 +53,14 @@ class Theme extends Base
         Config::set('pagebuilder.pages', self::path('views/pages', $theme));
 
         // Add theme sections
-        Section::add(self::path('views/sections', $theme));
+        if ($sectionsPath = self::path('views/sections', $theme)) {
+            Section::add($sectionsPath);
+        }
 
         // Add theme blocks
-        Block::add(self::path('views/blocks', $theme));
+        if ($blocksPath = self::path('views/blocks', $theme)) {
+            Block::add($blocksPath);
+        }
     }
 
     /**

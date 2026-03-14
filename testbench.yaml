@@ -1,6 +1,7 @@
 laravel: "@testbench"
 
 providers:
+  - Qirolab\Theme\ThemeServiceProvider
   - Coderstm\PageBuilder\Providers\PageBuilderServiceProvider
   - Workbench\App\Providers\WorkbenchServiceProvider
 
