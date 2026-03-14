@@ -99,8 +99,13 @@ class PageStorageTest extends TestCase
     public function test_preserved_page_persists_title_and_meta(): void
     {
         $data = [
-            'sections' => [],
-            'order' => [],
+            'sections' => [
+                'banner-1' => [
+                    'type' => 'banner',
+                    'settings' => ['text' => 'Welcome Home'],
+                ],
+            ],
+            'order' => ['banner-1'],
             'title' => 'Home Page',
             'meta' => [
                 'meta_title' => 'SEO Home',

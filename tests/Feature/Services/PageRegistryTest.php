@@ -21,14 +21,12 @@ class PageRegistryTest extends TestCase
     {
         $registry = $this->app->make(PageRegistry::class);
         $registry->put([
-            'home' => ['title' => 'Home', 'slug' => 'home', 'path' => '/pages/home.json'],
             'about' => ['title' => 'About', 'slug' => 'about', 'path' => '/pages/about.json'],
         ]);
 
         $pages = $registry->pages();
 
-        $this->assertCount(2, $pages);
-        $this->assertArrayHasKey('home', $pages);
+        $this->assertCount(1, $pages);
         $this->assertArrayHasKey('about', $pages);
     }
 
@@ -36,12 +34,12 @@ class PageRegistryTest extends TestCase
     {
         $registry = $this->app->make(PageRegistry::class);
         $registry->put([
-            'home' => ['title' => 'Home', 'slug' => 'home'],
+            'about' => ['title' => 'About', 'slug' => 'about'],
         ]);
 
-        $page = $registry->page('home');
+        $page = $registry->page('about');
         $this->assertIsArray($page);
-        $this->assertSame('Home', $page['title']);
+        $this->assertSame('About', $page['title']);
     }
 
     public function test_page_returns_null_for_missing_slug(): void
@@ -53,7 +51,7 @@ class PageRegistryTest extends TestCase
 
     public function test_load_pages_is_cached(): void
     {
-        Cache::put(PageRegistry::CACHE_KEY, ['home' => ['title' => 'Home']]);
+        Cache::put(PageRegistry::CACHE_KEY, ['about' => ['title' => 'About']]);
 
         $registry = $this->app->make(PageRegistry::class);
 

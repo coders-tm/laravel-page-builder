@@ -1,6 +1,15 @@
 {
-    "sections": [],
-    "order": [],
+    "sections": {
+        "banner-1": {
+            "type": "banner",
+            "settings": {
+                "text": "Welcome Home"
+            }
+        }
+    },
+    "order": [
+        "banner-1"
+    ],
     "title": "Home Page",
     "meta": {
         "meta_title": "SEO Home",
