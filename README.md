@@ -1,5 +1,12 @@
 # Laravel Page Builder
 
+<p align="center">
+<a href="https://github.com/coders-tm/laravel-page-builder/actions"><img src="https://github.com/coders-tm/laravel-page-builder/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/coderstm/laravel-page-builder"><img src="https://img.shields.io/packagist/dt/coderstm/laravel-page-builder" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/coderstm/laravel-page-builder"><img src="https://img.shields.io/packagist/v/coderstm/laravel-page-builder" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/coderstm/laravel-page-builder"><img src="https://img.shields.io/packagist/l/coderstm/laravel-page-builder" alt="License"></a>
+</p>
+
 A modern page builder for Laravel that allows you to build dynamic pages using layouts, sections and JSON rendering.
 It includes a visual editor, layout system, reusable sections and multi-theme support.
 
@@ -77,26 +84,6 @@ php artisan vendor:publish --tag=pagebuilder-assets
 ```bash
 php artisan migrate
 ```
-
----
-
-## Core Concepts
-
-The page builder follows a **layered architecture**:
-
-```
-Schema → Registry → Renderer → Services/Controllers
-                  ↗
-         Components (hydrated by Renderer)
-```
-
-| Layer          | Purpose                                                                                        |
-| -------------- | ---------------------------------------------------------------------------------------------- |
-| **Schema**     | Immutable value objects describing structure (`SectionSchema`, `BlockSchema`, `SettingSchema`) |
-| **Registry**   | Discovers and stores available section/block schemas from Blade files                          |
-| **Components** | Runtime instances hydrated from page JSON (`Section`, `Block`, `Settings`)                     |
-| **Rendering**  | Converts components to HTML through Blade views                                                |
-| **Services**   | Orchestrates page loading, rendering, and publishing                                           |
 
 ---
 
