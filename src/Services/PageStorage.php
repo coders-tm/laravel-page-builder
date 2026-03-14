@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Coderstm\PageBuilder\Services;
 
+use Coderstm\PageBuilder\PageBuilder;
 use Coderstm\PageBuilder\Support\PageData;
 use Illuminate\Support\Facades\File;
 
@@ -51,7 +52,10 @@ class PageStorage
         $payload = $data instanceof PageData ? $data->toArray() : $data;
 
         // Strip DB-only fields — title and meta are persisted to the database, not the JSON file.
-        unset($payload['title'], $payload['meta']);
+        // Except for preserved slugs (like home), which don't have a database record.
+        if (! PageBuilder::isPreservedPage($slug)) {
+            unset($payload['title'], $payload['meta']);
+        }
 
         $filePath = $this->pagesPath.'/'.$slug.'.json';
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

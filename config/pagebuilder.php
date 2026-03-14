@@ -64,4 +64,16 @@ return [
     'theme_settings_schema' => [],
 
     'theme_settings_path' => resource_path('theme-settings.json'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Preserved Pages
+    |--------------------------------------------------------------------------
+    |
+    | Define a list of slugs that are reserved by the system and cannot be
+    | used when creating new dynamic pages in the page builder.
+    |
+    */
+
+    'preserved_pages' => ['home'],
 ];

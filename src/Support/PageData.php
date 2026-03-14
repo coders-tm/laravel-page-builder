@@ -20,6 +20,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         private readonly array $order = [],
         private readonly array $layout = [],
         private readonly string $title = '',
+        private readonly array $meta = [],
     ) {}
 
     /**
@@ -55,6 +56,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             order: $order,
             layout: $layout,
             title: (string) ($data['title'] ?? ''),
+            meta: is_array($data['meta'] ?? null) ? $data['meta'] : [],
         );
     }
 
@@ -171,6 +173,14 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     public function title(): string
     {
         return $this->title;
+    }
+
+    /**
+     * Return the page SEO metadata.
+     */
+    public function meta(): array
+    {
+        return $this->meta;
     }
 
     /**
@@ -296,6 +306,8 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             'sections' => $this->sections,
             'order' => $this->order,
             'layout' => $layout,
+            'title' => $this->title,
+            'meta' => $this->meta,
         ];
     }
 

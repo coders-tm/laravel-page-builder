@@ -10,5 +10,40 @@
     },
     "order": [
         "banner-1"
-    ]
+    ],
+    "layout": {
+        "type": "page",
+        "header": {
+            "sections": {
+                "header": {
+                    "blocks": [],
+                    "order": [],
+                    "type": "header",
+                    "disabled": false
+                }
+            },
+            "order": [
+                "header"
+            ]
+        },
+        "footer": {
+            "sections": {
+                "footer": {
+                    "blocks": [],
+                    "order": [],
+                    "type": "footer",
+                    "disabled": false
+                }
+            },
+            "order": [
+                "footer"
+            ]
+        }
+    },
+    "title": "Home Page",
+    "meta": {
+        "meta_title": null,
+        "meta_description": null,
+        "meta_keywords": null
+    }
 }

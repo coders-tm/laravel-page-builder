@@ -26,6 +26,10 @@ class PageService
                     ->name('pages.'.$slug);
             }
         }
+
+        Route::get('/', [WebPageController::class, 'pages'])
+            ->defaults('slug', 'home')
+            ->name('pages.home');
     }
 
     /**

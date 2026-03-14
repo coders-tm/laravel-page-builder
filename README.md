@@ -20,6 +20,7 @@ It includes a visual editor, layout system, reusable sections and multi-theme su
 - **Recursive block nesting** — container blocks (rows, columns) can hold child blocks to any depth
 - **Theme blocks** — register global block types that any section can accept via `@theme` wildcard
 - **21+ Field Types** — from basic text inputs to advanced color pickers, icon selectors, and custom types
+- **Page Meta Persistence** — SEO titles and descriptions are automatically managed and persisted across dynamic and preserved pages
 - **Editor mode** — `data-editor-*` attributes injected only when the editor is active
 - **Publishable assets** — config, views, migrations, and frontend assets can be published independently
 
@@ -63,6 +64,9 @@ return [
 
     // Directory within the disk for uploaded assets
     'asset_directory' => 'pagebuilder',
+
+    // Reserved slugs that cannot be used for dynamic pages
+    'preserved_pages' => ['home'],
 ];
 ```
 
@@ -755,6 +759,22 @@ Access theme settings in Blade views via the globally shared `$theme` variable:
 
 `$theme` is a `ThemeSettings` instance shared with all Blade views. Use property-style access (`$theme->key`) or the `get()` helper with a default (`$theme->get('key', 'default')`).
 
+### Theme Middleware
+
+You can use the provided `ThemeMiddleware` to automatically apply themes based on route parameters or session data.
+
+```php
+// bootstrap/app.php (Laravel 11+)
+$middleware->alias([
+    'theme' => \Coderstm\PageBuilder\Http\Middleware\ThemeMiddleware::class,
+]);
+
+// routes/web.php
+Route::get('/shop/{theme_slug}', function () {
+    // ...
+})->middleware('theme:theme_slug');
+```
+
 ---
 
 ## Artisan Commands
@@ -769,7 +789,6 @@ php artisan theme:link
 ```
 
 ---
-
 
 ## License
 

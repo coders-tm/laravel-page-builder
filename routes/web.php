@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 // API routes (JSON responses)
 Route::prefix('pagebuilder')->group(function () {
     Route::get('pages', [PageBuilderController::class, 'pages']);
-    Route::get('page/{slug}', [PageBuilderController::class, 'page']);
+    Route::get('page/{slug?}', [PageBuilderController::class, 'page'])->defaults('slug', 'home');
     Route::post('render-section', [PageBuilderController::class, 'renderSection']);
     Route::post('render-block', [PageBuilderController::class, 'renderBlock']);
     Route::post('save-page', [PageBuilderController::class, 'savePage']);
@@ -31,6 +31,9 @@ Route::prefix('pagebuilder')->group(function () {
     Route::get('assets', [AssetController::class, 'index']);
     Route::post('assets/upload', [AssetController::class, 'upload']);
 });
+
+// Redirect to home page builder editor if accessing /pagebuilder without slug
+Route::redirect('pagebuilder', 'pagebuilder/home', 301);
 
 // Editor routes (Blade layout)
 Route::get('pagebuilder/{slug?}', [PageBuilderController::class, 'editor'])->name('pagebuilder.editor');

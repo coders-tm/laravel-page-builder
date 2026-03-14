@@ -132,10 +132,29 @@ class PageBuilder
         return [
             'baseUrl' => config('app.url').'/pagebuilder',
             'appUrl' => config('app.url'),
-            'pages' => array_values($pages->pages()),
+            'pages' => array_merge(array_values($pages->pages()), [
+                [
+                    'slug' => 'home',
+                    'title' => 'Home',
+                ],
+            ]),
             'sections' => $registry->get(),
             'blocks' => $blocks->get(),
             'themeSettings' => app(ThemeSettings::class)->toArray(),
         ];
+    }
+
+    /**
+     * Determine if a slug is a preserved system page.
+     */
+    public static function isPreservedPage(?string $slug): bool
+    {
+        if (! $slug) {
+            return false;
+        }
+
+        $preservedPages = config('pagebuilder.preserved_pages', ['home']);
+
+        return in_array(strtolower($slug), array_map('strtolower', $preservedPages));
     }
 }

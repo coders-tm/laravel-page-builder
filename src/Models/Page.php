@@ -2,6 +2,7 @@
 
 namespace Coderstm\PageBuilder\Models;
 
+use Coderstm\PageBuilder\PageBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Sluggable\HasSlug;
@@ -10,6 +11,15 @@ use Spatie\Sluggable\SlugOptions;
 class Page extends Model
 {
     use HasFactory, HasSlug;
+
+    protected static function booted()
+    {
+        static::saving(function ($page) {
+            if (PageBuilder::isPreservedPage($page->slug)) {
+                throw new \InvalidArgumentException("The slug '{$page->slug}' is reserved and cannot be used for dynamic pages.");
+            }
+        });
+    }
 
     protected $logIgnore = [
         'metadata',
@@ -37,7 +47,7 @@ class Page extends Model
         return SlugOptions::create()->generateSlugsFrom('title')->saveSlugsTo('slug')->preventOverwrite();
     }
 
-    public static function findBySlug(string $slug): static
+    public static function findActiveBySlug(string $slug): static
     {
         return static::where('slug', $slug)->where('is_active', true)->firstOrFail();
     }

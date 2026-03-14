@@ -64,7 +64,7 @@ class PageBuilderController extends Controller
      * and `order` — populated from the active layout Blade file when the
      * page JSON has no `layout` stored yet.
      */
-    public function page(string $slug): JsonResponse
+    public function page(string $slug = 'home'): JsonResponse
     {
         // Build the default layout by scanning the active layout Blade file.
         $defaultLayout = $this->layoutParser->defaultLayout();
@@ -170,7 +170,10 @@ class PageBuilderController extends Controller
         ]);
 
         $slug = $request->input('slug');
-        $data = $request->input('data');
+        $data = array_merge($request->input('data'), [
+            'title' => $request->input('meta.title'),
+            'meta' => $request->input('meta'),
+        ]);
 
         $saved = $this->pageStorage->save($slug, $data);
 
