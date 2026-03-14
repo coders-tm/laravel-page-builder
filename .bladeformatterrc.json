@@ -1,0 +1,8 @@
+{
+    "customDirectives": [
+        "schema",
+        "blocks",
+        "sections",
+        "pbEditorClass"
+    ]
+}
