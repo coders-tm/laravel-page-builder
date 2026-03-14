@@ -98,4 +98,17 @@ class PageBuilderTest extends TestCase
 
         $this->assertIsArray($vars);
     }
+
+    public function test_is_preserved_page(): void
+    {
+        $this->assertTrue(PageBuilder::isPreservedPage('home'));
+        $this->assertFalse(PageBuilder::isPreservedPage('custom-page'));
+        $this->assertFalse(PageBuilder::isPreservedPage(null));
+    }
+
+    public function test_is_preserved_page_case_insensitive(): void
+    {
+        $this->assertTrue(PageBuilder::isPreservedPage('HOME'));
+        $this->assertTrue(PageBuilder::isPreservedPage('Home'));
+    }
 }

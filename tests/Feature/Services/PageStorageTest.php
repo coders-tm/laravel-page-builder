@@ -95,4 +95,55 @@ class PageStorageTest extends TestCase
             File::delete($path);
         }
     }
+
+    public function test_preserved_page_persists_title_and_meta(): void
+    {
+        $data = [
+            'sections' => [],
+            'order' => [],
+            'title' => 'Home Page',
+            'meta' => [
+                'meta_title' => 'SEO Home',
+                'meta_description' => 'Home description',
+            ],
+        ];
+
+        // 'home' is a preserved page by default
+        $this->assertTrue($this->storage->save('home', $data));
+
+        $loaded = $this->storage->load('home');
+        $this->assertSame('Home Page', $loaded->title());
+        $this->assertSame('SEO Home', $loaded->meta()['meta_title']);
+        $this->assertSame('Home description', $loaded->meta()['meta_description']);
+
+        // Verify JSON file directly to be absolutely sure
+        $filePath = config('pagebuilder.pages').'/home.json';
+        $json = json_decode(file_get_contents($filePath), true);
+        $this->assertArrayHasKey('title', $json);
+        $this->assertArrayHasKey('meta', $json);
+    }
+
+    public function test_regular_page_strips_title_and_meta(): void
+    {
+        $data = [
+            'sections' => [],
+            'order' => [],
+            'title' => 'Regular Page',
+            'meta' => [
+                'meta_title' => 'SEO Regular',
+            ],
+        ];
+
+        $this->assertTrue($this->storage->save('regular-page', $data));
+
+        $loaded = $this->storage->load('regular-page');
+        $this->assertSame('', $loaded->title());
+        $this->assertSame([], $loaded->meta());
+
+        // Verify JSON file directly
+        $filePath = config('pagebuilder.pages').'/regular-page.json';
+        $json = json_decode(file_get_contents($filePath), true);
+        $this->assertArrayNotHasKey('title', $json);
+        $this->assertArrayNotHasKey('meta', $json);
+    }
 }

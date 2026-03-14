@@ -178,8 +178,10 @@ class PageDataTest extends TestCase
         $json = $data->toJson();
 
         $decoded = json_decode($json, true);
-        // title is DB-only — must NOT appear in the JSON file
-        $this->assertArrayNotHasKey('title', $decoded);
+        // title and meta are now part of the PageData DTO for the editor
+        $this->assertArrayHasKey('title', $decoded);
+        $this->assertArrayHasKey('meta', $decoded);
+        $this->assertSame('Home Page', $decoded['title']);
         $this->assertSame(['hero', 'footer'], $decoded['order']);
     }
 
@@ -189,8 +191,10 @@ class PageDataTest extends TestCase
         $json = json_encode($data);
 
         $decoded = json_decode($json, true);
-        // title is DB-only — must NOT appear in the JSON file
-        $this->assertArrayNotHasKey('title', $decoded);
+        // title and meta are now part of the PageData DTO for the editor
+        $this->assertArrayHasKey('title', $decoded);
+        $this->assertArrayHasKey('meta', $decoded);
+        $this->assertSame('Home Page', $decoded['title']);
     }
 
     // ─── Layout Tests ──────────────────────────────────────────
