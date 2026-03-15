@@ -40,3 +40,4 @@ workbench:
 env:
   - CACHE_STORE=array
   - CACHE_DRIVER=array
+  - SESSION_DRIVER=array
