@@ -113,6 +113,13 @@ export interface BlockSchema {
     settings: SettingSchema[];
     blocks?: { type: string; name: string }[];
     presets?: any[];
+    /**
+     * True when this schema comes from an inline local block definition
+     * (has keys beyond `type` in the parent section's blocks array).
+     * Local blocks have no registered Blade view and cannot be previewed
+     * via api.renderBlock().
+     */
+    local?: boolean;
 }
 
 export interface BlockData {

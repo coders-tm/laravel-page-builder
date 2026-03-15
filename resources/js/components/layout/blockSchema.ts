@@ -107,8 +107,9 @@ export function getAddableBlockTypes(
             .filter((b) => b.type !== "@theme") // safety: skip stray @theme entries
             .map((entry) => {
                 if (isLocalBlockEntry(entry)) {
-                    // Local definition — used as-is for the picker.
-                    return entry as unknown as BlockSchema;
+                    // Local definition — used as-is for the picker; mark as local
+                    // so callers (e.g. AddBlockModal) can skip the preview API call.
+                    return { ...(entry as unknown as BlockSchema), local: true };
                 }
                 // Bare theme-block reference — resolve from registry.
                 return (

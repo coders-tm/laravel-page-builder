@@ -193,6 +193,13 @@ export default function AddBlockModal({
             return;
         }
 
+        if (previewBlock.local) {
+            setPreviewHtml("");
+            setPreviewError(null);
+            setIsPreviewLoading(false);
+            return;
+        }
+
         let cancelled = false;
 
         const loadPreview = async () => {
