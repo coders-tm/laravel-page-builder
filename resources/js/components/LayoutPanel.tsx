@@ -450,11 +450,28 @@ export default function LayoutPanel() {
                                         isSelected={
                                             selectedSection === sectionId
                                         }
+                                        selectedBlockPath={
+                                            selectedSection === sectionId
+                                                ? selectedBlockPath
+                                                : []
+                                        }
+                                        themeBlocks={themeBlocks}
                                         onSelect={handleSelectSection}
+                                        onSelectBlock={handleSelectBlock}
                                         onToggleDisabled={
                                             handleToggleSectionDisabled
                                         }
+                                        onRemoveBlock={handleRemoveBlock}
+                                        onDuplicateBlock={handleDuplicateBlock}
+                                        onToggleBlockDisabled={
+                                            handleToggleBlockDisabled
+                                        }
+                                        onAddBlock={handleAddBlock}
+                                        onOpenAddBlockModal={openAddBlockModal}
+                                        onRenameBlock={handleRenameBlock}
                                         onHover={handleHover}
+                                        collapseAllSignal={collapseAllSignal}
+                                        isDraggingGlobal={isDraggingSections}
                                     />
                                 );
                             })}
@@ -617,11 +634,28 @@ export default function LayoutPanel() {
                                         isSelected={
                                             selectedSection === sectionId
                                         }
+                                        selectedBlockPath={
+                                            selectedSection === sectionId
+                                                ? selectedBlockPath
+                                                : []
+                                        }
+                                        themeBlocks={themeBlocks}
                                         onSelect={handleSelectSection}
+                                        onSelectBlock={handleSelectBlock}
                                         onToggleDisabled={
                                             handleToggleSectionDisabled
                                         }
+                                        onRemoveBlock={handleRemoveBlock}
+                                        onDuplicateBlock={handleDuplicateBlock}
+                                        onToggleBlockDisabled={
+                                            handleToggleBlockDisabled
+                                        }
+                                        onAddBlock={handleAddBlock}
+                                        onOpenAddBlockModal={openAddBlockModal}
+                                        onRenameBlock={handleRenameBlock}
                                         onHover={handleHover}
+                                        collapseAllSignal={collapseAllSignal}
+                                        isDraggingGlobal={isDraggingSections}
                                     />
                                 );
                             })}

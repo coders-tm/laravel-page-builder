@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Coderstm\PageBuilder\Registry;
 
+use Coderstm\PageBuilder\Schema\SectionSchema;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
 
@@ -70,6 +71,9 @@ class LayoutParser
      *
      * Each section is initialised with schema-derived default settings so that
      * pages whose JSON has no `layout` key render correctly with the theme defaults.
+     * When the section schema declares presets, `presets[0]` is applied as the
+     * initial settings/blocks so layout sections (header, footer) render with
+     * content on first load rather than as empty shells.
      *
      * `blocks` is stored as an empty array (not stdClass) to avoid type errors
      * when the data flows into Renderer::hydrateBlocks(array $rawBlocks, …).
@@ -82,16 +86,87 @@ class LayoutParser
         $sections = [];
 
         foreach ($keys as $key) {
-            $sections[$key] = [
-                'type' => $key,
-                'disabled' => false,
-            ];
+            $sections[$key] = $this->buildSectionDefaults($key);
         }
 
         return [
             'sections' => $sections,
             'order' => $keys,
         ];
+    }
+
+    /**
+     * Build the default section data for a single layout key.
+     *
+     * Falls back to a bare skeleton when no schema or preset is found.
+     *
+     * @return array<string, mixed>
+     */
+    protected function buildSectionDefaults(string $key): array
+    {
+        $base = [
+            'type' => $key,
+            'disabled' => false,
+        ];
+
+        $meta = $this->sectionRegistry->get($key);
+        $schema = $meta['schema'] ?? null;
+
+        if (! ($schema instanceof SectionSchema) || empty($schema->presets)) {
+            return $base;
+        }
+
+        $preset = $schema->presets[0];
+
+        if (! empty($preset['settings']) && is_array($preset['settings'])) {
+            $base['settings'] = $preset['settings'];
+        }
+
+        if (! empty($preset['blocks']) && is_array($preset['blocks'])) {
+            ['blocks' => $blocks, 'order' => $order] = $this->convertPresetBlocks($preset['blocks']);
+            $base['blocks'] = $blocks;
+            $base['order'] = $order;
+        }
+
+        return $base;
+    }
+
+    /**
+     * Convert a preset blocks list (sequential array) into the keyed-map + order
+     * format used by page JSON and Renderer::hydrateBlocks().
+     *
+     * Nested blocks are converted recursively.
+     *
+     * @param  array<int, array>  $presetBlocks
+     * @return array{blocks: array<string, array>, order: array<string>}
+     */
+    protected function convertPresetBlocks(array $presetBlocks): array
+    {
+        $blocks = [];
+        $order = [];
+        $typeCounts = [];
+
+        foreach ($presetBlocks as $presetBlock) {
+            $type = $presetBlock['type'] ?? 'block';
+            $typeCounts[$type] = ($typeCounts[$type] ?? 0) + 1;
+            $id = $type . '_' . $typeCounts[$type];
+
+            $block = [
+                'type' => $type,
+                'settings' => $presetBlock['settings'] ?? [],
+            ];
+
+            if (! empty($presetBlock['blocks']) && is_array($presetBlock['blocks'])) {
+                ['blocks' => $nested, 'order' => $nestedOrder] = $this->convertPresetBlocks($presetBlock['blocks']);
+                $block['blocks'] = $nested;
+                $block['order'] = $nestedOrder;
+            }
+
+            $blocks[$id] = $block;
+            $order[] = $id;
+        }
+
+        return ['blocks' => $blocks, 'order' => $order];
     }
 
     /**
