@@ -209,8 +209,10 @@ export default function PreviewCanvas() {
 
   /* ── Send inspector state update whenever it changes ─────────────── */
   useEffect(() => {
-    sendMessage({ type: "set-inspector", enabled: inspectorEnabled });
-  }, [inspectorEnabled, sendMessage]);
+    // Hide inspector while dragging to prevent visual clutter and awkward interactions
+    const actuallyEnabled = inspectorEnabled && !isDragging;
+    sendMessage({ type: "set-inspector", enabled: actuallyEnabled });
+  }, [inspectorEnabled, isDragging, sendMessage]);
 
   /* ── Inject Editor JS/CSS into iframe on load ────────────────────── */
   const handleIframeLoad = useCallback(() => {
