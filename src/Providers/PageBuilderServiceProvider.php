@@ -116,10 +116,14 @@ class PageBuilderServiceProvider extends ServiceProvider
         $kernel->pushMiddleware(Middleware\RequestThemeMiddleware::class);
         Route::aliasMiddleware('theme', Middleware\ThemeMiddleware::class);
 
-        // Routes
+        // Public Page routes
+        Route::middleware(['web'])->group(function () {
+            Facades\Page::routes();
+        });
+
+        // Page builder routes
         Route::middleware(config('pagebuilder.middleware', ['web']))
             ->group(function () {
-                Facades\Page::routes();
                 $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
             });
 
