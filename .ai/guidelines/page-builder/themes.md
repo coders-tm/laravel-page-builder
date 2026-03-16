@@ -15,7 +15,7 @@ themes/
 └── my-theme/
     ├── views/
     │   ├── layouts/
-    │   │   └── app.blade.php          # Master layout (header, main, footer)
+    │   │   └── page.blade.php          # Master layout (header, main, footer)
     │   ├── sections/                  # Theme sections (override or extend built-ins)
     │   │   ├── hero.blade.php
     │   │   ├── features.blade.php
@@ -30,7 +30,7 @@ themes/
     │   └── pages/                     # Page JSON files
     │       ├── home.json
     │       └── about.json
-    └── public/
+    └── assets/
         ├── css/
         │   └── theme.css
         └── js/
@@ -56,12 +56,12 @@ The Page Builder reads the active theme from this config and registers its secti
 
 ---
 
-## Master Layout (`layouts/app.blade.php`)
+## Master Layout (`layouts/page.blade.php`)
 
 The master layout integrates layout sections (header/footer) and yields the page content area:
 
 ```blade
-{{-- themes/my-theme/views/layouts/app.blade.php --}}
+{{-- themes/my-theme/views/layouts/page.blade.php --}}
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @pbEditorClass>
@@ -349,7 +349,7 @@ Page JSON files live at `themes/{name}/views/pages/{slug}.json` (or `resources/v
 
 ## Theme Development Checklist
 
-- [ ] Create `themes/{name}/views/layouts/app.blade.php` with `@sections('header')` and `@sections('footer')`
+- [ ] Create `themes/{name}/views/layouts/page.blade.php` with `@sections('header')` and `@sections('footer')`
 - [ ] Add `@pbEditorClass` to `<html>` tag
 - [ ] Create sections in `themes/{name}/views/sections/` with `@schema()` directives
 - [ ] Create blocks in `themes/{name}/views/blocks/` with `@schema()` directives

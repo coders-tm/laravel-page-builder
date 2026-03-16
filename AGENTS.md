@@ -112,7 +112,7 @@ Theme files shadow the built-in package files. Last registration wins.
 
 ```
 themes/my-theme/views/
-├── layouts/app.blade.php     # Master layout with @sections('header'), @yield('content'), @sections('footer')
+├── layouts/page.blade.php     # Master layout with @sections('header'), @yield('content'), @sections('footer')
 ├── sections/                 # Theme-specific sections
 └── blocks/                   # Theme-specific blocks
 ```
