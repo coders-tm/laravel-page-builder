@@ -59,9 +59,9 @@ This single command:
 
 **Options**
 
-| Flag | Description |
-| --- | --- |
-| `--force` | Overwrite files that already exist |
+| Flag        | Description                                            |
+| ----------- | ------------------------------------------------------ |
+| `--force`   | Overwrite files that already exist                     |
 | `--migrate` | Run `php artisan migrate` immediately after publishing |
 
 ```bash
@@ -73,12 +73,6 @@ php artisan pagebuilder:install --force --migrate
 
 ```bash
 php artisan migrate
-```
-
-### Build the section & block registry
-
-```bash
-php artisan page-builder:regenerate
 ```
 
 ### Configuration reference
@@ -745,7 +739,7 @@ Render layout sections in your Blade layout file using `@sections()`:
     <title>
         {{ $meta_title ?? ($title ?? '') . ' | ' . config('app.name') }}
     </title>
-    
+
     <!-- Fonts and Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -859,14 +853,14 @@ Route::get('/shop/{theme_slug}', function () {
 
 ## Artisan Commands
 
-| Command | Description |
-| --- | --- |
-| `pagebuilder:install` | Publish config, migrations, assets, and scaffold starter views |
-| `pagebuilder:install --force` | Same as above, overwriting any existing files |
-| `pagebuilder:install --migrate` | Also run `php artisan migrate` after publishing |
-| `pages:regenerate` | Rebuild the page registry cache (run after adding/removing page JSON files) |
-| `theme:link` | Symlink theme asset directories into `public/themes/` |
-| `theme:link --force` | Overwrite existing symlinks |
+| Command                         | Description                                                                 |
+| ------------------------------- | --------------------------------------------------------------------------- |
+| `pagebuilder:install`           | Publish config, migrations, assets, and scaffold starter views              |
+| `pagebuilder:install --force`   | Same as above, overwriting any existing files                               |
+| `pagebuilder:install --migrate` | Also run `php artisan migrate` after publishing                             |
+| `pages:regenerate`              | Rebuild the page registry cache (run after adding/removing page JSON files) |
+| `theme:link`                    | Symlink theme asset directories into `public/themes/`                       |
+| `theme:link --force`            | Overwrite existing symlinks                                                 |
 
 ---
 

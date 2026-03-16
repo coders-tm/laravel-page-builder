@@ -43,13 +43,13 @@ Dependencies flow **downward only**. Never import from a higher layer.
 Schema → Registry → Components → Rendering → Services/Controllers
 ```
 
-| Layer | Directory | Rule |
-|---|---|---|
-| Schema | `src/Schema/` | Immutable `readonly` value objects — never mutated |
-| Registry | `src/Registry/` | Singleton scanners — `SectionRegistry`, `BlockRegistry` |
-| Components | `src/Components/`, `src/Collections/` | Hydrated by `Renderer` only — never `new Section()` |
-| Rendering | `src/Rendering/` | `Renderer` is the single entry point for all HTML output |
-| Services | `src/Services/` | Orchestrators — call `Renderer`, `PageStorage`, etc. |
+| Layer      | Directory                             | Rule                                                     |
+| ---------- | ------------------------------------- | -------------------------------------------------------- |
+| Schema     | `src/Schema/`                         | Immutable `readonly` value objects — never mutated       |
+| Registry   | `src/Registry/`                       | Singleton scanners — `SectionRegistry`, `BlockRegistry`  |
+| Components | `src/Components/`, `src/Collections/` | Hydrated by `Renderer` only — never `new Section()`      |
+| Rendering  | `src/Rendering/`                      | `Renderer` is the single entry point for all HTML output |
+| Services   | `src/Services/`                       | Orchestrators — call `Renderer`, `PageStorage`, etc.     |
 
 ---
 
@@ -61,7 +61,6 @@ Schema → Registry → Components → Rendering → Services/Controllers
 2. Start with `@schema([...])` — include `name`, `settings`, `blocks`, `presets`.
 3. Use `$section->settings->key` for values; add `{!! $section->editorAttributes() !!}` to the root element.
 4. Use `@blocks($section)` if the section accepts blocks.
-5. Run `php artisan page-builder:regenerate` to update the registry cache.
 
 ```blade
 @schema([
@@ -123,11 +122,11 @@ Schema → Registry → Components → Rendering → Services/Controllers
 
 In a section's `@schema()` `blocks` array:
 
-| Entry | Detected as | Resolved via |
-|---|---|---|
-| `['type' => 'row']` — only `type` key | Theme reference | `BlockRegistry::get('row')` |
-| `['type' => '@theme']` | Wildcard — any theme block | `BlockRegistry::all()` |
-| `['type' => 'item', 'name' => '...']` — extra keys | Local definition | Used as-is; no registry lookup |
+| Entry                                              | Detected as                | Resolved via                   |
+| -------------------------------------------------- | -------------------------- | ------------------------------ |
+| `['type' => 'row']` — only `type` key              | Theme reference            | `BlockRegistry::get('row')`    |
+| `['type' => '@theme']`                             | Wildcard — any theme block | `BlockRegistry::all()`         |
+| `['type' => 'item', 'name' => '...']` — extra keys | Local definition           | Used as-is; no registry lookup |
 
 **Never add** `name` or `settings` to a bare reference — it changes the lookup behaviour.
 
@@ -135,17 +134,17 @@ In a section's `@schema()` `blocks` array:
 
 ## Do / Don't
 
-| Do | Don't |
-|---|---|
-| Inject `Renderer` via constructor | Instantiate `new Renderer()` |
-| Call `SectionRegistry::get('type')` | Scan Blade files yourself |
-| Use `$section->settings->key` | Access `$section->settings['key']` directly |
-| Use `@blocks($section\|$block)` | Call `$renderer->renderBlocks(...)` from Blade |
-| Emit events in managers | Patch preview directly from components |
-| Use `useEditorInstance()` for editor state | Thread props through component trees |
-| Use Zustand `useStore` actions for mutations | Mutate store state directly |
-| Write `final class` for value objects | Leave value objects open for extension |
-| Keep layer dependencies downward | Import a Service from a Schema class |
+| Do                                           | Don't                                          |
+| -------------------------------------------- | ---------------------------------------------- |
+| Inject `Renderer` via constructor            | Instantiate `new Renderer()`                   |
+| Call `SectionRegistry::get('type')`          | Scan Blade files yourself                      |
+| Use `$section->settings->key`                | Access `$section->settings['key']` directly    |
+| Use `@blocks($section\|$block)`              | Call `$renderer->renderBlocks(...)` from Blade |
+| Emit events in managers                      | Patch preview directly from components         |
+| Use `useEditorInstance()` for editor state   | Thread props through component trees           |
+| Use Zustand `useStore` actions for mutations | Mutate store state directly                    |
+| Write `final class` for value objects        | Leave value objects open for extension         |
+| Keep layer dependencies downward             | Import a Service from a Schema class           |
 
 ---
 
@@ -239,10 +238,10 @@ final class SectionSchema implements Arrayable
 
 ## Deep Reference
 
-| Topic | File |
-|---|---|
-| Five-layer architecture, DI rules, HTTP routes | [core.md](.ai/guidelines/page-builder/core.md) |
-| Page JSON structure and field reference | [layouts.md](.ai/guidelines/page-builder/layouts.md) |
-| Sections, setting types, schema API | [sections.md](.ai/guidelines/page-builder/sections.md) |
-| Blocks, nesting, containers, BlockRegistry | [blocks.md](.ai/guidelines/page-builder/blocks.md) |
-| Themes, master layout, shadowing, assets | [themes.md](.ai/guidelines/page-builder/themes.md) |
+| Topic                                          | File                                                   |
+| ---------------------------------------------- | ------------------------------------------------------ |
+| Five-layer architecture, DI rules, HTTP routes | [core.md](.ai/guidelines/page-builder/core.md)         |
+| Page JSON structure and field reference        | [layouts.md](.ai/guidelines/page-builder/layouts.md)   |
+| Sections, setting types, schema API            | [sections.md](.ai/guidelines/page-builder/sections.md) |
+| Blocks, nesting, containers, BlockRegistry     | [blocks.md](.ai/guidelines/page-builder/blocks.md)     |
+| Themes, master layout, shadowing, assets       | [themes.md](.ai/guidelines/page-builder/themes.md)     |

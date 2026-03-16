@@ -21,15 +21,16 @@ Schema → Registry → Components (Runtime) → Rendering → Services/Controll
 
 ### Layer 1 — Schema (`src/Schema/`)
 
-**Purpose:** Immutable value objects that describe what a section or block *can* look like.
+**Purpose:** Immutable value objects that describe what a section or block _can_ look like.
 
-| Class | Responsibility |
-|---|---|
-| `SectionSchema` | Defines a section: name, settings, allowed blocks, presets, limits |
-| `BlockSchema` | Defines a block: type, name, settings, allowed child blocks, presets |
-| `SettingSchema` | Defines one setting: id, type, label, default value, options |
+| Class           | Responsibility                                                       |
+| --------------- | -------------------------------------------------------------------- |
+| `SectionSchema` | Defines a section: name, settings, allowed blocks, presets, limits   |
+| `BlockSchema`   | Defines a block: type, name, settings, allowed child blocks, presets |
+| `SettingSchema` | Defines one setting: id, type, label, default value, options         |
 
 Rules:
+
 - All properties are `readonly`.
 - Schema objects are **never mutated** after construction.
 - Constructed from raw arrays extracted from Blade `@schema()` directives.
@@ -38,14 +39,15 @@ Rules:
 
 **Purpose:** Discovers, stores, and provides typed schema objects.
 
-| Class | Responsibility |
-|---|---|
-| `SectionRegistry` | Scans `resources/views/sections/`, registers `SectionSchema` objects |
-| `BlockRegistry` | Scans `resources/views/blocks/`, registers `BlockSchema` objects |
+| Class             | Responsibility                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| `SectionRegistry` | Scans `resources/views/sections/`, registers `SectionSchema` objects                  |
+| `BlockRegistry`   | Scans `resources/views/blocks/`, registers `BlockSchema` objects                      |
 | `SchemaExtractor` | Parses `@schema([...])` directives from Blade files using balanced-bracket extraction |
-| `LayoutParser` | Reads default layout zones (header/footer) from layout Blade |
+| `LayoutParser`    | Reads default layout zones (header/footer) from layout Blade                          |
 
 Rules:
+
 - Registries are singletons, lazy-loaded from Blade file scanning.
 - **Last registration wins** — themes can shadow built-in schemas.
 - `SectionRegistry::get('hero')` → returns `SectionSchema`.
@@ -55,15 +57,16 @@ Rules:
 
 **Purpose:** Runtime instances hydrated from page JSON using schema defaults.
 
-| Class | Responsibility |
-|---|---|
-| `Section` | Runtime section: `id`, `type`, `settings`, `blocks`, `editorAttributes()` |
-| `Block` | Runtime block: `id`, `type`, `settings`, `blocks` (nested), `editorAttributes()` |
-| `Settings` | Schema-aware settings bag with magic `__get`, `ArrayAccess`, default resolution |
-| `BlockCollection` | Ordered, iterable collection of `Block` instances |
-| `SectionCollection` | Ordered collection of `Section` instances with `render()` and `enabled()` |
+| Class               | Responsibility                                                                   |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `Section`           | Runtime section: `id`, `type`, `settings`, `blocks`, `editorAttributes()`        |
+| `Block`             | Runtime block: `id`, `type`, `settings`, `blocks` (nested), `editorAttributes()` |
+| `Settings`          | Schema-aware settings bag with magic `__get`, `ArrayAccess`, default resolution  |
+| `BlockCollection`   | Ordered, iterable collection of `Block` instances                                |
+| `SectionCollection` | Ordered collection of `Section` instances with `render()` and `enabled()`        |
 
 Rules:
+
 - Components are hydrated by `Renderer`, never instantiated directly.
 - `Settings` resolves defaults from schema when a key has no stored value.
 - `Block` always has a `BlockCollection $blocks` — leaf blocks have an empty one.
@@ -72,13 +75,14 @@ Rules:
 
 **Purpose:** Converts runtime objects into HTML via Blade views.
 
-| Class | Key Methods |
-|---|---|
-| `Renderer` | `renderSection`, `renderBlock`, `renderBlocks`, `renderBlockChildren`, `hydrateSection`, `hydrateBlock` |
-| `EditorAttributes` | `forSection`, `forBlock`, `autoInjectLiveText` |
-| `BladeDirectives` | Registers `@blocks`, `@schema`, `@sections`, `@pbEditorClass` |
+| Class              | Key Methods                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| `Renderer`         | `renderSection`, `renderBlock`, `renderBlocks`, `renderBlockChildren`, `hydrateSection`, `hydrateBlock` |
+| `EditorAttributes` | `forSection`, `forBlock`, `autoInjectLiveText`                                                          |
+| `BladeDirectives`  | Registers `@blocks`, `@schema`, `@sections`, `@pbEditorClass`                                           |
 
 Rules:
+
 - ALL rendering goes through `Renderer` — never render sections or blocks directly from views.
 - In editor mode, `autoInjectLiveText` injects `data-live-text-setting` on string settings automatically.
 - `@blocks($section)` → renders all top-level blocks; `@blocks($block)` → renders nested child blocks.
@@ -87,14 +91,14 @@ Rules:
 
 **Purpose:** High-level orchestrators for page loading, rendering, and persistence.
 
-| Class | Responsibility |
-|---|---|
-| `PageRenderer` | Loads page JSON → hydrates all sections → renders complete HTML |
-| `PageStorage` | JSON file I/O for page data (reads/writes from `config('pagebuilder.pages')`) |
-| `PageRegistry` | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`) |
-| `PageService` | Route registration + DB page model lookup |
-| `ThemeSettings` | Global theme settings persistence (JSON file) |
-| `Theme` | Active theme management wrapper |
+| Class           | Responsibility                                                                |
+| --------------- | ----------------------------------------------------------------------------- |
+| `PageRenderer`  | Loads page JSON → hydrates all sections → renders complete HTML               |
+| `PageStorage`   | JSON file I/O for page data (reads/writes from `config('pagebuilder.pages')`) |
+| `PageRegistry`  | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                |
+| `PageService`   | Route registration + DB page model lookup                                     |
+| `ThemeSettings` | Global theme settings persistence (JSON file)                                 |
+| `Theme`         | Active theme management wrapper                                               |
 
 ---
 
@@ -159,7 +163,7 @@ return [
 ## Artisan Commands
 
 ```bash
-php artisan page-builder:regenerate   # Regenerate the page registry cache
+php artisan pages:regenerate   # Regenerate the page registry cache
 php artisan theme:link                # Symlink theme public assets
 ```
 
@@ -167,19 +171,19 @@ php artisan theme:link                # Symlink theme public assets
 
 ## HTTP Routes
 
-| Method | URI | Controller | Purpose |
-|---|---|---|---|
-| GET | `/pagebuilder/{slug?}` | `PageBuilderController@editor` | Load React editor SPA |
-| GET | `/pagebuilder/pages` | `PageBuilderController` | List all pages |
-| GET | `/pagebuilder/page/{slug}` | `PageBuilderController` | Get page JSON + default layout |
-| POST | `/pagebuilder/render-section` | `PageBuilderController` | Live preview section render |
-| POST | `/pagebuilder/render-block` | `PageBuilderController` | Live preview block render |
-| POST | `/pagebuilder/save-page` | `PageBuilderController` | Persist page JSON |
-| GET | `/pagebuilder/theme-settings` | `PageBuilderController` | Read theme settings |
-| POST | `/pagebuilder/theme-settings` | `PageBuilderController` | Save theme settings |
-| GET | `/pagebuilder/assets` | `AssetController` | List media library |
-| POST | `/pagebuilder/assets/upload` | `AssetController` | Upload media asset |
-| GET | `/{slug}` | `WebPageController@pages` | Render published page |
+| Method | URI                           | Controller                     | Purpose                        |
+| ------ | ----------------------------- | ------------------------------ | ------------------------------ |
+| GET    | `/pagebuilder/{slug?}`        | `PageBuilderController@editor` | Load React editor SPA          |
+| GET    | `/pagebuilder/pages`          | `PageBuilderController`        | List all pages                 |
+| GET    | `/pagebuilder/page/{slug}`    | `PageBuilderController`        | Get page JSON + default layout |
+| POST   | `/pagebuilder/render-section` | `PageBuilderController`        | Live preview section render    |
+| POST   | `/pagebuilder/render-block`   | `PageBuilderController`        | Live preview block render      |
+| POST   | `/pagebuilder/save-page`      | `PageBuilderController`        | Persist page JSON              |
+| GET    | `/pagebuilder/theme-settings` | `PageBuilderController`        | Read theme settings            |
+| POST   | `/pagebuilder/theme-settings` | `PageBuilderController`        | Save theme settings            |
+| GET    | `/pagebuilder/assets`         | `AssetController`              | List media library             |
+| POST   | `/pagebuilder/assets/upload`  | `AssetController`              | Upload media asset             |
+| GET    | `/{slug}`                     | `WebPageController@pages`      | Render published page          |
 
 ---
 

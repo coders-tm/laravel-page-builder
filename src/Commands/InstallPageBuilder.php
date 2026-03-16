@@ -50,7 +50,6 @@ class InstallPageBuilder extends Command
         $this->line('  <fg=gray>Next steps:</>');
         $this->line('  1. Review <fg=cyan>config/pagebuilder.php</> and update paths if needed.');
         $this->line('  2. Run <fg=cyan>php artisan migrate</> if you have not already.');
-        $this->line('  3. Run <fg=cyan>php artisan page-builder:regenerate</> to build the section/block registry.');
         $this->newLine();
 
         return self::SUCCESS;

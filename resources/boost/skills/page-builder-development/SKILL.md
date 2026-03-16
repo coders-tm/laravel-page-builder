@@ -28,7 +28,7 @@ Five layers — dependencies flow downward only:
 - **Facades**: `Section::get('hero')`, `Block::get('row')`, `Page::findBySlug('home')`, `Theme::active()`
 - **Config**: See `config/pagebuilder.php` for `pages`, `sections`, `blocks`, `disk`, and `theme_settings_schema`
 - **Helpers**: `pb_editor()` — bool editor mode; `theme()` — active theme name; `theme_vite()` — Vite loader
-- **Artisan**: `php artisan page-builder:regenerate` to rebuild the page registry cache
+- **Artisan**: `php artisan pages:regenerate` to rebuild the page registry cache
 - **Routes**: All editor API endpoints are under `/pagebuilder/*`; published pages are served at `/{slug}`
 
 ## Blade Directives
@@ -129,16 +129,16 @@ A bare `{ type: 'row' }` entry in a section's `blocks` array is a theme registry
 
 ## Key API Endpoints
 
-| Purpose                  | Method | Endpoint                             |
-|--------------------------|--------|--------------------------------------|
-| Load editor SPA          | GET    | `/pagebuilder/{slug?}`               |
-| List all pages           | GET    | `/pagebuilder/pages`                 |
-| Get page JSON + layout   | GET    | `/pagebuilder/page/{slug}`           |
-| Render section (preview) | POST   | `/pagebuilder/render-section`        |
-| Render block (preview)   | POST   | `/pagebuilder/render-block`          |
-| Save page JSON           | POST   | `/pagebuilder/save-page`             |
-| Get theme settings       | GET    | `/pagebuilder/theme-settings`        |
-| Save theme settings      | POST   | `/pagebuilder/theme-settings`        |
-| List assets              | GET    | `/pagebuilder/assets`                |
-| Upload asset             | POST   | `/pagebuilder/assets/upload`         |
-| Render published page    | GET    | `/{slug}`                            |
+| Purpose                  | Method | Endpoint                      |
+| ------------------------ | ------ | ----------------------------- |
+| Load editor SPA          | GET    | `/pagebuilder/{slug?}`        |
+| List all pages           | GET    | `/pagebuilder/pages`          |
+| Get page JSON + layout   | GET    | `/pagebuilder/page/{slug}`    |
+| Render section (preview) | POST   | `/pagebuilder/render-section` |
+| Render block (preview)   | POST   | `/pagebuilder/render-block`   |
+| Save page JSON           | POST   | `/pagebuilder/save-page`      |
+| Get theme settings       | GET    | `/pagebuilder/theme-settings` |
+| Save theme settings      | POST   | `/pagebuilder/theme-settings` |
+| List assets              | GET    | `/pagebuilder/assets`         |
+| Upload asset             | POST   | `/pagebuilder/assets/upload`  |
+| Render published page    | GET    | `/{slug}`                     |
