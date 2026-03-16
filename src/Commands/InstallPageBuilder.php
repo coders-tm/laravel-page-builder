@@ -35,8 +35,6 @@ class InstallPageBuilder extends Command
         $this->components->info('Installing Page Builder...');
 
         $this->publishConfig($force);
-        $this->publishMigrations($force);
-        $this->publishAssets($force);
         $this->scaffoldThemeViews($force);
 
         if ($this->option('migrate')) {
@@ -69,19 +67,6 @@ class InstallPageBuilder extends Command
     }
 
     /**
-     * Publish the package migrations.
-     */
-    private function publishMigrations(bool $force): void
-    {
-        $this->components->task('Publishing migrations', function () use ($force) {
-            $this->callSilently('vendor:publish', [
-                '--tag' => 'pagebuilder-migrations',
-                '--force' => $force,
-            ]);
-        });
-    }
-
-    /**
      * Publish the compiled frontend assets.
      */
     private function publishAssets(bool $force): void
@@ -105,6 +90,7 @@ class InstallPageBuilder extends Command
             'layouts' => resource_path('views/layouts'),
             'sections' => resource_path('views/sections'),
             'blocks' => resource_path('views/blocks'),
+            'templates' => resource_path('views/templates'),
         ];
 
         foreach ($targets as $dir => $destination) {
