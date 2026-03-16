@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2026-03-16
+
+### Added
+
+- `PageBuilder::usePageModel()` method for custom page model support
+- Template fallback support in `PageService` for rendering pages when JSON is missing
+- Automatic sharing of `$page` model with all views rendered via `PageService`
+
+### Changed
+
+- Enhanced page meta resolution priority in `PageService` (Arg → DB → JSON)
+
+### Refactored
+
+- Renamed master layout file from `app.blade.php` to `page.blade.php`
+
 ## [1.0.8] - 2026-03-16
 
 ### Added
