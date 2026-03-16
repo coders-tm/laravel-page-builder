@@ -13,6 +13,7 @@ This directory contains structured guidelines for AI agents (Cursor, Claude Code
 | [sections.md](sections.md) | Section Blade files, `@schema()` directive, setting types, blocks array, SectionRegistry |
 | [blocks.md](blocks.md) | Block Blade files, nesting, `@blocks()` directive, theme vs local blocks, BlockRegistry |
 | [themes.md](themes.md) | Theme directory layout, master Blade layout, theme shadowing, assets, naming conventions |
+| [templates.md](templates.md) | JSON templates, wrapper property, variable interpolation, theme override, `TemplateStorage` |
 
 ---
 
@@ -47,6 +48,24 @@ This directory contains structured guidelines for AI agents (Cursor, Claude Code
         }
     },
     "order": ["unique-id"]
+}
+```
+
+### Create a template
+
+1. Create `resources/views/templates/{name}.json`
+2. Declare `sections`, `order`, optional `layout` (string or `false`), optional `wrapper`
+3. Use `{{ $page->title }}` in settings values to interpolate page model attributes
+4. Assign the template to a page via `Page::$template = 'name'`
+
+```json
+{
+    "layout":  "page",
+    "wrapper": "main#content",
+    "sections": {
+        "main": { "type": "page-content" }
+    },
+    "order": ["main"]
 }
 ```
 
@@ -102,9 +121,12 @@ Lower layers never import from higher layers. All services are constructor-injec
 | `Section` | `src/Components/Section.php` | Runtime section instance |
 | `Block` | `src/Components/Block.php` | Runtime block instance |
 | `Settings` | `src/Components/Settings.php` | Schema-aware settings bag |
-| `PageData` | `src/Support/PageData.php` | Immutable page JSON value object |
+| `PageData` | `src/Support/PageData.php` | Immutable page JSON value object (includes `wrapper`) |
 | `PageStorage` | `src/Services/PageStorage.php` | Page JSON file I/O |
-| `PageRenderer` | `src/Services/PageRenderer.php` | Full-page render orchestrator |
+| `PageRenderer` | `src/Services/PageRenderer.php` | Full-page render orchestrator (applies wrapper) |
+| `TemplateStorage` | `src/Services/TemplateStorage.php` | Template JSON file I/O (theme-aware) |
+| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php` | Resolves `{{ $page->attr }}` in template data |
+| `WrapperParser` | `src/Support/WrapperParser.php` | Parses CSS-selector wrapper strings into HTML |
 
 ---
 

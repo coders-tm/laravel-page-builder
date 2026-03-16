@@ -95,6 +95,33 @@ Schema → Registry → Components → Rendering → Services/Controllers
 </div>
 ```
 
+### Add a new template
+
+1. Create `resources/views/templates/{name}.json`.
+2. Declare `sections` and `order` (required). Optionally add `layout` and `wrapper`.
+3. Use `{{ $page->attribute }}` in any settings value to interpolate the page model.
+4. Assign the template to a page via `$page->template = 'name'`.
+
+```json
+{
+    "layout": "page",
+    "wrapper": "main#page-main.container",
+    "sections": {
+        "hero": {
+            "type": "hero",
+            "settings": { "title": "{{ $page->title }}" }
+        },
+        "main": { "type": "page-content" }
+    },
+    "order": ["hero", "main"]
+}
+```
+
+Rules:
+- Template name must match the filename without `.json` (e.g. `page.alternate` → `page.alternate.json`).
+- A template is only consulted when `pages/{slug}.json` and `pages/{slug}.blade.php` both do not exist.
+- To override a template per-theme, place `views/templates/{name}.json` inside the theme directory.
+
 ### Add a new setting type
 
 - Add the field component under `resources/js/components/settings/`.
@@ -169,6 +196,7 @@ return [
     'pages'                 => resource_path('views/pages'),
     'sections'              => resource_path('views/sections'),
     'blocks'                => resource_path('views/blocks'),
+    'templates'             => resource_path('views/templates'),
     'middleware'            => ['web'],
     'disk'                  => 'public',
     'asset_directory'       => 'pagebuilder',
@@ -238,10 +266,11 @@ final class SectionSchema implements Arrayable
 
 ## Deep Reference
 
-| Topic                                          | File                                                   |
-| ---------------------------------------------- | ------------------------------------------------------ |
-| Five-layer architecture, DI rules, HTTP routes | [core.md](.ai/guidelines/page-builder/core.md)         |
-| Page JSON structure and field reference        | [layouts.md](.ai/guidelines/page-builder/layouts.md)   |
-| Sections, setting types, schema API            | [sections.md](.ai/guidelines/page-builder/sections.md) |
-| Blocks, nesting, containers, BlockRegistry     | [blocks.md](.ai/guidelines/page-builder/blocks.md)     |
-| Themes, master layout, shadowing, assets       | [themes.md](.ai/guidelines/page-builder/themes.md)     |
+| Topic                                          | File                                                       |
+| ---------------------------------------------- | ---------------------------------------------------------- |
+| Five-layer architecture, DI rules, HTTP routes | [core.md](.ai/guidelines/page-builder/core.md)             |
+| Page JSON structure and field reference        | [layouts.md](.ai/guidelines/page-builder/layouts.md)       |
+| Sections, setting types, schema API            | [sections.md](.ai/guidelines/page-builder/sections.md)     |
+| Blocks, nesting, containers, BlockRegistry     | [blocks.md](.ai/guidelines/page-builder/blocks.md)         |
+| Themes, master layout, shadowing, assets       | [themes.md](.ai/guidelines/page-builder/themes.md)         |
+| Templates, wrapper, variable interpolation     | [templates.md](.ai/guidelines/page-builder/templates.md)   |

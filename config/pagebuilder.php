@@ -21,6 +21,9 @@ return [
     // Path to the theme blocks directory (Blade block templates)
     'blocks' => resource_path('views/blocks'),
 
+    // Path to the templates directory (JSON template files)
+    'templates' => resource_path('views/templates'),
+
     /*
     |--------------------------------------------------------------------------
     | Middleware

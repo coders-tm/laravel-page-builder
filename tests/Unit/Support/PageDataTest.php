@@ -390,4 +390,63 @@ class PageDataTest extends TestCase
         $this->assertArrayHasKey('nav-row', $header['blocks']);
         $this->assertSame(['nav-row'], $header['order']);
     }
+
+    // ── wrapper ───────────────────────────────────────────────────────────────
+
+    public function test_wrapper_defaults_to_null(): void
+    {
+        $data = PageData::fromArray($this->sampleData());
+
+        $this->assertNull($data->wrapper());
+    }
+
+    public function test_from_array_reads_wrapper(): void
+    {
+        $data = PageData::fromArray([
+            ...$this->sampleData(),
+            'wrapper' => 'main#content.container',
+        ]);
+
+        $this->assertSame('main#content.container', $data->wrapper());
+    }
+
+    public function test_from_array_ignores_empty_wrapper_string(): void
+    {
+        $data = PageData::fromArray([
+            ...$this->sampleData(),
+            'wrapper' => '',
+        ]);
+
+        $this->assertNull($data->wrapper());
+    }
+
+    public function test_from_array_ignores_non_string_wrapper(): void
+    {
+        $data = PageData::fromArray([
+            ...$this->sampleData(),
+            'wrapper' => 123,
+        ]);
+
+        $this->assertNull($data->wrapper());
+    }
+
+    public function test_to_array_includes_wrapper_when_set(): void
+    {
+        $data = PageData::fromArray([
+            ...$this->sampleData(),
+            'wrapper' => 'div#main',
+        ]);
+
+        $array = $data->toArray();
+        $this->assertArrayHasKey('wrapper', $array);
+        $this->assertSame('div#main', $array['wrapper']);
+    }
+
+    public function test_to_array_omits_wrapper_when_null(): void
+    {
+        $data = PageData::fromArray($this->sampleData());
+
+        $array = $data->toArray();
+        $this->assertArrayNotHasKey('wrapper', $array);
+    }
 }

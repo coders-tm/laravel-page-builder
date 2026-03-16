@@ -1,0 +1,11 @@
+{
+    "wrapper": "main#page-alternate.page-wrapper",
+    "sections": {
+        "main": {
+            "type": "page-content"
+        }
+    },
+    "order": [
+        "main"
+    ]
+}

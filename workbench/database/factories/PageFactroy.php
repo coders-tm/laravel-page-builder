@@ -3,6 +3,7 @@
 namespace Workbench\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Workbench\App\Models\Page;
 
 /**
  * @template TModel of \Workbench\App\Models\Page
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PageFactroy extends Factory
 {
-    protected $model = \Workbench\App\Models\Page::class;
+    protected $model = Page::class;
 
     /**
      * Define the model's default state.
@@ -29,10 +30,8 @@ class PageFactroy extends Factory
     }
 
     /**
-    * Indicate that the page is inactive.
-    *
-    * @return static
-    */
+     * Indicate that the page is inactive.
+     */
     public function inactive(): static
     {
         return $this->state(fn (array $attributes) => [

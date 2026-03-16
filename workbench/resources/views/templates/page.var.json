@@ -1,0 +1,13 @@
+{
+    "sections": {
+        "title-banner": {
+            "type": "banner",
+            "settings": {
+                "text": "{{ $page->title }}"
+            }
+        }
+    },
+    "order": [
+        "title-banner"
+    ]
+}

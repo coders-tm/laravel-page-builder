@@ -8,6 +8,7 @@ use Coderstm\PageBuilder\Http\Controllers\WebPageController;
 use Coderstm\PageBuilder\PageBuilder;
 use Coderstm\PageBuilder\Registry\LayoutParser;
 use Coderstm\PageBuilder\Support\PageData;
+use Coderstm\PageBuilder\Support\TemplateVariableResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
@@ -19,6 +20,8 @@ class PageService
         protected readonly PageStorage $pageStorage,
         protected readonly LayoutParser $layoutParser,
         protected readonly EditorPreviewShell $editorPreviewShell,
+        protected readonly TemplateStorage $templateStorage,
+        protected readonly TemplateVariableResolver $variableResolver,
     ) {}
 
     /**
@@ -82,8 +85,83 @@ class PageService
             ]);
         }
 
-        // ── 4. Nothing found ──────────────────────────────────────────────
+        // ── 4. Template fallback ──────────────────────────────────────────
+        $templateData = $this->resolveTemplate($dbPage);
+
+        if ($templateData !== null) {
+            $resolvedData = $this->variableResolver->resolve($templateData, $dbPage);
+            $templateLayout = $this->resolveTemplateLayout($resolvedData);
+            $page = $this->buildPageFromTemplate($resolvedData, $templateLayout, $dbPage);
+
+            return view('pagebuilder::page', [
+                ...$this->pageMeta($dbPage, $page, $meta),
+                'slug' => $slug,
+                '__pb_content' => $this->pageRenderer->renderPage($page),
+                '__pb_layout' => $page,
+            ]);
+        }
+
+        // ── 5. Nothing found ──────────────────────────────────────────────
         abort(404);
+    }
+
+    /**
+     * Resolve template data for the given DB page.
+     *
+     * Tries the page's own template first; falls back to the default "page"
+     * template. Returns null when neither template file exists.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function resolveTemplate(mixed $dbPage): ?array
+    {
+        $templateName = (string) ($dbPage?->template ?? '');
+        $templateName = $templateName !== '' ? $templateName : 'page';
+
+        $data = $this->templateStorage->load($templateName);
+
+        // If a specific template was requested but not found, try the default.
+        if ($data === null && $templateName !== 'page') {
+            $data = $this->templateStorage->load('page');
+        }
+
+        return $data;
+    }
+
+    /**
+     * Determine the default layout array for a template's layout declaration.
+     *
+     * @param  array<string, mixed>  $templateData
+     * @return array<string, mixed>
+     */
+    private function resolveTemplateLayout(array $templateData): array
+    {
+        $layout = $templateData['layout'] ?? 'page';
+
+        // layout: false → render without any layout zones
+        if ($layout === false) {
+            return [];
+        }
+
+        $layoutType = is_string($layout) && $layout !== '' ? $layout : 'page';
+
+        return $this->layoutParser->defaultLayout($layoutType);
+    }
+
+    /**
+     * Build a PageData instance from template JSON data.
+     *
+     * @param  array<string, mixed>  $templateData  Resolved (variable-substituted) template data
+     * @param  array<string, mixed>  $defaultLayout
+     */
+    private function buildPageFromTemplate(array $templateData, array $defaultLayout, mixed $dbPage): PageData
+    {
+        return PageData::fromArray([
+            'sections' => $templateData['sections'] ?? [],
+            'order' => $templateData['order'] ?? [],
+            'wrapper' => $templateData['wrapper'] ?? null,
+            'title' => $dbPage?->title ?? '',
+        ], $defaultLayout);
     }
 
     /**

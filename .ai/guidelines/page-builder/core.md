@@ -91,14 +91,17 @@ Rules:
 
 **Purpose:** High-level orchestrators for page loading, rendering, and persistence.
 
-| Class           | Responsibility                                                                |
-| --------------- | ----------------------------------------------------------------------------- |
-| `PageRenderer`  | Loads page JSON → hydrates all sections → renders complete HTML               |
-| `PageStorage`   | JSON file I/O for page data (reads/writes from `config('pagebuilder.pages')`) |
-| `PageRegistry`  | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                |
-| `PageService`   | Route registration + DB page model lookup                                     |
-| `ThemeSettings` | Global theme settings persistence (JSON file)                                 |
-| `Theme`         | Active theme management wrapper                                               |
+| Class                     | Responsibility                                                                |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `PageRenderer`            | Loads page JSON → hydrates all sections → renders complete HTML; applies wrapper |
+| `PageStorage`             | JSON file I/O for page data (reads/writes from `config('pagebuilder.pages')`) |
+| `TemplateStorage`         | JSON file I/O for template data (theme-aware, `config('pagebuilder.templates')`) |
+| `TemplateVariableResolver`| Resolves `{{ $page->attr }}` placeholders in template section settings        |
+| `WrapperParser`           | Parses CSS-selector wrapper strings (e.g. `div#id.class`) into HTML elements  |
+| `PageRegistry`            | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                |
+| `PageService`             | Route registration + page resolution (Blade → JSON → template → 404)         |
+| `ThemeSettings`           | Global theme settings persistence (JSON file)                                 |
+| `Theme`                   | Active theme management wrapper                                               |
 
 ---
 
@@ -147,14 +150,15 @@ theme_vite();   // Vite — returns Vite asset loader for the active theme
 
 ```php
 return [
-    'pages'                 => resource_path('views/pages'),         // Page JSON files dir
-    'sections'              => resource_path('views/sections'),       // Section Blade dir
-    'blocks'                => resource_path('views/blocks'),         // Block Blade dir
-    'middleware'            => ['web'],                               // Route middleware
-    'disk'                  => 'public',                              // Storage disk for assets
-    'asset_directory'       => 'pagebuilder',                         // Sub-dir on disk
-    'theme_settings_schema' => [],                                    // Global theme settings
-    'theme_settings_path'   => resource_path('theme-settings.json'),  // Theme settings file
+    'pages'                 => resource_path('views/pages'),          // Page JSON files dir
+    'sections'              => resource_path('views/sections'),        // Section Blade dir
+    'blocks'                => resource_path('views/blocks'),          // Block Blade dir
+    'templates'             => resource_path('views/templates'),       // Template JSON files dir
+    'middleware'            => ['web'],                                // Route middleware
+    'disk'                  => 'public',                               // Storage disk for assets
+    'asset_directory'       => 'pagebuilder',                          // Sub-dir on disk
+    'theme_settings_schema' => [],                                     // Global theme settings
+    'theme_settings_path'   => resource_path('theme-settings.json'),   // Theme settings file
 ];
 ```
 

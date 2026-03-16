@@ -20,6 +20,7 @@ It includes a visual editor, layout system, reusable sections and multi-theme su
 - **`@schema()` directive** — declare settings, child blocks, and presets directly in Blade templates
 - **Visual editor** — React SPA with iframe live preview, drag-and-drop, and inline text editing
 - **JSON-based storage** — page data stored as JSON files on disk for fast reads and easy version control
+- **JSON templates** — Shopify-style fallback layouts for pages without a per-page JSON; supports `wrapper`, variable interpolation (`{{ $page->title }}`), and theme overrides
 - **Per-page Layouts** — site header and footer are configurable per-page, stored in the page JSON
 - **Recursive block nesting** — container blocks (rows, columns) can hold child blocks to any depth
 - **Theme blocks** — register global block types that any section can accept via `@theme` wildcard
@@ -89,6 +90,9 @@ return [
 
     // Path to theme block Blade templates
     'blocks' => resource_path('views/blocks'),
+
+    // Path to JSON template files (fallback layouts for pages without a page JSON)
+    'templates' => resource_path('views/templates'),
 
     // Middleware applied to editor routes
     'middleware' => ['web'],
@@ -356,6 +360,168 @@ Pages are stored as JSON files in the configured pages directory. Each page cont
   },
   "order": ["hero-1"]
 }
+```
+
+---
+
+## Templates
+
+Templates are **JSON fallback layouts** for pages that have no per-page page builder JSON file and no custom Blade view. Inspired by Shopify's JSON template system, they let you define a single file that controls which sections a whole category of pages renders — without requiring a separate `pages/{slug}.json` for every page.
+
+### Page resolution order
+
+```
+1. Custom Blade view    pages/{slug}.blade.php   (highest priority)
+2. Page builder JSON    pages/{slug}.json
+3. Template JSON        templates/{template}.json or templates/page.json
+4. 404
+```
+
+Templates are only consulted when both step 1 and step 2 miss. A template never overrides an existing page JSON.
+
+### Creating a template
+
+Place template files in `resources/views/templates/` (configurable via `config('pagebuilder.templates')`).
+
+```json
+// resources/views/templates/page.json  — default template used by all pages
+{
+    "sections": {
+        "main": {
+            "type": "page-content"
+        }
+    },
+    "order": ["main"]
+}
+```
+
+The `page.json` file is the **default template**. Any page without a page JSON, and without a specific template selected, renders through it.
+
+### Template JSON schema
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `sections` | object | yes | Section data map — same format as page JSON sections |
+| `order` | string[] | yes | Section render order |
+| `layout` | string \| false | no | Layout type (e.g. `"page"`, `"full-width"`). Defaults to `"page"`. Pass `false` to render without header/footer zones |
+| `wrapper` | string | no | CSS-selector string that wraps all sections in an HTML element |
+
+### Assigning a template to a page
+
+Set the `template` column on the `Page` model:
+
+```php
+$page = Page::find(1);
+$page->template = 'page.alternate';
+$page->save();
+```
+
+Or when creating a page:
+
+```php
+Page::create([
+    'title'    => 'About Us',
+    'slug'     => 'about',
+    'template' => 'page.alternate',
+    'content'  => '<p>About our company.</p>',
+]);
+```
+
+Template names map to filenames without the `.json` extension:
+
+| `template` field | File loaded |
+|---|---|
+| `null` or `""` | `templates/page.json` |
+| `"page"` | `templates/page.json` |
+| `"page.alternate"` | `templates/page.alternate.json` |
+| `"product"` | `templates/product.json` |
+
+If the selected template file does not exist, the package falls back to `page.json`. If `page.json` also does not exist, a 404 is returned.
+
+### The `wrapper` property
+
+The `wrapper` field wraps all rendered section HTML in a single HTML element. The value uses a CSS-selector-like syntax:
+
+```
+tag#id.class1.class2[attr1=val1][attr2=val2]
+```
+
+Supported wrapper tags: `<div>`, `<main>`, `<section>`.
+
+```json
+{
+    "wrapper": "div#div_id.div_class[attribute-one=value]",
+    "sections": { "main": { "type": "page-content" } },
+    "order": ["main"]
+}
+```
+
+Output:
+
+```html
+<div id="div_id" class="div_class" attribute-one="value">
+    <!-- rendered page sections -->
+</div>
+```
+
+### Variable interpolation
+
+Template section settings support `{{ $page->attribute }}` placeholders. At render time they are replaced with the corresponding attribute from the `Page` Eloquent model.
+
+```json
+{
+    "sections": {
+        "hero": {
+            "type": "hero",
+            "settings": {
+                "title":       "{{ $page->title }}",
+                "description": "{{ $page->meta_description }}"
+            }
+        },
+        "main": { "type": "page-content" }
+    },
+    "order": ["hero", "main"]
+}
+```
+
+Any column on the `Page` model can be used: `title`, `slug`, `content`, `meta_title`, `meta_description`, `meta_keywords`, or any custom column. Missing or `null` attributes resolve to an empty string.
+
+### Alternative template example
+
+```json
+// resources/views/templates/page.alternate.json
+{
+    "wrapper": "main#page-alternate.page-wrapper",
+    "sections": {
+        "main": {
+            "type": "page-content"
+        }
+    },
+    "order": ["main"]
+}
+```
+
+### `layout: false` — rendering without header/footer
+
+Set `"layout": false` to skip the layout zone system entirely. No `@sections('header')` or `@sections('footer')` zones are rendered:
+
+```json
+{
+    "layout": false,
+    "sections": {
+        "main": { "type": "hero" }
+    },
+    "order": ["main"]
+}
+```
+
+### Theme-aware templates
+
+If a theme is active, `TemplateStorage` checks the theme's `views/templates/` directory first. This allows themes to override the default `page.json` template or add new template files without touching the application's templates directory:
+
+```
+themes/my-theme/views/templates/page.json         ← overrides app templates/page.json
+themes/my-theme/views/templates/product.json      ← theme-specific product template
 ```
 
 ---

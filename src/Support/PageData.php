@@ -21,6 +21,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         private readonly array $layout = [],
         private readonly string $title = '',
         private readonly array $meta = [],
+        private readonly ?string $wrapper = null,
     ) {}
 
     /**
@@ -51,12 +52,17 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         $storedLayout = is_array($data['layout'] ?? null) ? $data['layout'] : [];
         $layout = self::mergeLayouts($defaultLayout, $storedLayout);
 
+        $wrapper = isset($data['wrapper']) && is_string($data['wrapper']) && $data['wrapper'] !== ''
+            ? $data['wrapper']
+            : null;
+
         return new self(
             sections: $sections,
             order: $order,
             layout: $layout,
             title: (string) ($data['title'] ?? ''),
             meta: is_array($data['meta'] ?? null) ? $data['meta'] : [],
+            wrapper: $wrapper,
         );
     }
 
@@ -280,6 +286,16 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Return the wrapper CSS-selector string, or null when no wrapper is set.
+     *
+     * Example: "div#main.container[data-page=1]"
+     */
+    public function wrapper(): ?string
+    {
+        return $this->wrapper;
+    }
+
+    /**
      * Determine if the page has no sections.
      */
     public function isEmpty(): bool
@@ -310,13 +326,19 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             ];
         }
 
-        return [
+        $result = [
             'sections' => $this->sections,
             'order' => $this->order,
             'layout' => $layout,
             'title' => $this->title,
             'meta' => $this->meta,
         ];
+
+        if ($this->wrapper !== null) {
+            $result['wrapper'] = $this->wrapper;
+        }
+
+        return $result;
     }
 
     public function toJson($options = 0): string

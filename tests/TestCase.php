@@ -18,6 +18,11 @@ abstract class TestCase extends BaseTestCase
             __DIR__.'/../workbench/resources/views/pages'
         );
 
+        $app->make('config')->set(
+            'pagebuilder.templates',
+            __DIR__.'/../workbench/resources/views/templates'
+        );
+
         $app->make('config')->set('app.name', 'My App');
     }
 }

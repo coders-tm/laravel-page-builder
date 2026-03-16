@@ -6,6 +6,7 @@ namespace Coderstm\PageBuilder\Services;
 
 use Coderstm\PageBuilder\Rendering\Renderer;
 use Coderstm\PageBuilder\Support\PageData;
+use Coderstm\PageBuilder\Support\WrapperParser;
 
 /**
  * Responsible exclusively for rendering page data into HTML.
@@ -17,6 +18,7 @@ class PageRenderer
     public function __construct(
         protected readonly Renderer $renderer,
         protected readonly PageStorage $storage,
+        protected readonly WrapperParser $wrapperParser,
     ) {}
 
     /**
@@ -57,6 +59,10 @@ class PageRenderer
             }
 
             $html .= $this->renderer->renderRawSection($sectionId, $sectionData, $editor);
+        }
+
+        if ($wrapper = $pageData->wrapper()) {
+            $html = $this->wrapperParser->render($wrapper, $html);
         }
 
         return $html;

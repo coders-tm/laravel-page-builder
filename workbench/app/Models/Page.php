@@ -10,7 +10,7 @@ class Page extends Model
     /**
      * Create a new factory instance for the model.
      *
-     * @return \Workbench\Database\Factories\PageFactroy
+     * @return PageFactroy
      */
     protected static function newFactory()
     {

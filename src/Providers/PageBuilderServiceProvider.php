@@ -11,8 +11,11 @@ use Coderstm\PageBuilder\Services;
 use Coderstm\PageBuilder\Services\PageRegistry;
 use Coderstm\PageBuilder\Services\PageRenderer;
 use Coderstm\PageBuilder\Services\PageStorage;
+use Coderstm\PageBuilder\Services\TemplateStorage;
 use Coderstm\PageBuilder\Services\ThemeSettings;
 use Coderstm\PageBuilder\Support;
+use Coderstm\PageBuilder\Support\TemplateVariableResolver;
+use Coderstm\PageBuilder\Support\WrapperParser;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
@@ -64,7 +67,13 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         $this->app->singleton(PageRegistry::class);
         $this->app->singleton(PageStorage::class);
+        $this->app->singleton(TemplateStorage::class);
         $this->app->singleton(ThemeSettings::class);
+
+        // ─── Support utilities ───────────────────────────────────
+
+        $this->app->singleton(WrapperParser::class);
+        $this->app->singleton(TemplateVariableResolver::class);
 
         // ─── Rendering ──────────────────────────────────────────
 
@@ -79,6 +88,7 @@ class PageBuilderServiceProvider extends ServiceProvider
             return new PageRenderer(
                 $app->make(Rendering\Renderer::class),
                 $app->make(PageStorage::class),
+                $app->make(WrapperParser::class),
             );
         });
     }
