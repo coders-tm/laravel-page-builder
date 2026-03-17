@@ -96,6 +96,48 @@ export class PageManager {
     /** Update a single theme setting value. */
     updateThemeSetting(key: string, value: any): void {
         useStore.getState().updateThemeSettingValue(key, value);
+
+        // Resolve the css_var declared on the matching setting schema entry.
+        const { schema } = useStore.getState().themeSettings;
+        let cssVar: string | null = null;
+        outer: for (const group of schema) {
+            for (const setting of group.settings) {
+                if ((setting.key ?? setting.id) === key) {
+                    cssVar = setting.css_var ?? null;
+                    break outer;
+                }
+            }
+        }
+
+        this.events.emit("theme:setting-changed", { key, value, cssVar });
+    }
+
+    /** Reset a single theme setting to its schema default. */
+    resetThemeSetting(key: string): void {
+        const { schema } = useStore.getState().themeSettings;
+        for (const group of schema) {
+            for (const setting of group.settings) {
+                if ((setting.key ?? setting.id) === key) {
+                    if (setting.default !== undefined) {
+                        this.updateThemeSetting(key, setting.default);
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    /** Reset every theme setting to its schema default. */
+    resetAllThemeSettings(): void {
+        const { schema } = useStore.getState().themeSettings;
+        for (const group of schema) {
+            for (const setting of group.settings) {
+                const key = setting.key ?? setting.id;
+                if (setting.default !== undefined) {
+                    this.updateThemeSetting(key, setting.default);
+                }
+            }
+        }
     }
 
     /** Save theme settings to the API. */

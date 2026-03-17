@@ -905,6 +905,11 @@ export const EDITOR_JS = `
                 el.innerHTML = msg.value;
             });
         }
+
+        if (msg.type === 'update-css-var') {
+            console.log(msg)
+            document.documentElement.style.setProperty(msg.cssVar, msg.value);
+        }
     });
 
     // ── Signal ready ──────────────────────────────────────────────────────

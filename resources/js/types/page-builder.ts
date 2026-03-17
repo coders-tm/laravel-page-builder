@@ -137,6 +137,8 @@ export interface BlockData {
 
 export interface SettingSchema {
     id: string;
+    /** Alternative key used by theme settings (in place of id). */
+    key?: string;
     type: string;
     label: string;
     default?: any;
@@ -148,4 +150,6 @@ export interface SettingSchema {
     step?: number;
     unit?: string;
     content?: string;
+    /** CSS custom-property name (e.g. `--colors-primary`) to update live in the preview. */
+    css_var?: string;
 }

@@ -84,6 +84,9 @@ export interface EditorEventMap {
     "page:changed": { slug: string };
     "page:meta-updated": { meta: Record<string, any> };
 
+    /* ── Theme events ────────────────────────────────────────────────── */
+    "theme:setting-changed": { key: string; value: any; cssVar: string | null };
+
     /* ── Preview events ──────────────────────────────────────────────── */
     "preview:rerender": { sectionId: string };
     "preview:reloaded": {};

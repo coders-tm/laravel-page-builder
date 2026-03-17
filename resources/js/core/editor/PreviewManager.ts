@@ -104,6 +104,11 @@ export class PreviewManager {
         this.messageBus?.send("update-live-text", { path, value });
     }
 
+    /** Set a CSS custom property on the preview document root instantly. */
+    updateCssVar(cssVar: string, value: string): void {
+        this.messageBus?.send("update-css-var", { cssVar, value });
+    }
+
     /** Remove a section from the iframe DOM. */
     removeSection(sectionId: string): void {
         this.messageBus?.send("remove-section", { sectionId });

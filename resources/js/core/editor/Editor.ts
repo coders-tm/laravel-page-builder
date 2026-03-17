@@ -260,6 +260,15 @@ export class Editor {
                 }
             }
         );
+
+        this.events.on(
+            "theme:setting-changed",
+            ({ cssVar, value }: { cssVar: string | null; value: any }) => {
+                if (cssVar) {
+                    this.preview.updateCssVar(cssVar, value);
+                }
+            }
+        );
     }
 
     /* ── Convenience shortcuts (delegate to EventBus) ────────────────── */
