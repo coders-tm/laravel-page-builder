@@ -63,7 +63,7 @@ class Theme extends Base
         }
 
         // Set theme settings configuration
-        Config::set('pagebuilder.theme_settings_path', self::path('settings.json'));
+        Config::set('pagebuilder.theme_settings_path', self::path('config.json', $theme));
     }
 
     /**
