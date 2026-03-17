@@ -80,7 +80,7 @@ class PageService
             return view('pagebuilder::page', [
                 ...$this->pageMeta($dbPage, $page, $meta),
                 'slug' => $slug,
-                '__pb_content' => $this->pageRenderer->renderPage($page),
+                '__pb_content' => $this->pageRenderer->renderCached($slug, $page),
                 '__pb_layout' => $page,
             ]);
         }
@@ -96,7 +96,7 @@ class PageService
             return view('pagebuilder::page', [
                 ...$this->pageMeta($dbPage, $page, $meta),
                 'slug' => $slug,
-                '__pb_content' => $this->pageRenderer->renderPage($page),
+                '__pb_content' => $this->pageRenderer->renderCached($slug, $page),
                 '__pb_layout' => $page,
             ]);
         }

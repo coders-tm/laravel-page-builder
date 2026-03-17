@@ -15,7 +15,7 @@ class PageStorage
 {
     protected string $pagesPath;
 
-    public function __construct()
+    public function __construct(protected readonly PageCache $pageCache)
     {
         $this->pagesPath = config('pagebuilder.pages');
     }
@@ -60,6 +60,12 @@ class PageStorage
         $filePath = $this->pagesPath.'/'.$slug.'.json';
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
-        return File::put($filePath, $json) !== false;
+        $result = File::put($filePath, $json) !== false;
+
+        if ($result) {
+            $this->pageCache->forget($slug);
+        }
+
+        return $result;
     }
 }

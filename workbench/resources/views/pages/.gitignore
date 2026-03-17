@@ -1,2 +1,8 @@
-from-object.json
-overwrite.json
+*
+!.gitignore
+!home.json
+!layout-default.json
+!layout-simple.json
+!page-with-content.json
+!regular-page.json
+!test-page.json
