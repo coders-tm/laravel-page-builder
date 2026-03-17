@@ -51,16 +51,19 @@ function ThemeSettingsPanel() {
                     )}
 
                     <div className="px-4 py-3 border-b border-gray-100">
-                        {group.settings.map((setting: any, idx: number) => (
+                        {group.settings.map((setting: any, idx: number) => {
+                            const settingKey = setting.key ?? setting.id;
+                            return (
                             <FieldRenderer
-                                key={setting.id || `s-${groupIdx}-${idx}`}
+                                key={settingKey || `s-${groupIdx}-${idx}`}
                                 setting={setting}
-                                value={values?.[setting.id]}
+                                value={values?.[settingKey]}
                                 onChange={(val) =>
-                                    handleChange(setting.id, val)
+                                    handleChange(settingKey, val)
                                 }
                             />
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             ))}

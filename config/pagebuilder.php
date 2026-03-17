@@ -69,9 +69,155 @@ return [
             'name' => 'Colors',
             'settings' => [
                 [
-                    'id' => 'primary_color', 'type' => 'color', 'label' => 'Primary', 'default' => '#3B82F6'],
+                    'key' => 'colors.text_secondary',
+                    'label' => 'Text (secondary)',
+                    'type' => 'color',
+                    'default' => '#90c1cb'
+                ],
                 [
-                    'id' => 'font_family',   'type' => 'google_font', 'label' => 'Font', 'default' => 'sans'],
+                    'key' => 'colors.primary',
+                    'label' => 'Primary',
+                    'type' => 'color',
+                    'default' => '#10b981'
+                ],
+                [
+                    'key' => 'colors.primary_hover',
+                    'label' => 'Primary (hover)',
+                    'type' => 'color',
+                    'default' => '#059669'
+                ],
+                [
+                    'key' => 'colors.accent',
+                    'label' => 'Accent',
+                    'type' => 'color',
+                    'default' => '#10b981'
+                ],
+                [
+                    'key' => 'colors.accent_hover',
+                    'label' => 'Accent (hover)',
+                    'type' => 'color',
+                    'default' => '#059669'
+                ],
+                [
+                    'key' => 'colors.background_light',
+                    'label' => 'Background (light)',
+                    'type' => 'color',
+                    'default' => '#f8f6f6'
+                ],
+                [
+                    'key' => 'colors.background_dark',
+                    'label' => 'Background (dark)',
+                    'type' => 'color',
+                    'default' => '#0f0f0f'
+                ],
+                [
+                    'key' => 'colors.bg_darker',
+                    'label' => 'Background (darker)',
+                    'type' => 'color',
+                    'default' => '#0a0a0a'
+                ],
+                [
+                    'key' => 'colors.bg_card',
+                    'label' => 'Card background',
+                    'type' => 'color',
+                    'default' => '#1a1a1a'
+                ],
+                [
+                    'key' => 'colors.bg_card_hover',
+                    'label' => 'Card background (hover)',
+                    'type' => 'color',
+                    'default' => '#222222'
+                ],
+                [
+                    'key' => 'colors.surface_dark',
+                    'label' => 'Surface (dark)',
+                    'type' => 'color',
+                    'default' => '#271c1c'
+                ],
+                [
+                    'key' => 'colors.border_dark',
+                    'label' => 'Border (dark)',
+                    'type' => 'color',
+                    'default' => '#2a2a2a'
+                ],
+                [
+                    'key' => 'colors.text_body',
+                    'label' => 'Text (body)',
+                    'type' => 'color',
+                    'default' => '#a0a0a0'
+                ],
+                [
+                    'key' => 'colors.text_muted',
+                    'label' => 'Text (muted)',
+                    'type' => 'color',
+                    'default' => '#b99d9d'
+                ],
+                [
+                    'key' => 'colors.neutral_surface',
+                    'label' => 'Neutral surface',
+                    'type' => 'color',
+                    'default' => '#221010'
+                ],
+                [
+                    'key' => 'colors.neutral_border',
+                    'label' => 'Neutral border',
+                    'type' => 'color',
+                    'default' => '#392828'
+                ],
+                [
+                    'key' => 'colors.neutral_text_dim',
+                    'label' => 'Neutral text (dim)',
+                    'type' => 'color',
+                    'default' => '#b99d9d'
+                ],
+            ],
+        ],
+
+        [
+            'name' => 'Typography',
+            'settings' => [
+                [
+                    'key' => 'fonts.display',
+                    'label' => 'Display font',
+                    'type' => 'google_font',
+                    'default' => 'Inter, sans-serif'
+                ],
+                [
+                    'key' => 'fonts.body',
+                    'label' => 'Body font',
+                    'type' => 'google_font',
+                    'default' => 'Inter, sans-serif'
+                ],
+            ],
+        ],
+
+        [
+            'name' => 'Radius & Shape',
+            'settings' => [
+                [
+                    'key' => 'radius.base',
+                    'label' => 'Radius (base)',
+                    'type' => 'text',
+                    'default' => '0.25rem'
+                ],
+                [
+                    'key' => 'radius.lg',
+                    'label' => 'Radius (lg)',
+                    'type' => 'text',
+                    'default' => '0.5rem'
+                ],
+                [
+                    'key' => 'radius.xl',
+                    'label' => 'Radius (xl)',
+                    'type' => 'text',
+                    'default' => '0.75rem'
+                ],
+                [
+                    'key' => 'radius.full',
+                    'label' => 'Radius (full)',
+                    'type' => 'text',
+                    'default' => '9999px'
+                ],
             ],
         ],
     ],
