@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Coderstm\PageBuilder\Tests\Unit\Services;
 
+use Coderstm\PageBuilder\Services\PageCache;
 use Coderstm\PageBuilder\Services\ThemeSettings;
 use Coderstm\PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\File;
@@ -32,7 +33,7 @@ class ThemeSettingsTest extends TestCase
         ]);
 
         // Fresh instance so it picks up the config set above
-        $this->themeSettings = new ThemeSettings;
+        $this->themeSettings = new ThemeSettings($this->app->make(PageCache::class));
     }
 
     protected function tearDown(): void
@@ -109,7 +110,7 @@ class ThemeSettingsTest extends TestCase
     {
         File::put($this->valuesPath, json_encode(['primary_color' => '#ABCDEF']));
 
-        $fresh = new ThemeSettings;
+        $fresh = new ThemeSettings($this->app->make(PageCache::class));
         $this->assertSame(['primary_color' => '#ABCDEF'], $fresh->values());
     }
 

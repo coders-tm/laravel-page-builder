@@ -19,10 +19,14 @@ class PageRenderer
         protected readonly Renderer $renderer,
         protected readonly PageStorage $storage,
         protected readonly WrapperParser $wrapperParser,
+        protected readonly PageCache $pageCache,
     ) {}
 
     /**
      * Render a page by slug, returning the full HTML string or null when not found.
+     *
+     * Non-editor renders are served from the HTML cache when enabled.
+     * Editor mode always bypasses the cache so live changes are visible immediately.
      */
     public function render(string $slug, bool $editor = false): ?string
     {
@@ -32,7 +36,32 @@ class PageRenderer
             return null;
         }
 
-        return $this->renderPage($page, $editor);
+        if ($editor) {
+            return $this->renderPage($page, editor: true);
+        }
+
+        return $this->renderCached($slug, $page);
+    }
+
+    /**
+     * Render a PageData instance with caching, keyed by slug.
+     *
+     * Returns the cached HTML on a hit; renders, stores, and returns on a miss.
+     * Editor mode must never call this method — use renderPage() directly instead.
+     */
+    public function renderCached(string $slug, PageData $page): string
+    {
+        $cached = $this->pageCache->get($slug);
+
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $html = $this->renderPage($page);
+
+        $this->pageCache->put($slug, $html);
+
+        return $html;
     }
 
     /**
