@@ -116,7 +116,7 @@ class PageService
      *
      * @return array<string, mixed>|null
      */
-    private function resolveTemplate(mixed $dbPage): ?array
+    protected function resolveTemplate(mixed $dbPage): ?array
     {
         $templateName = (string) ($dbPage?->template ?? '');
         $templateName = $templateName !== '' ? $templateName : 'page';
@@ -137,7 +137,7 @@ class PageService
      * @param  array<string, mixed>  $templateData
      * @return array<string, mixed>
      */
-    private function resolveTemplateLayout(array $templateData): array
+    protected function resolveTemplateLayout(array $templateData): array
     {
         $layout = $templateData['layout'] ?? 'page';
 
@@ -157,7 +157,7 @@ class PageService
      * @param  array<string, mixed>  $templateData  Resolved (variable-substituted) template data
      * @param  array<string, mixed>  $defaultLayout
      */
-    private function buildPageFromTemplate(array $templateData, array $defaultLayout, mixed $dbPage): PageData
+    protected function buildPageFromTemplate(array $templateData, array $defaultLayout, mixed $dbPage): PageData
     {
         return PageData::fromArray([
             'sections' => $templateData['sections'] ?? [],
@@ -170,7 +170,7 @@ class PageService
     /**
      * Build a PageData instance from stored JSON, merging the DB page title.
      */
-    private function buildPage(?PageData $stored, array $defaultLayout, mixed $dbPage): PageData
+    protected function buildPage(?PageData $stored, array $defaultLayout, mixed $dbPage): PageData
     {
         $data = $stored?->toArray() ?? [];
         $data['title'] = $dbPage?->title ?? $data['title'] ?? '';
@@ -186,7 +186,7 @@ class PageService
      * @param  array<string, string|null>  $meta
      * @return array{title: ?string, meta_title: ?string, meta_description: ?string, meta_keywords: ?string}
      */
-    private function pageMeta(mixed $dbPage, ?PageData $stored = null, array $meta = []): array
+    protected function pageMeta(mixed $dbPage, ?PageData $stored = null, array $meta = []): array
     {
         $storedMeta = $stored?->meta() ?? [];
 
