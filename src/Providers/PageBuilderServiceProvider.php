@@ -5,6 +5,7 @@ namespace Coderstm\PageBuilder\Providers;
 use Coderstm\PageBuilder\Commands;
 use Coderstm\PageBuilder\Facades;
 use Coderstm\PageBuilder\Http\Middleware;
+use Coderstm\PageBuilder\PageBuilder;
 use Coderstm\PageBuilder\Registry;
 use Coderstm\PageBuilder\Rendering;
 use Coderstm\PageBuilder\Services;
@@ -114,16 +115,10 @@ class PageBuilderServiceProvider extends ServiceProvider
         // Register theme middleware
         Route::aliasMiddleware('theme', Middleware\ThemeMiddleware::class);
 
-        // Public Page routes
-        Route::middleware(['web'])->group(function () {
-            Facades\Page::routes();
-        });
-
-        // Page builder routes
-        Route::middleware(config('pagebuilder.middleware', ['web']))
-            ->group(function () {
-                $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
-            });
+        if (! PageBuilder::$withoutRoutes) {
+            PageBuilder::pageRoutes();
+            PageBuilder::builderRoutes(config('pagebuilder.middleware', ['web']));
+        }
 
         // Views & migrations
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'pagebuilder');

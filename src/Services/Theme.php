@@ -47,7 +47,7 @@ class Theme extends Base
 
         self::finder()->setActiveTheme($theme, $parentTheme);
 
-        if (!File::exists(self::finder()->getThemePath($theme))) {
+        if (! File::exists(self::finder()->getThemePath($theme))) {
             return;
         }
 
@@ -180,7 +180,7 @@ class Theme extends Base
             $asset = "/{$asset}";
         }
 
-        $path = $mixPath . $asset;
+        $path = $mixPath.$asset;
 
         return $absolute ? $path : url($path);
     }

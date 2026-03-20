@@ -8,6 +8,7 @@ use Coderstm\PageBuilder\Registry\BlockRegistry;
 use Coderstm\PageBuilder\Registry\SectionRegistry;
 use Coderstm\PageBuilder\Services\PageRegistry;
 use Coderstm\PageBuilder\Services\ThemeSettings;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use RuntimeException;
 
@@ -20,11 +21,44 @@ class PageBuilder
     protected static ?bool $editorOverride = null;
 
     /**
+     * Set to true to prevent the service provider from auto-registering any routes.
+     */
+    public static bool $withoutRoutes = false;
+
+    /**
      * The page model class name.
      *
      * @var string
      */
     public static $pageModel = Models\Page::class;
+
+    /**
+     * Set to true to prevent the service provider from auto-registering any routes.
+     */
+    public static function withoutRoutes(bool $withoutRoutes = true): void
+    {
+        static::$withoutRoutes = $withoutRoutes;
+    }
+
+    /**
+     * Register public page routes with the given middleware.
+     */
+    public static function pageRoutes(array $middleware = ['web']): void
+    {
+        Route::middleware($middleware)->group(function () {
+            Page::routes();
+        });
+    }
+
+    /**
+     * Register page builder editor routes with the given middleware.
+     */
+    public static function builderRoutes(array $middleware = []): void
+    {
+        Route::middleware($middleware)->group(function () {
+            require __DIR__.'/../routes/web.php';
+        });
+    }
 
     /**
      * Set the model to be used by the page builder and register observer.
@@ -36,7 +70,9 @@ class PageBuilder
         $model::observe(PageObserver::class);
     }
 
-    /** Force editor mode on (use when ?pb-editor=1 is not available, e.g. API previews). */
+    /**
+     * Force editor mode on, regardless of query string. Mainly for testing purposes.
+     */
     public static function enableEditor(): void
     {
         static::$editorOverride = true;
@@ -51,7 +87,7 @@ class PageBuilder
     /**
      * Whether editor mode is active.
      *
-     * Returns the runtime override when set, otherwise checks ?pb-editor=1.
+     * Checks for a runtime override first, then falls back to the presence of ?pb-editor=1 in the query string.
      */
     public static function editor(): bool
     {
