@@ -13,19 +13,14 @@ use Illuminate\Support\Facades\File;
  */
 class PageStorage
 {
-    protected string $pagesPath;
-
-    public function __construct(protected readonly PageCache $pageCache)
-    {
-        $this->pagesPath = config('pagebuilder.pages');
-    }
+    public function __construct(protected readonly PageCache $pageCache) {}
 
     /**
      * Load and decode a page JSON file by slug.
      */
     public function load(string $slug): ?PageData
     {
-        $filePath = $this->pagesPath.'/'.$slug.'.json';
+        $filePath = config('pagebuilder.pages').'/'.$slug.'.json';
 
         if (! File::exists($filePath)) {
             return null;
@@ -45,8 +40,10 @@ class PageStorage
      */
     public function save(string $slug, array|PageData $data): bool
     {
-        if (! File::isDirectory($this->pagesPath)) {
-            File::makeDirectory($this->pagesPath, 0755, true);
+        $pagesPath = config('pagebuilder.pages');
+
+        if (! File::isDirectory($pagesPath)) {
+            File::makeDirectory($pagesPath, 0755, true);
         }
 
         $payload = $data instanceof PageData ? $data->toArray() : $data;
@@ -57,7 +54,7 @@ class PageStorage
             unset($payload['title'], $payload['meta']);
         }
 
-        $filePath = $this->pagesPath.'/'.$slug.'.json';
+        $filePath = $pagesPath.'/'.$slug.'.json';
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         $result = File::put($filePath, $json) !== false;

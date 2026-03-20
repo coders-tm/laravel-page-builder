@@ -14,13 +14,10 @@ use Illuminate\Support\Facades\Cache;
  */
 final class PageCache
 {
-    private readonly string $prefix;
-
     private readonly int|false $ttl;
 
     public function __construct()
     {
-        $this->prefix = (string) config('pagebuilder.cache.prefix', 'pagebuilder.page');
         $ttl = (int) config('pagebuilder.cache.ttl', 3600);
         $this->ttl = $ttl === 0 ? false : $ttl;
     }
@@ -101,15 +98,17 @@ final class PageCache
 
     private function key(string $slug): string
     {
-        $theme = (string) config('theme.active', 'default');
+        $prefix = (string) config('pagebuilder.cache.prefix', 'pagebuilder.page');
         $generation = $this->generation();
 
-        return "{$this->prefix}.{$theme}.{$generation}.{$slug}";
+        return "{$prefix}.{$generation}.{$slug}";
     }
 
     private function generationKey(): string
     {
-        return "{$this->prefix}.generation";
+        $prefix = (string) config('pagebuilder.cache.prefix', 'pagebuilder.page');
+
+        return "{$prefix}.generation";
     }
 
     private function generation(): int

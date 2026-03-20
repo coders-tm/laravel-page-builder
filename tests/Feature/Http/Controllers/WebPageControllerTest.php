@@ -123,7 +123,7 @@ class WebPageControllerTest extends TestCase
         // exercised by the page-content section when included in a page JSON.
         $response->assertStatus(200);
     }
-    
+
     public function test_sections_directive_renders_with_default_layout_on_custom_route(): void
     {
         // No DB record, no Page::routes() — purely a custom Route::get() in workbench/routes/web.php
@@ -147,7 +147,7 @@ class WebPageControllerTest extends TestCase
     public function test_sections_directive_renders_with_default_layout_when_using_custom_blade_view(): void
     {
         ModelsPage::factory()->create([
-            'slug'  => 'custom-blade',
+            'slug' => 'custom-blade',
             'title' => 'Custom Blade Page',
         ]);
 
