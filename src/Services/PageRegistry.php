@@ -3,12 +3,11 @@
 namespace Coderstm\PageBuilder\Services;
 
 use Coderstm\PageBuilder\Facades\Page;
+use Coderstm\PageBuilder\PageBuilder;
 use Illuminate\Support\Facades\Cache;
 
 class PageRegistry
 {
-    public const CACHE_KEY = 'pagebuilder.pages';
-
     /**
      * Pages data loaded once at construction (singleton).
      */
@@ -17,8 +16,8 @@ class PageRegistry
     public function __construct()
     {
         try {
-            if (Cache::has(self::CACHE_KEY)) {
-                $this->pages = Cache::get(self::CACHE_KEY);
+            if (Cache::has(PageBuilder::$pageCacheKey)) {
+                $this->pages = Cache::get(PageBuilder::$pageCacheKey);
 
                 return;
             }
@@ -28,7 +27,7 @@ class PageRegistry
 
         try {
             $this->pages = $this->buildFromDatabase();
-            Cache::put(self::CACHE_KEY, $this->pages);
+            Cache::put(PageBuilder::$pageCacheKey, $this->pages);
         } catch (\Throwable) {
             // DB not available yet (e.g. before migrations). Don't cache so
             // the next request retries automatically.
@@ -68,7 +67,7 @@ class PageRegistry
     public function put(array $pages): void
     {
         try {
-            Cache::forever(self::CACHE_KEY, $pages);
+            Cache::forever(PageBuilder::$pageCacheKey, $pages);
         } catch (\Throwable) {
             // Cache not available
         }
@@ -83,13 +82,13 @@ class PageRegistry
     public function reload(): void
     {
         try {
-            Cache::forget(self::CACHE_KEY);
+            Cache::forget(PageBuilder::$pageCacheKey);
         } catch (\Throwable) {
             // Cache not available
         }
         $this->pages = $this->buildFromDatabase();
         try {
-            Cache::forever(self::CACHE_KEY, $this->pages);
+            Cache::forever(PageBuilder::$pageCacheKey, $this->pages);
         } catch (\Throwable) {
             // Cache not available
         }
@@ -101,7 +100,7 @@ class PageRegistry
     public function flush(): void
     {
         try {
-            Cache::forget(self::CACHE_KEY);
+            Cache::forget(PageBuilder::$pageCacheKey);
         } catch (\Throwable) {
             // Cache not available
         }

@@ -26,6 +26,13 @@ class PageBuilder
     public static bool $withoutRoutes = false;
 
     /**
+     * The cache key for storing pages data.
+     *
+     * @var string
+     */
+    public static $pageCacheKey = 'pagebuilder.pages';
+
+    /**
      * The page model class name.
      *
      * @var string

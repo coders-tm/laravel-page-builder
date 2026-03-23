@@ -303,10 +303,6 @@ class PageCacheTest extends TestCase
         $this->assertStringContainsString('Freshly Saved', $html);
     }
 
-    // =========================================================================
-    // End-to-end — cache invalidation via ThemeSettings::save()
-    // =========================================================================
-
     public function test_theme_settings_save_flushes_all_page_caches(): void
     {
         $this->app['config']->set('pagebuilder.cache.enabled', true);
@@ -360,5 +356,49 @@ class PageCacheTest extends TestCase
         Page::render(self::PAGE_A);
 
         $this->assertNull($this->pageCache->get(self::PAGE_A));
+    }
+
+    public function test_custom_prefix_isolates_entries_from_default(): void
+    {
+        $this->app['config']->set('pagebuilder.cache.enabled', true);
+        $this->app['config']->set('pagebuilder.cache.prefix', 'pagebuilder.page');
+
+        // Store under the default prefix (generation=0).
+        $this->pageCache->put('home', '<p>default</p>');
+        $this->assertSame('<p>default</p>', Cache::get('pagebuilder.page.0.home'));
+
+        // Switch to a tenant prefix — the tenant key must not exist yet.
+        $this->app['config']->set('pagebuilder.cache.prefix', 'pagebuilder.page.tenant-42');
+        $this->assertNull(Cache::get('pagebuilder.page.tenant-42.0.home'));
+
+        // Store under the tenant prefix.
+        $this->pageCache->put('home', '<p>tenant-42</p>');
+        $this->assertSame('<p>tenant-42</p>', Cache::get('pagebuilder.page.tenant-42.0.home'));
+
+        // Default prefix key must remain unchanged.
+        $this->assertSame('<p>default</p>', Cache::get('pagebuilder.page.0.home'));
+    }
+
+    public function test_flush_only_invalidates_current_prefix(): void
+    {
+        $this->app['config']->set('pagebuilder.cache.enabled', true);
+        $this->app['config']->set('pagebuilder.cache.prefix', 'pagebuilder.page');
+
+        // Populate the default prefix (generation=0).
+        $this->pageCache->put('home', '<p>default</p>');
+        $this->assertSame('<p>default</p>', Cache::get('pagebuilder.page.0.home'));
+
+        // Populate the tenant prefix (generation=0).
+        $this->app['config']->set('pagebuilder.cache.prefix', 'pagebuilder.page.tenant-42');
+        $this->pageCache->put('home', '<p>tenant-42</p>');
+
+        // Flush the tenant prefix — increments its generation to 1.
+        $this->pageCache->flush();
+        $this->assertNull($this->pageCache->get('home'));
+        $this->assertSame(1, (int) Cache::get('pagebuilder.page.tenant-42.generation'));
+
+        // Default prefix generation is untouched — still 0, entry still present.
+        $this->assertSame(0, (int) Cache::get('pagebuilder.page.generation', 0));
+        $this->assertSame('<p>default</p>', Cache::get('pagebuilder.page.0.home'));
     }
 }
