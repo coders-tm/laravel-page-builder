@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('pagebuilder')->as('pagebuilder.')->group(function () {
     Route::get('pages', [PageBuilderController::class, 'pages'])->name('pages');
-    Route::get('page/{slug?}', [PageBuilderController::class, 'page'])->defaults('slug', 'home')->name('page');
+    Route::get('page/{slug?}', [PageBuilderController::class, 'page'])->where('slug', '.*')->defaults('slug', 'home')->name('page');
     Route::post('render-section', [PageBuilderController::class, 'renderSection'])->name('render-section');
     Route::post('render-block', [PageBuilderController::class, 'renderBlock'])->name('render-block');
     Route::post('save-page', [PageBuilderController::class, 'savePage'])->name('save-page');
@@ -35,4 +35,4 @@ Route::prefix('pagebuilder')->as('pagebuilder.')->group(function () {
 Route::redirect('pagebuilder', 'pagebuilder/home', 301)->name('pagebuilder.index');
 
 // Editor routes (Blade layout)
-Route::get('pagebuilder/{slug?}', [PageBuilderController::class, 'editor'])->name('pagebuilder.editor');
+Route::get('pagebuilder/{slug?}', [PageBuilderController::class, 'editor'])->where('slug', '.*')->name('pagebuilder.editor');

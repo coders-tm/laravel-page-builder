@@ -38,7 +38,7 @@ class PageService
      */
     public function render(string $slug, array $meta = []): mixed
     {
-        if (! preg_match('/^[a-z0-9\-_]+$/i', $slug)) {
+        if (! preg_match('#^[a-z0-9\-_/]+$#i', $slug)) {
             abort(404);
         }
 

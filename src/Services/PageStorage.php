@@ -46,6 +46,13 @@ class PageStorage
             File::makeDirectory($pagesPath, 0755, true);
         }
 
+        $filePath = $pagesPath.'/'.$slug.'.json';
+        $directory = dirname($filePath);
+
+        if (! File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
         $payload = $data instanceof PageData ? $data->toArray() : $data;
 
         // Strip DB-only fields — title and meta are persisted to the database, not the JSON file.
@@ -54,7 +61,7 @@ class PageStorage
             unset($payload['title'], $payload['meta']);
         }
 
-        $filePath = $pagesPath.'/'.$slug.'.json';
+        // $filePath already defined above
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         $result = File::put($filePath, $json) !== false;

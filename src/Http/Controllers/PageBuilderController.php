@@ -36,7 +36,7 @@ class PageBuilderController extends Controller
      *
      * Render the PageBuilder editor React application.
      */
-    public function editor(): View
+    public function editor(?string $slug = null): View
     {
         return view('pagebuilder::layout', [
             'config' => PageBuilder::scriptVariables(),
@@ -159,7 +159,7 @@ class PageBuilderController extends Controller
     public function savePage(Request $request): JsonResponse
     {
         $request->validate([
-            'slug' => 'required|string|alpha_dash',
+            'slug' => 'required|string|regex:#^[a-zA-Z0-9\-_\/]+$#',
             'data' => 'required|array',
             'meta' => 'nullable|array',
             'meta.title' => 'nullable|string|max:255',
