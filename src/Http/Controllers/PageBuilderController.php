@@ -66,6 +66,8 @@ class PageBuilderController extends Controller
      */
     public function page(string $slug = 'home'): JsonResponse
     {
+        $paths = explode('/', $slug);
+        $slug = end($paths);
         $stored = $this->pageStorage->load($slug);
         $layoutType = $stored?->layoutType() ?? 'page';
         $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
