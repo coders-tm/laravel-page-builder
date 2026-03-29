@@ -5,7 +5,97 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-03-29
+
+### Fixed
+
+- `RichTextField` content synchronization when switching between different blocks in the sidebar
+- Page Builder Preview iframe synchronization to correctly reflect section order immediately after reordering
+- `Select` component dropdown scrolling and viewport handling for long lists
+
+### Refactored
+
+- `Select` component styling and formatting for improved visual consistency
+
+## [1.2.1] - 2026-03-28
+
+### Changed
+
+- Enhanced slug handling in page retrieval by extracting only the last segment from nested paths for more robust resolution
+
+## [1.2.0] - 2026-03-27
+
+### Enhanced
+
+- General functional improvements and performance optimizations across the editor core
+
+## [1.1.10] - 2026-03-26
+
+### Fixed
+
+- Enhanced slug handling in route registration and validation for nested slugs
+
+## [1.1.9] - 2026-03-25
+
+### Added
+
+- `pageCacheKey` support for more granular cache management in `PageBuilder` and `PageRegistry`
+
+## [1.1.8] - 2026-03-24
+
+### Removed
+
+- `EditorLogo` component functionality to simplify the editor UI
+
+## [1.1.7] - 2026-03-23
+
+### Added
+
+- Resource registration methods and conditional route loading to `PageBuilder` for better extensibility
+
+## [1.1.6] - 2026-03-22
+
+### Added
+
+- Integration of `RequestThemeMiddleware` into standard page routes for improved multi-theme support
+
+## [1.1.5] - 2026-03-21
+
+### Changed
+
+- Refactored caching logic to use configuration-based cache prefixes and page paths
+
+### Added
+
+- `MultiThemePageTest` for rigorous verification of theme-isolated content
+
+## [1.1.4] - 2026-03-20
+
+### Added
+
+- Automated cache prefixing for Page Builder based on the active theme
+
+## [1.1.3] - 2026-03-19
+
+### Added
+
+- Support for HTML caching of compiled pages with configurable options
+
+## [1.1.2] - 2026-03-18
+
+### Changed
+
+- Migrated theme settings configuration from `settings.json` to `config.json` for standardized naming
+- Centralized theme path resolution within the `Theme` service
+
+## [1.1.1] - 2026-03-17
+
+### Fixed
+
+- Initial theme settings configuration path resolution bug
+
 ## [1.1.0] - 2026-03-17
+
 
 ### Added
 
