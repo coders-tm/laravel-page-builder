@@ -27,5 +27,7 @@ class DatabaseSeeder extends Seeder
             'title' => 'Default Template',
             'slug' => 'default-template',
         ]);
+
+        // PageFactroy::new()->times(50)->create();
     }
 }
