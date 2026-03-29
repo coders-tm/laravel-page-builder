@@ -101,7 +101,7 @@ final class PageCache
         $prefix = (string) config('pagebuilder.cache.prefix', 'pagebuilder.page');
         $generation = $this->generation();
 
-        return "{$prefix}.{$generation}.{$slug}";
+        return "{$prefix}.{$generation}." . str_replace('/', '.', $slug);
     }
 
     private function generationKey(): string

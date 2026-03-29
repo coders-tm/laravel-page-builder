@@ -66,8 +66,6 @@ class PageBuilderController extends Controller
      */
     public function page(string $slug = 'home'): JsonResponse
     {
-        $paths = explode('/', $slug);
-        $slug = end($paths);
         $stored = $this->pageStorage->load($slug);
         $layoutType = $stored?->layoutType() ?? 'page';
         $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
@@ -194,7 +192,7 @@ class PageBuilderController extends Controller
                 'meta_title' => $meta['meta_title'] ?? null,
                 'meta_description' => $meta['meta_description'] ?? null,
                 'meta_keywords' => $meta['meta_keywords'] ?? null,
-            ], fn ($v) => $v !== null));
+            ], fn($v) => $v !== null));
         }
 
         // Save theme settings when included in the same request

@@ -28,6 +28,17 @@ class DatabaseSeeder extends Seeder
             'slug' => 'default-template',
         ]);
 
+        PageFactroy::new()->create([
+            'title' => 'Parent Page',
+            'slug' => 'features',
+        ]);
+
+        PageFactroy::new()->create([
+            'title' => 'Child Page',
+            'slug' => 'child-page',
+            'parent' => 'features',
+        ]);
+
         // PageFactroy::new()->times(50)->create();
     }
 }

@@ -204,15 +204,11 @@ class PageService
             return;
         }
 
-        foreach (app(PageRegistry::class)->pages() as $page) {
-            $slug = $page['slug'];
-            $parent = $page['parent'] ?? null;
-            $path = $parent ? "{$parent}/{$slug}" : $slug;
-
+        foreach (app(PageRegistry::class)->pages() as $path => $page) {
             if ($path) {
                 Route::get($path, [WebPageController::class, 'pages'])
-                    ->defaults('slug', $slug)
-                    ->name('pages.'.$slug);
+                    ->defaults('slug', $path)
+                    ->name('pages.' . str_replace('/', '.', $path));
             }
         }
 
@@ -228,13 +224,17 @@ class PageService
     {
         return PageBuilder::$pageModel::where('is_active', true)
             ->get()
-            ->keyBy('slug')
-            ->map(fn ($page) => [
-                'id' => $page->id,
-                'slug' => $page->slug,
-                'parent' => $page->parent,
-                'title' => $page->title,
-            ])
+            ->mapWithKeys(function ($page) {
+                $path = $page->parent ? "{$page->parent}/{$page->slug}" : $page->slug;
+
+                return [$path => [
+                    'id' => $page->id,
+                    'slug' => $page->slug,
+                    'parent' => $page->parent,
+                    'title' => $page->title,
+                    'path' => $path,
+                ]];
+            })
             ->all();
     }
 
@@ -243,6 +243,16 @@ class PageService
      */
     public function findBySlug(string $slug): ?Model
     {
+        if (str_contains($slug, '/')) {
+            $paths = explode('/', $slug);
+            $slugPart = array_pop($paths);
+            $parentPath = implode('/', $paths);
+
+            return PageBuilder::$pageModel::where('slug', $slugPart)
+                ->where('parent', $parentPath)
+                ->first();
+        }
+
         return PageBuilder::$pageModel::where('slug', $slug)->first();
     }
 
@@ -263,12 +273,18 @@ class PageService
             'meta_title' => $meta['meta_title'] ?? null,
             'meta_description' => $meta['meta_description'] ?? null,
             'meta_keywords' => $meta['meta_keywords'] ?? null,
-        ], fn ($v) => $v !== null);
+        ], fn($v) => $v !== null);
 
         if (empty($fillable)) {
             return true;
         }
 
-        return (bool) PageBuilder::$pageModel::where('slug', $slug)->update($fillable);
+        $page = $this->findBySlug($slug);
+
+        if (! $page) {
+            return false;
+        }
+
+        return (bool) $page->update($fillable);
     }
 }
