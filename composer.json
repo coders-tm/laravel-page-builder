@@ -1,99 +1,99 @@
 {
-    "name": "coderstm/laravel-page-builder",
-    "description": "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.",
-    "keywords": [
-        "coderstm",
-        "laravel",
-        "page-builder",
-        "sections",
-        "blocks",
-        "themes",
-        "cms",
-        "content",
-        "blade",
-        "json"
-    ],
-    "homepage": "https://github.com/coderstm/laravel-page-builder",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Dipak Sarkar",
-            "email": "hello@dipaksarkar.in",
-            "homepage": "https://dipaksarkar.in",
-            "role": "Developer"
-        }
-    ],
-    "support": {
-        "issues": "https://github.com/coderstm/laravel-page-builder/issues",
-        "source": "https://github.com/coderstm/laravel-page-builder"
-    },
-    "require": {
-        "php": "^8.2",
-        "illuminate/support": "^11.0|^12.0",
-        "illuminate/http": "^11.0|^12.0",
-        "illuminate/routing": "^11.0|^12.0",
-        "illuminate/view": "^11.0|^12.0",
-        "qirolab/laravel-themer": "^2.4",
-        "spatie/laravel-sluggable": "^3.6"
-    },
-    "require-dev": {
-        "larastan/larastan": "^2.9|^3.0",
-        "laravel/pint": "^1.0",
-        "orchestra/testbench": "^9.0|^10.0",
-        "pestphp/pest": "^3.0|^4.0",
-        "pestphp/pest-plugin-laravel": "^3.0|^4.1",
-        "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^11.0|^12.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Coderstm\\PageBuilder\\": "src/"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Coderstm\\PageBuilder\\Tests\\": "tests/",
-            "Coderstm\\PageBuilder\\Tests\\Stubs\\": "tests/Stubs/",
-            "Workbench\\App\\": "workbench/app/",
-            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
-            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
-        }
-    },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-main": "1.x-dev"
-        },
-        "laravel": {
-            "providers": [
-                "Coderstm\\PageBuilder\\Providers\\PageBuilderServiceProvider"
-            ]
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "scripts": {
-        "post-autoload-dump": [
-            "@clear",
-            "@prepare"
-        ],
-        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
-        "prepare": "@php vendor/bin/testbench package:discover --ansi",
-        "build": "@php vendor/bin/testbench workbench:build --ansi",
-        "serve": [
-            "Composer\\Config::disableProcessTimeout",
-            "@build",
-            "@php vendor/bin/testbench serve --ansi"
-        ],
-        "lint": "@php vendor/bin/phpstan analyse",
-        "test": "@php vendor/bin/phpunit"
+  "name": "coderstm/laravel-page-builder",
+  "description": "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.",
+  "keywords": [
+    "coderstm",
+    "laravel",
+    "page-builder",
+    "sections",
+    "blocks",
+    "themes",
+    "cms",
+    "content",
+    "blade",
+    "json"
+  ],
+  "homepage": "https://github.com/coderstm/laravel-page-builder",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dipak Sarkar",
+      "email": "hello@dipaksarkar.in",
+      "homepage": "https://dipaksarkar.in",
+      "role": "Developer"
     }
+  ],
+  "support": {
+    "issues": "https://github.com/coderstm/laravel-page-builder/issues",
+    "source": "https://github.com/coderstm/laravel-page-builder"
+  },
+  "require": {
+    "php": "^8.2",
+    "illuminate/support": "^11.0|^12.0",
+    "illuminate/http": "^11.0|^12.0",
+    "illuminate/routing": "^11.0|^12.0",
+    "illuminate/view": "^11.0|^12.0",
+    "qirolab/laravel-themer": "^2.4",
+    "spatie/laravel-sluggable": "^3.6"
+  },
+  "require-dev": {
+    "larastan/larastan": "^2.9|^3.0",
+    "laravel/pint": "^1.0",
+    "orchestra/testbench": "^9.0|^10.0",
+    "pestphp/pest": "^3.0|^4.0",
+    "pestphp/pest-plugin-laravel": "^3.0|^4.1",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^11.0|^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Coderstm\\PageBuilder\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Coderstm\\PageBuilder\\Tests\\": "tests/",
+      "Coderstm\\PageBuilder\\Tests\\Stubs\\": "tests/Stubs/",
+      "Workbench\\App\\": "workbench/app/",
+      "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+      "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.x-dev"
+    },
+    "laravel": {
+      "providers": [
+        "Coderstm\\PageBuilder\\Providers\\PageBuilderServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "scripts": {
+    "post-autoload-dump": [
+      "@clear",
+      "@prepare"
+    ],
+    "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+    "prepare": "@php vendor/bin/testbench package:discover --ansi",
+    "build": "@php vendor/bin/testbench workbench:build --ansi",
+    "serve": [
+      "Composer\\Config::disableProcessTimeout",
+      "@build",
+      "@php vendor/bin/testbench serve --ansi"
+    ],
+    "lint": "@php vendor/bin/phpstan analyse",
+    "test": "@php vendor/bin/phpunit"
+  }
 }
