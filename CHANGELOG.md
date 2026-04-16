@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.9] - 2026-04-16
+
+### Added
+
+- **Editor `mode` config option** — Set `mode: 'page'` (default) or `mode: 'email'` when calling `PageBuilder.init()`. Email mode automatically hides the page selector dropdown in the header and the sidebar tab strip (Sections / Page / Theme), making the editor suitable for email template and single-document editing contexts.
+- **`BootstrapManager` now hydrates pages from config** — `config.pages` passed via `PageBuilder.init()` is now correctly synced into the Zustand store during bootstrap, fixing an issue where the page selector dropdown was always empty because the store was created before `setConfig()` was called.
+
+### Changed
+
+- **Unified API URL pattern** — Page load and save now use `baseUrl` exclusively, eliminating the need for separate endpoint configuration:
+  - Load: `GET {baseUrl}/{slug}.json`
+  - Save: `POST {baseUrl}/{slug}`
+- **Laravel routes updated** to match the new URL pattern:
+  - `GET pagebuilder/{slug}.json` → `PageBuilderController@page`
+  - `POST pagebuilder/{slug}` → `PageBuilderController@savePage`
+  - Removed the old `GET pagebuilder/page/{slug}` and `POST pagebuilder/save-page` routes.
+- **Removed `GET /pagebuilder/pages` route and `pages()` controller method** — The page list is now passed directly via `PageBuilder::scriptVariables()` in the Blade layout config, removing an unnecessary API round-trip on editor boot.
+- **`PageBuilder::scriptVariables()` pages formatting** — Pages are now mapped from `PageRegistry` using the pre-computed `path` field (which already includes the parent prefix), producing a clean `{ id, slug, title, parent }` shape for the frontend.
+
+### Removed
+
+- `api.getPages()` frontend method — no longer needed; pages are initialised from the server-rendered config.
+- `PageSlice.loadPages()` store action and `PageManager.loadAll()` / `BootstrapManager.loadAll()` — replaced by config hydration at bootstrap time.
+- `PageRegistry` dependency from `PageBuilderController` constructor — only used by the now-removed `pages()` method.
+
 ## [1.2.8] - 2026-03-31
 
 ### Changed
