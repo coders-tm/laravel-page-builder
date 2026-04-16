@@ -12,6 +12,10 @@ return [
     |
     */
 
+    // Base URL path for the page builder routes (e.g., 'pagebuilder' or 'foo')
+    // The editor will be accessible at /{basePath}/* and API endpoints at /{basePath}/*
+    'basePath' => 'pagebuilder',
+
     // Path to the pages directory (JSON data files)
     'pages' => resource_path('views/pages'),
 

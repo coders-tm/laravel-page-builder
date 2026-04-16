@@ -172,9 +172,10 @@ class PageBuilder
         $pages = app(PageRegistry::class);
         $registry = app(SectionRegistry::class);
         $blocks = app(BlockRegistry::class);
+        $basePath = config('pagebuilder.basePath', 'pagebuilder');
 
         return [
-            'baseUrl' => config('app.url').'/pagebuilder',
+            'baseUrl' => url($basePath),
             'appUrl' => config('app.url'),
             'pages' => array_merge(
                 [

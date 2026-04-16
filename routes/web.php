@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('pagebuilder')->as('pagebuilder.')->group(function () {
+$basePath = config('pagebuilder.basePath', 'pagebuilder');
+
+Route::prefix($basePath)->as('pagebuilder.')->group(function () {
     Route::get('{slug}.json', [PageBuilderController::class, 'page'])->where('slug', '[^.]+')->defaults('slug', 'home')->name('page');
     Route::post('{slug}', [PageBuilderController::class, 'savePage'])->where('slug', '.*')->name('save-page');
     Route::post('render-section', [PageBuilderController::class, 'renderSection'])->name('render-section');
@@ -30,8 +32,8 @@ Route::prefix('pagebuilder')->as('pagebuilder.')->group(function () {
     Route::post('assets/upload', [AssetController::class, 'upload'])->name('assets.upload');
 });
 
-// Redirect to home page builder editor if accessing /pagebuilder without slug
-Route::redirect('pagebuilder', 'pagebuilder/home', 301)->name('pagebuilder.index');
+// Redirect to home page builder editor if accessing /{basePath} without slug
+Route::redirect($basePath, $basePath.'/home', 301)->name('pagebuilder.index');
 
 // Editor routes (Blade layout)
-Route::get('pagebuilder/{slug?}', [PageBuilderController::class, 'editor'])->where('slug', '.*')->name('pagebuilder.editor');
+Route::get($basePath.'/{slug?}', [PageBuilderController::class, 'editor'])->where('slug', '.*')->name('pagebuilder.editor');
