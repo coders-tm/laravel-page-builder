@@ -1,39 +1,47 @@
 import {
-    BlockData,
-    Page,
-    SectionData,
-    ThemeSettingsData,
+  BlockData,
+  Page,
+  SectionData,
+  ThemeSettingsData,
 } from "./types/page-builder";
 import type { AssetProvider } from "./types/asset";
 import laravelAssetProvider from "./services/laravelAssetProvider";
 
 // Define the shape of our global configuration
 export interface PageBuilderConfig {
-    baseUrl: string;
-    appUrl: string;
-    pages: Page[];
-    sections: Record<string, SectionData>;
-    blocks: Record<string, BlockData>;
-    themeSettings: ThemeSettingsData;
-    fields: Record<
-        string,
-        | {
-              type: "external";
-              fetchList: () => Promise<
-                  Array<{
-                      label: string | number;
-                      value: string | number;
-                  }>
-              >;
-          }
-        | ((args: {
-              setting: any;
-              value: any;
-              onChange: (val: any) => void;
-              container: HTMLElement;
-          }) => void | string | HTMLElement)
-    >;
-    [key: string]: any;
+  baseUrl: string;
+  appUrl: string;
+  pages: Page[];
+  sections: Record<string, SectionData>;
+  blocks: Record<string, BlockData>;
+  themeSettings: ThemeSettingsData;
+  /**
+   * Editor mode.
+   *
+   * - `"page"`  (default) — full page builder with page selector and sidebar tabs.
+   * - `"email"` — hides the page selector and sidebar tab strip; intended for
+   *               email/template editors where there is only one document to edit.
+   */
+  mode?: "page" | "email";
+  fields: Record<
+    string,
+    | {
+        type: "external";
+        fetchList: () => Promise<
+          Array<{
+            label: string | number;
+            value: string | number;
+          }>
+        >;
+      }
+    | ((args: {
+        setting: any;
+        value: any;
+        onChange: (val: any) => void;
+        container: HTMLElement;
+      }) => void | string | HTMLElement)
+  >;
+  [key: string]: any;
 }
 
 /**
@@ -44,20 +52,20 @@ export interface PageBuilderConfig {
  * changing any UI code.
  */
 export interface EditorConfig {
-    assets?: {
-        provider?: AssetProvider;
-    };
+  assets?: {
+    provider?: AssetProvider;
+  };
 }
 
 // Default configuration fallback
 const config: PageBuilderConfig = {
-    baseUrl: "/pagebuilder",
-    appUrl: "/",
-    pages: [],
-    sections: {},
-    blocks: {},
-    themeSettings: { schema: [], values: {} },
-    fields: {},
+  baseUrl: "/pagebuilder",
+  appUrl: "/",
+  pages: [],
+  sections: {},
+  blocks: {},
+  themeSettings: { schema: [], values: {} },
+  fields: {},
 };
 
 /**
@@ -65,9 +73,9 @@ const config: PageBuilderConfig = {
  * Passed to createEditor() when no overrides are supplied.
  */
 export const defaultConfig: EditorConfig = {
-    assets: {
-        provider: laravelAssetProvider,
-    },
+  assets: {
+    provider: laravelAssetProvider,
+  },
 };
 
 /**
@@ -75,7 +83,7 @@ export const defaultConfig: EditorConfig = {
  * Call this during PageBuilder.init() to inject settings.
  */
 export function setConfig(newConfig: Partial<PageBuilderConfig>) {
-    Object.assign(config, newConfig);
+  Object.assign(config, newConfig);
 }
 
 export default config;

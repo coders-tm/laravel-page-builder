@@ -16,10 +16,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('pagebuilder')->as('pagebuilder.')->group(function () {
-    Route::get('page/{slug?}', [PageBuilderController::class, 'page'])->where('slug', '.*')->defaults('slug', 'home')->name('page');
+    Route::get('{slug}.json', [PageBuilderController::class, 'page'])->where('slug', '[^.]+')->defaults('slug', 'home')->name('page');
+    Route::post('{slug}', [PageBuilderController::class, 'savePage'])->where('slug', '.*')->name('save-page');
     Route::post('render-section', [PageBuilderController::class, 'renderSection'])->name('render-section');
     Route::post('render-block', [PageBuilderController::class, 'renderBlock'])->name('render-block');
-    Route::post('save-page', [PageBuilderController::class, 'savePage'])->name('save-page');
 
     // Theme settings
     Route::get('theme-settings', [PageBuilderController::class, 'themeSettings'])->name('theme-settings');

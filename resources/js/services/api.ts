@@ -9,10 +9,11 @@ import { get, post } from "./apiFetch";
  */
 const api = {
   /**
-   * Fetch a single page by slug.
+   * Fetch a single page/template by slug.
+   * GET {baseUrl}/{slug}.json
    */
   async getPage(slug: string) {
-    return get<any>(`${config.baseUrl}/page/${slug}`);
+    return get<any>(`${config.baseUrl}/${slug}.json`);
   },
 
   /**
@@ -30,7 +31,8 @@ const api = {
   },
 
   /**
-   * Save a page (sections + meta).
+   * Save a page/template by slug.
+   * POST {baseUrl}/{slug}
    */
   async savePage(
     slug: string,
@@ -38,7 +40,7 @@ const api = {
     meta?: any,
     themeSettings?: Record<string, any>,
   ) {
-    return post<any>(`${config.baseUrl}/save-page`, {
+    return post<any>(`${config.baseUrl}/${slug}`, {
       slug,
       data,
       meta,

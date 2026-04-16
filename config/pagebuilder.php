@@ -242,7 +242,7 @@ return [
         'storage',
         'uploads',
         'files',
-        'vendor'
+        'vendor',
     ],
 
     /*

@@ -41,9 +41,8 @@ class NestedSlugTest extends TestCase
             'is_active' => true,
         ]);
 
-        // 2. Try to access the API route
-        // This is expected to FAIL (404) before the fix
-        $response = $this->get('/pagebuilder/page/parent/child');
+        // 2. Try to access the API route — new pattern: GET /pagebuilder/{slug}.json
+        $response = $this->get('/pagebuilder/parent/child.json');
 
         $response->assertOk();
     }

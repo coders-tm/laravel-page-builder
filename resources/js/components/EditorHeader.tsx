@@ -14,6 +14,7 @@ import { useEditorNavigation } from "@/hooks/useEditorNavigation";
 import { useEditorLayout } from "@/hooks/useEditorLayout";
 import { useStore } from "@/core/store/useStore";
 import { useMaxBreakpoint } from "@/hooks/useBreakpoint";
+import config from "@/config";
 
 /**
  * Top header bar — reads all state directly from the editor context,
@@ -52,20 +53,25 @@ export default function EditorHeader() {
 
         <EditorLogo />
 
-        <div className="relative flex-shrink-0">
-          <Select value={slug || ""} onValueChange={(value) => setPage(value)}>
-            <SelectTrigger className="h-8 w-[160px] bg-transparent border-none hover:bg-gray-100 focus:ring-0 focus:ring-offset-0 font-medium text-gray-800">
-              <SelectValue placeholder="Select page…" />
-            </SelectTrigger>
-            <SelectContent>
-              {pages.map((p) => (
-                <SelectItem key={p.slug} value={p.slug}>
-                  {p.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {config.mode !== "email" && (
+          <div className="relative flex-shrink-0">
+            <Select
+              value={slug || ""}
+              onValueChange={(value) => setPage(value)}
+            >
+              <SelectTrigger className="h-8 w-[160px] bg-transparent border-none hover:bg-gray-100 focus:ring-0 focus:ring-offset-0 font-medium text-gray-800">
+                <SelectValue placeholder="Select page…" />
+              </SelectTrigger>
+              <SelectContent>
+                {pages.map((p) => (
+                  <SelectItem key={p.slug} value={p.slug}>
+                    {p.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* ── Center: Device switcher + Undo/Redo ────────────────── */}
