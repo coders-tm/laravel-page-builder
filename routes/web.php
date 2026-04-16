@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('pagebuilder')->as('pagebuilder.')->group(function () {
-    Route::get('pages', [PageBuilderController::class, 'pages'])->name('pages');
     Route::get('page/{slug?}', [PageBuilderController::class, 'page'])->where('slug', '.*')->defaults('slug', 'home')->name('page');
     Route::post('render-section', [PageBuilderController::class, 'renderSection'])->name('render-section');
     Route::post('render-block', [PageBuilderController::class, 'renderBlock'])->name('render-block');

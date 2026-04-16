@@ -8,75 +8,72 @@ import { get, post } from "./apiFetch";
  * JSON headers, and consistent error handling automatically.
  */
 const api = {
-    /**
-     * Fetch all pages.
-     */
-    async getPages() {
-        return get<any[]>(`${config.baseUrl}/pages`);
-    },
+  /**
+   * Fetch a single page by slug.
+   */
+  async getPage(slug: string) {
+    return get<any>(`${config.baseUrl}/page/${slug}`);
+  },
 
-    /**
-     * Fetch a single page by slug.
-     */
-    async getPage(slug: string) {
-        return get<any>(`${config.baseUrl}/page/${slug}`);
-    },
+  /**
+   * Render a block with given settings (live preview update).
+   */
+  async renderBlock(payload: Record<string, any>) {
+    return post<{ html: string }>(`${config.baseUrl}/render-block`, payload);
+  },
 
-    /**
-     * Render a block with given settings (live preview update).
-     */
-    async renderBlock(payload: Record<string, any>) {
-        return post<{ html: string }>(
-            `${config.baseUrl}/render-block`,
-            payload
-        );
-    },
+  /**
+   * Render a section with given settings (live preview update).
+   */
+  async renderSection(payload: Record<string, any>) {
+    return post<{ html: string }>(`${config.baseUrl}/render-section`, payload);
+  },
 
-    /**
-     * Render a section with given settings (live preview update).
-     */
-    async renderSection(payload: Record<string, any>) {
-        return post<{ html: string }>(
-            `${config.baseUrl}/render-section`,
-            payload
-        );
-    },
+  /**
+   * Save a page (sections + meta).
+   */
+  async savePage(
+    slug: string,
+    data: any,
+    meta?: any,
+    themeSettings?: Record<string, any>,
+  ) {
+    return post<any>(`${config.baseUrl}/save-page`, {
+      slug,
+      data,
+      meta,
+      theme_settings: themeSettings,
+    });
+  },
 
-    /**
-     * Save a page (sections + meta).
-     */
-    async savePage(slug: string, data: any, meta?: any, themeSettings?: Record<string, any>) {
-        return post<any>(`${config.baseUrl}/save-page`, { slug, data, meta, theme_settings: themeSettings });
-    },
+  /**
+   * Get theme settings (schema + values).
+   */
+  async getThemeSettings() {
+    return get<{ schema: any[]; values: Record<string, any> }>(
+      `${config.baseUrl}/theme-settings`,
+    );
+  },
 
-    /**
-     * Get theme settings (schema + values).
-     */
-    async getThemeSettings() {
-        return get<{ schema: any[]; values: Record<string, any> }>(
-            `${config.baseUrl}/theme-settings`
-        );
-    },
+  /**
+   * Save theme settings values.
+   */
+  async saveThemeSettings(values: Record<string, any>) {
+    return post<any>(`${config.baseUrl}/theme-settings`, { values });
+  },
 
-    /**
-     * Save theme settings values.
-     */
-    async saveThemeSettings(values: Record<string, any>) {
-        return post<any>(`${config.baseUrl}/theme-settings`, { values });
-    },
-
-    /**
-     * Get the preview URL for a page.
-     *
-     * Uses the real page URL with ?pb-editor=1 query parameter
-     * so the preview renders through the actual site layout.
-     */
-    getPreviewUrl(slug: string): string {
-        const params = new URLSearchParams({ "pb-editor": "1" });
-        // Home page is served at "/", other pages at "/{slug}"
-        const path = slug === "home" ? "/" : `/${slug}`;
-        return `${config.appUrl}${path}?${params.toString()}`;
-    },
+  /**
+   * Get the preview URL for a page.
+   *
+   * Uses the real page URL with ?pb-editor=1 query parameter
+   * so the preview renders through the actual site layout.
+   */
+  getPreviewUrl(slug: string): string {
+    const params = new URLSearchParams({ "pb-editor": "1" });
+    // Home page is served at "/", other pages at "/{slug}"
+    const path = slug === "home" ? "/" : `/${slug}`;
+    return `${config.appUrl}${path}?${params.toString()}`;
+  },
 };
 
 export default api;

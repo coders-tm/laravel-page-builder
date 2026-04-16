@@ -8,7 +8,6 @@ use Coderstm\PageBuilder\Registry\BlockRegistry;
 use Coderstm\PageBuilder\Registry\LayoutParser;
 use Coderstm\PageBuilder\Registry\SectionRegistry;
 use Coderstm\PageBuilder\Rendering\Renderer;
-use Coderstm\PageBuilder\Services\PageRegistry;
 use Coderstm\PageBuilder\Services\PageRenderer;
 use Coderstm\PageBuilder\Services\PageStorage;
 use Coderstm\PageBuilder\Services\ThemeSettings;
@@ -25,7 +24,6 @@ class PageBuilderController extends Controller
         protected PageStorage $pageStorage,
         protected SectionRegistry $sectionRegistry,
         protected BlockRegistry $blockRegistry,
-        protected PageRegistry $pageRegistry,
         protected Renderer $renderer,
         protected ThemeSettings $themeSettings,
         protected LayoutParser $layoutParser,
@@ -41,16 +39,6 @@ class PageBuilderController extends Controller
         return view('pagebuilder::layout', [
             'config' => PageBuilder::scriptVariables(),
         ]);
-    }
-
-    /**
-     * GET /pagebuilder/pages
-     *
-     * List all available pages from the canonical page registry.
-     */
-    public function pages(): JsonResponse
-    {
-        return response()->json($this->pageRegistry->pages());
     }
 
     /**
@@ -192,7 +180,7 @@ class PageBuilderController extends Controller
                 'meta_title' => $meta['meta_title'] ?? null,
                 'meta_description' => $meta['meta_description'] ?? null,
                 'meta_keywords' => $meta['meta_keywords'] ?? null,
-            ], fn ($v) => $v !== null));
+            ], fn($v) => $v !== null));
         }
 
         // Save theme settings when included in the same request

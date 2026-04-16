@@ -67,7 +67,7 @@ const PageBuilder = {
     // Signal that the editor is ready
     editorInstance.ready();
 
-    // Return a public API similar to GrapesJS
+    // Return a public API
     return {
       /** Subscribe to editor change events. */
       onChange(callback: (data: any) => void) {
