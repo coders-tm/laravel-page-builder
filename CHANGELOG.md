@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.0] - 2026-04-16
+## [1.3.1] - 2026-04-16
+
+### Added
+
+- **Custom `basePath` configuration** — Set `basePath` in `config/pagebuilder.php` to customize the editor and API route prefix (e.g., `'basePath' => 'foo'` makes the editor accessible at `/foo` instead of `/pagebuilder`). Defaults to `'pagebuilder'` for backward compatibility.
+  - All routes now dynamically use the configured `basePath`.
+  - Frontend automatically derives `baseUrl` from the `basePath` via `PageBuilder::scriptVariables()`.
+  - React Router `basename` is automatically extracted from the dynamic `baseUrl`, enabling the editor to work at any custom path without additional configuration.
+
+### Changed
+
+- **Route generation is now dynamic** — `routes/web.php` now reads `config('pagebuilder.basePath')` instead of using hardcoded paths, allowing deployment-time or environment-specific customization of the editor URL.
+
+## [1.3.0] - 2026-04-15
 
 ### Added
 
