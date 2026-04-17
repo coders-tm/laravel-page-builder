@@ -39,6 +39,7 @@ export function useEditorNavigation({
   const device = searchParams.get("device") || "desktop";
   const rawBlock = searchParams.get("block") || "";
   const blockPath: string[] = rawBlock ? rawBlock.split(",") : [];
+  const isEditorMode = searchParams.get("editor") === "true";
 
   // Register router adapter for URL updates originating from manager commands.
   // Only the root-level caller (useEditor) opts in via registerAdapter: true.
@@ -49,12 +50,13 @@ export function useEditorNavigation({
     editor.navigation.setAdapter({
       navigate,
       setSearchParams,
+      editorMode: isEditorMode,
     });
 
     return () => {
       editor.navigation.setAdapter(null);
     };
-  }, [editor, navigate, setSearchParams, registerAdapter]);
+  }, [editor, navigate, setSearchParams, registerAdapter, isEditorMode]);
 
   // Sync current route into the manager.
   useEffect(() => {

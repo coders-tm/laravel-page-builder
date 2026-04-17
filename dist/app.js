@@ -8560,16 +8560,17 @@ function a2() {
 function Ft({
   registerAdapter: a = !1
 } = {}) {
-  const e = a2(), l = k9(), r = cl().pathname || "/", o = r === "/" ? null : r.replace(/^\//, ""), [i, s] = Whe(), u = i.get("section") || null, f = i.get("device") || "desktop", d = i.get("block") || "", m = d ? d.split(",") : [];
+  const e = a2(), l = k9(), r = cl().pathname || "/", o = r === "/" ? null : r.replace(/^\//, ""), [i, s] = Whe(), u = i.get("section") || null, f = i.get("device") || "desktop", d = i.get("block") || "", m = d ? d.split(",") : [], v = i.get("editor") === "true";
   h.useEffect(() => {
     if (a)
       return e.navigation.setAdapter({
         navigate: l,
-        setSearchParams: s
+        setSearchParams: s,
+        editorMode: v
       }), () => {
         e.navigation.setAdapter(null);
       };
-  }, [e, l, s, a]), h.useEffect(() => {
+  }, [e, l, s, a, v]), h.useEffect(() => {
     e.navigation.syncFromRoute({
       slug: o,
       device: f,
@@ -8577,24 +8578,24 @@ function Ft({
       blockPath: m
     });
   }, [e, o, f, u, m.join(",")]);
-  const v = h.useSyncExternalStore(
-    (b) => e.navigation.subscribe(b),
+  const b = h.useSyncExternalStore(
+    (S) => e.navigation.subscribe(S),
     () => e.navigation.getVersion(),
     () => 0
   );
   return h.useMemo(
     () => ({
       ...e.navigation.getSnapshot(),
-      setPage: (b) => e.navigation.setPage(b),
-      setSelection: (b, S = []) => e.navigation.setSelection(b, S),
-      setSection: (b, S = null) => e.navigation.setSection(b, S),
-      pushBlock: (b) => e.navigation.pushBlock(b),
+      setPage: (S) => e.navigation.setPage(S),
+      setSelection: (S, y = []) => e.navigation.setSelection(S, y),
+      setSection: (S, y = null) => e.navigation.setSection(S, y),
+      pushBlock: (S) => e.navigation.pushBlock(S),
       clearSection: () => e.navigation.clearSelection(),
-      setDevice: (b) => e.navigation.setDevice(b),
+      setDevice: (S) => e.navigation.setDevice(S),
       goBack: () => e.navigation.goBack(),
       navigate: l
     }),
-    [e, l, v]
+    [e, l, b]
   );
 }
 function Lbe() {
@@ -25009,6 +25010,7 @@ class jxe {
   writeSelectionToUrl(e, l) {
     var r;
     const t = {
+      editor: "true",
       ...this.device !== "desktop" ? { device: this.device } : {}
     };
     e && (t.section = e), l.length > 0 && (t.block = l.join(",")), (r = this.adapter) == null || r.setSearchParams(t);
@@ -25030,7 +25032,9 @@ class jxe {
   setDevice(e) {
     var t;
     this.layout.setDevice(e), this.setState({ device: e });
-    const l = {};
+    const l = {
+      editor: "true"
+    };
     this.selectedSection && (l.section = this.selectedSection), this.blockPath.length > 0 && (l.block = this.blockPath.join(",")), e !== "desktop" && (l.device = e), (t = this.adapter) == null || t.setSearchParams(l);
   }
   goBack() {

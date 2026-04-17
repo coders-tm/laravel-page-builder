@@ -5,6 +5,7 @@ import type { LayoutManager } from "./LayoutManager";
 interface NavigationAdapter {
   navigate: (path: string, options?: { replace?: boolean }) => void;
   setSearchParams: (params: Record<string, string>) => void;
+  editorMode?: boolean;
 }
 
 interface NavigationState {
@@ -151,6 +152,7 @@ export class NavigationManager {
 
   private writeSelectionToUrl(sectionId: string | null, path: string[]): void {
     const params: Record<string, string> = {
+      editor: "true",
       ...(this.device !== "desktop" ? { device: this.device } : {}),
     };
 
@@ -202,7 +204,9 @@ export class NavigationManager {
     this.layout.setDevice(device);
     this.setState({ device });
 
-    const params: Record<string, string> = {};
+    const params: Record<string, string> = {
+      editor: "true",
+    };
     if (this.selectedSection) params.section = this.selectedSection;
     if (this.blockPath.length > 0) params.block = this.blockPath.join(",");
     if (device !== "desktop") params.device = device;
