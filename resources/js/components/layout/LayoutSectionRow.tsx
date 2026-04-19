@@ -320,6 +320,7 @@ export default function LayoutSectionRow({
                                     isDraggingGlobal={isDraggingGlobal}
                                     collapseAllSignal={collapseAllSignal}
                                     depth={1}
+                                    parentBlocksMap={section.blocks}
                                 />
                             );
                         })}

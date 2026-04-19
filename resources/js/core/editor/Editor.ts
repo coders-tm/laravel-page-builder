@@ -548,8 +548,28 @@ export class Editor {
             : insertAtStartToken
         : null;
 
-    if (blockTypes.length === 1) {
-      const blockType = blockTypes[0];
+    // Evaluate Limits
+    const currentBlocks = parentNode?.blocks || {};
+    const countByType: Record<string, number> = {};
+    for (const block of Object.values(currentBlocks)) {
+      const type = (block as any).type;
+      if (type) {
+        countByType[type] = (countByType[type] || 0) + 1;
+      }
+    }
+
+    const blockTypesWithLimits = blockTypes.map((schema) => {
+      const limit = schema.limit ?? 0;
+      if (limit > 0 && (countByType[schema.type] || 0) >= limit) {
+        return { ...schema, disabled: true };
+      }
+      return schema;
+    });
+
+    const enabledTypes = blockTypesWithLimits.filter(t => !t.disabled);
+
+    if (blockTypesWithLimits.length === 1 && enabledTypes.length === 1) {
+      const blockType = enabledTypes[0];
       const defaults: Record<string, any> = {};
       (blockType.settings || []).forEach((s: any) => {
         if (s.default !== undefined) defaults[s.id] = s.default;
@@ -566,7 +586,7 @@ export class Editor {
     }
 
     this.layout.openAddBlockModal(
-      blockTypes,
+      blockTypesWithLimits,
       sectionId,
       parentPath,
       afterBlockId,

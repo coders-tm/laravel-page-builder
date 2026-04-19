@@ -542,6 +542,7 @@ export default function SortableSectionRow({
                                     isDraggingGlobal={isDraggingGlobal}
                                     collapseAllSignal={collapseAllSignal}
                                     depth={1}
+                                    parentBlocksMap={section.blocks}
                                 />
                             );
                         })}
