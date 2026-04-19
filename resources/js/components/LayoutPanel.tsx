@@ -25,6 +25,7 @@ import { useEditorLayout } from "@/hooks/useEditorLayout";
 import { useEditorNavigation } from "@/hooks/useEditorNavigation";
 import api from "@/services/api";
 import { BlockSchema, SectionInstance } from "@/types/page-builder";
+import { parsePresetBlocks } from "@/core/utils/blocks";
 import SortableSectionRow from "./layout/SortableSectionRow";
 import LayoutSectionRow from "./layout/LayoutSectionRow";
 
@@ -116,7 +117,7 @@ export default function LayoutPanel() {
   );
 
   const handleAddBlockFromModal = useCallback(
-    (type: string) => {
+    (type: string, presetIndex: number = 0) => {
       const modal = layout.addBlockModal;
       if (!modal?.isOpen || !modal.sectionId) return;
       const matched = modal.blockTypes.find((t) => t.type === type);
@@ -127,7 +128,7 @@ export default function LayoutPanel() {
         if (s.default !== undefined) defaults[s.id] = s.default;
       });
 
-      const preset = Array.isArray(matched.presets) ? matched.presets[0] : null;
+      const preset = Array.isArray(matched.presets) ? matched.presets[presetIndex] || matched.presets[0] : null;
       if (preset?.settings && typeof preset.settings === "object") {
         Object.assign(defaults, preset.settings);
       }
@@ -136,38 +137,14 @@ export default function LayoutPanel() {
       let parsedOrder: string[] = [];
 
       if (Array.isArray(preset?.blocks)) {
-        const parseBlocks = (presetBlocks: any[], pathPrefix: string) => {
-          const bMap: any = {};
-          const bOrder: string[] = [];
-
-          presetBlocks.forEach((pb: any, i: number) => {
-            const blockId = `${pb.type}_${Date.now()}_${pathPrefix}${i}`;
-
-            // Look up theme global block for defaults if possible
-            const childSchema = themeBlocks[pb.type]?.schema || {};
-            const childDefaults: any = {};
-            (childSchema.settings || []).forEach((s: any) => {
-               if (s.default !== undefined) childDefaults[s.id] = s.default;
-            });
-
-            const { bMap: cMap, bOrder: cOrder } = Array.isArray(pb.blocks)
-              ? parseBlocks(pb.blocks, `${pathPrefix}${i}_`)
-              : { bMap: {}, bOrder: [] };
-
-            bMap[blockId] = {
-              type: pb.type,
-              settings: { ...childDefaults, ...(pb.settings || {}) },
-              blocks: cMap,
-              order: cOrder,
-            };
-            bOrder.push(blockId);
-          });
-          return { bMap, bOrder };
-        };
-
-        const { bMap, bOrder } = parseBlocks(preset.blocks, "");
-        parsedBlocks = bMap;
-        parsedOrder = bOrder;
+        const result = parsePresetBlocks(
+            preset.blocks,
+            "",
+            themeBlocks,
+            (type, prefix, i) => `${type}_${Date.now()}_${prefix}${i}`
+        );
+        parsedBlocks = result.parsedBlocks;
+        parsedOrder = result.parsedOrder;
       }
 
       handleAddBlock(

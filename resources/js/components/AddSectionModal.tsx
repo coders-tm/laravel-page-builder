@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useEditorInstance } from "@/core/editorContext";
 import { useEditorLayout } from "@/hooks/useEditorLayout";
 import { useEditorNavigation } from "@/hooks/useEditorNavigation";
+import { parsePresetBlocks } from "@/core/utils/blocks";
 import { useStore } from "@/core/store/useStore";
 
 interface SectionEntry {
@@ -35,29 +36,14 @@ interface SectionEntry {
 
 const PREVIEW_IFRAME_WIDTH = 1400;
 
-function parsePreviewBlocks(presetBlocks: any[], idPrefix: string) {
-    const parsedBlocks: Record<string, any> = {};
-    const parsedOrder: string[] = [];
 
-    presetBlocks.forEach((pb: any, i: number) => {
-        const blockId = `${pb.type || "block"}_preview_${idPrefix}${i}`;
-        const { blocks: childBlocks, order: childOrder } = Array.isArray(pb.blocks)
-            ? parsePreviewBlocks(pb.blocks, `${idPrefix}${i}_`)
-            : { blocks: {}, order: [] };
 
-        parsedBlocks[blockId] = {
-            type: pb.type,
-            settings: pb.settings || {},
-            blocks: childBlocks,
-            order: childOrder,
-        };
-        parsedOrder.push(blockId);
-    });
-
-    return { parsedBlocks, parsedOrder };
-}
-
-function buildSectionPreviewPayload(type: string, meta: Record<string, any>) {
+function buildSectionPreviewPayload(
+    type: string, 
+    meta: Record<string, any>, 
+    presetIndex: number = 0,
+    themeBlocks: Record<string, any> = {}
+) {
     const schema = (meta?.schema || meta || {}) as Record<string, any>;
 
     const settings: Record<string, any> = {};
@@ -68,13 +54,18 @@ function buildSectionPreviewPayload(type: string, meta: Record<string, any>) {
     const blocks: Record<string, any> = {};
     const order: string[] = [];
 
-    const preset = Array.isArray(schema.presets) ? schema.presets[0] : null;
+    const preset = Array.isArray(schema.presets) ? schema.presets[presetIndex] || schema.presets[0] : null;
     if (preset?.settings && typeof preset.settings === "object") {
         Object.assign(settings, preset.settings);
     }
 
     if (Array.isArray(preset?.blocks)) {
-        const { parsedBlocks, parsedOrder } = parsePreviewBlocks(preset.blocks, "");
+        const { parsedBlocks, parsedOrder } = parsePresetBlocks(
+            preset.blocks, 
+            "", 
+            themeBlocks, 
+            (type, prefix, i) => `${type}_preview_${prefix}${i}`
+        );
         Object.assign(blocks, parsedBlocks);
         order.push(...parsedOrder);
     }
@@ -101,7 +92,7 @@ export default function AddSectionModal() {
     const editor = useEditorInstance();
     const layout = useEditorLayout();
     const { slug } = useEditorNavigation();
-    const { sections } = useStore();
+    const { sections, blocks: themeBlocks } = useStore();
     const isOpen = layout.addSectionModal.isOpen;
 
     const isMobile = !useBreakpoint(768);
@@ -117,6 +108,7 @@ export default function AddSectionModal() {
     const [previewHtml, setPreviewHtml] = useState("");
     const [isPreviewLoading, setIsPreviewLoading] = useState(false);
     const [previewError, setPreviewError] = useState<string | null>(null);
+    const [selectedPresetIndex, setSelectedPresetIndex] = useState(0);
 
     // Mobile-specific step logic
     const [step, setStep] = useState<"list" | "preview">("list");
@@ -158,6 +150,10 @@ export default function AddSectionModal() {
         }
         return selectedEntry;
     }, [hoveredType, filteredEntries, entries, selectedEntry]);
+
+    useEffect(() => {
+        setSelectedPresetIndex(0);
+    }, [previewEntry?.type]);
 
     const previewSrc = useMemo(() => buildPreviewUrl(slug), [slug]);
     const iframeHeight = useMemo(() => {
@@ -245,7 +241,9 @@ export default function AddSectionModal() {
             try {
                 const payload = buildSectionPreviewPayload(
                     previewEntry.type,
-                    previewEntry.meta
+                    previewEntry.meta,
+                    selectedPresetIndex,
+                    themeBlocks
                 );
                 const { html } = await api.renderSection(payload);
                 if (cancelled) return;
@@ -267,7 +265,7 @@ export default function AddSectionModal() {
             cancelled = true;
             window.clearTimeout(timer);
         };
-    }, [isOpen, previewEntry?.type]);
+    }, [isOpen, previewEntry?.type, selectedPresetIndex]);
 
     useEffect(() => {
         if (!isOpen || !iframeReady) return;
@@ -311,7 +309,8 @@ export default function AddSectionModal() {
         const sectionId = editor.addSection(
             entry.type,
             entry.meta || {},
-            layout.addSectionModal.insertIndex ?? null
+            layout.addSectionModal.insertIndex ?? null,
+            selectedPresetIndex
         );
         editor.layout.closeAddSectionModal();
         editor.selectSection(sectionId);
@@ -428,6 +427,21 @@ export default function AddSectionModal() {
                     >
                         Add
                     </button>
+                </div>
+            )}
+
+            {previewEntry && Array.isArray(previewEntry.meta?.schema?.presets) && previewEntry.meta.schema.presets.length > 1 && (
+                <div className="px-3 py-2 border-b border-gray-200 bg-white flex items-center shrink-0">
+                    <span className="text-sm font-medium text-gray-500 mr-3">Preset:</span>
+                    <select
+                        value={selectedPresetIndex}
+                        onChange={(e) => setSelectedPresetIndex(Number(e.target.value))}
+                        className="text-sm border border-gray-300 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-blue-500 min-w-[200px]"
+                    >
+                        {previewEntry.meta.schema.presets.map((preset: any, idx: number) => (
+                            <option key={idx} value={idx}>{preset.name || `Preset ${idx + 1}`}</option>
+                        ))}
+                    </select>
                 </div>
             )}
 

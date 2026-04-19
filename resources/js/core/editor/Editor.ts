@@ -376,8 +376,9 @@ export class Editor {
     type: string,
     schema: any,
     insertIndex: number | null = null,
+    presetIndex: number = 0
   ): string {
-    return this.sections.add(type, schema, insertIndex);
+    return this.sections.add(type, schema, insertIndex, presetIndex);
   }
 
   addBlock(

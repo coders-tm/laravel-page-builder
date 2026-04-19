@@ -1,5 +1,7 @@
 import { StateCreator } from "zustand";
 import { PageBuilderState } from "../useStore";
+import { getThemeConfig } from "@/config";
+import { parsePresetBlocks } from "@/core/utils/blocks";
 
 export interface SectionSlice {
     updateSectionSettings: (
@@ -9,7 +11,8 @@ export interface SectionSlice {
     addSection: (
         type: string,
         schema: any,
-        insertIndex?: number | null
+        insertIndex?: number | null,
+        presetIndex?: number
     ) => string;
     removeSection: (sectionId: string) => void;
     reorderSections: (fromIndex: number, toIndex: number) => void;
@@ -35,7 +38,7 @@ export const createSectionSlice: StateCreator<
             sec.settings = { ...sec.settings, ...patch };
         }),
 
-    addSection: (type, sectionMeta, insertIndex = null) => {
+    addSection: (type, sectionMeta, insertIndex = null, presetIndex = 0) => {
         const schema = (sectionMeta as any).schema || sectionMeta;
         const sectionId = `${type}_${Date.now()}`;
 
@@ -46,49 +49,22 @@ export const createSectionSlice: StateCreator<
 
         const blocks: any = {};
         const blockOrder: string[] = [];
-        const preset = (schema.presets || [])[0];
+        const preset = (schema.presets || [])[presetIndex] || (schema.presets || [])[0];
 
         if (preset) {
             if (preset.settings) {
                 Object.assign(settings, preset.settings);
             }
 
-            if (preset.blocks) {
-                const parseBlocks = (presetBlocks: any[], pathPrefix: string) => {
-                    const bMap: any = {};
-                    const bOrder: string[] = [];
-
-                    presetBlocks.forEach((pb: any, i: number) => {
-                        const blockId = `${pb.type}_${Date.now()}_${pathPrefix}${i}`;
-                        const blockSchema =
-                            (get().blocks[pb.type] as any)?.schema || {};
-
-                        const blockDefaults: any = {};
-                        (blockSchema.settings || []).forEach((s: any) => {
-                            if (s.default !== undefined)
-                                blockDefaults[s.id] = s.default;
-                        });
-
-                        const { bMap: childBlocks, bOrder: childOrder } =
-                            Array.isArray(pb.blocks)
-                                ? parseBlocks(pb.blocks, `${pathPrefix}${i}_`)
-                                : { bMap: {}, bOrder: [] };
-
-                        bMap[blockId] = {
-                            type: pb.type,
-                            settings: { ...blockDefaults, ...(pb.settings || {}) },
-                            blocks: childBlocks,
-                            order: childOrder,
-                        };
-                        bOrder.push(blockId);
-                    });
-
-                    return { bMap, bOrder };
-                };
-
-                const { bMap, bOrder } = parseBlocks(preset.blocks, "");
-                Object.assign(blocks, bMap);
-                blockOrder.push(...bOrder);
+            if (Array.isArray(preset.blocks)) {
+                const result = parsePresetBlocks(
+                    preset.blocks,
+                    "",
+                    get().blocks,
+                    (pbType, prefix, i) => `${pbType}_${Date.now()}_${prefix}${i}`
+                );
+                Object.assign(blocks, result.parsedBlocks);
+                blockOrder.push(...result.parsedOrder);
             }
         }
 

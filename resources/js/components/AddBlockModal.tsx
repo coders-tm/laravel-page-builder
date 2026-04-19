@@ -23,6 +23,9 @@ import {
     DrawerTitle,
     DrawerClose,
 } from "@/components/ui/drawer";
+import { useEditorLayout } from "@/hooks/useEditorLayout";
+import { useEditorNavigation } from "@/hooks/useEditorNavigation";
+import { parsePresetBlocks } from "@/core/utils/blocks";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import { cn } from "@/lib/utils";
 
@@ -30,35 +33,17 @@ interface AddBlockModalProps {
     isOpen: boolean;
     previewUrl: string;
     onClose: () => void;
-    onAdd: (type: string) => void;
+    onAdd: (type: string, presetIndex: number) => void;
     blockTypes: BlockSchema[];
 }
 
 const PREVIEW_IFRAME_WIDTH = 1240;
 
-function parsePreviewBlocks(presetBlocks: any[], idPrefix: string) {
-    const parsedBlocks: Record<string, any> = {};
-    const parsedOrder: string[] = [];
-
-    presetBlocks.forEach((pb: any, i: number) => {
-        const blockId = `${pb.type || "block"}_preview_${idPrefix}${i}`;
-        const { blocks: childBlocks, order: childOrder } = Array.isArray(pb.blocks)
-            ? parsePreviewBlocks(pb.blocks, `${idPrefix}${i}_`)
-            : { blocks: {}, order: [] };
-
-        parsedBlocks[blockId] = {
-            type: pb.type,
-            settings: pb.settings || {},
-            blocks: childBlocks,
-            order: childOrder,
-        };
-        parsedOrder.push(blockId);
-    });
-
-    return { parsedBlocks, parsedOrder };
-}
-
-function buildBlockPreviewPayload(schema: BlockSchema) {
+function buildBlockPreviewPayload(
+    schema: BlockSchema, 
+    presetIndex: number = 0,
+    blockTypes: BlockSchema[] = []
+) {
     const type = schema.type || "block";
     const values: Record<string, any> = {};
 
@@ -71,13 +56,18 @@ function buildBlockPreviewPayload(schema: BlockSchema) {
     const order: string[] = [];
 
     // Override with first preset settings if available
-    const preset = Array.isArray(schema.presets) ? schema.presets[0] : null;
+    const preset = Array.isArray(schema.presets) ? schema.presets[presetIndex] || schema.presets[0] : null;
     if (preset?.settings && typeof preset.settings === "object") {
         Object.assign(values, preset.settings);
     }
 
     if (Array.isArray(preset?.blocks)) {
-        const { parsedBlocks, parsedOrder } = parsePreviewBlocks(preset.blocks, "");
+        const { parsedBlocks, parsedOrder } = parsePresetBlocks(
+            preset.blocks, 
+            "", 
+            blockTypes,
+            (type, prefix, i) => `${type}_preview_${prefix}${i}`
+        );
         Object.assign(blocks, parsedBlocks);
         order.push(...parsedOrder);
     }
@@ -109,6 +99,7 @@ export default function AddBlockModal({
     const [previewHtml, setPreviewHtml] = useState("");
     const [isPreviewLoading, setIsPreviewLoading] = useState(false);
     const [previewError, setPreviewError] = useState<string | null>(null);
+    const [selectedPresetIndex, setSelectedPresetIndex] = useState(0);
     const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Mobile-specific step logic
@@ -144,6 +135,10 @@ export default function AddBlockModal({
         }
         return selectedBlock;
     }, [hoveredType, filteredBlocks, blockTypes, selectedBlock]);
+
+    useEffect(() => {
+        setSelectedPresetIndex(0);
+    }, [previewBlock?.type]);
 
     const iframeHeight = useMemo(() => {
         if (previewContainerHeight <= 0 || previewScale <= 0) {
@@ -221,7 +216,7 @@ export default function AddBlockModal({
             setIsPreviewLoading(true);
             setPreviewError(null);
             try {
-                const payload = buildBlockPreviewPayload(previewBlock);
+                const payload = buildBlockPreviewPayload(previewBlock, selectedPresetIndex, blockTypes);
                 const { html } = await api.renderBlock(payload);
                 if (cancelled) return;
                 setPreviewHtml(html || "");
@@ -242,7 +237,7 @@ export default function AddBlockModal({
             cancelled = true;
             window.clearTimeout(timer);
         };
-    }, [isOpen, previewBlock?.type]);
+    }, [isOpen, previewBlock?.type, selectedPresetIndex]);
 
     useEffect(() => {
         if (!isOpen || !iframeReady) return;
@@ -284,7 +279,7 @@ export default function AddBlockModal({
 
     const handleAddBlock = (block: BlockSchema) => {
         if (block.disabled) return;
-        onAdd(block.type);
+        onAdd(block.type, selectedPresetIndex);
         onClose();
     };
 
@@ -412,6 +407,21 @@ export default function AddBlockModal({
                     >
                         Add
                     </button>
+                </div>
+            )}
+
+            {previewBlock && Array.isArray(previewBlock.presets) && previewBlock.presets.length > 1 && (
+                <div className="px-3 py-2 border-b border-gray-200 bg-white flex items-center shrink-0">
+                    <span className="text-sm font-medium text-gray-500 mr-3">Preset:</span>
+                    <select
+                        value={selectedPresetIndex}
+                        onChange={(e) => setSelectedPresetIndex(Number(e.target.value))}
+                        className="text-sm border border-gray-300 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-blue-500 min-w-[200px]"
+                    >
+                        {previewBlock.presets.map((preset: any, idx: number) => (
+                            <option key={idx} value={idx}>{preset.name || `Preset ${idx + 1}`}</option>
+                        ))}
+                    </select>
                 </div>
             )}
 
