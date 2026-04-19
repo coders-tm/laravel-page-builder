@@ -144,6 +144,34 @@ abstract class BaseCollection implements Arrayable, ArrayAccess, Countable, Iter
     }
 
     /**
+     * Chunk the collection into multiple collections of a given size.
+     *
+     * @return array<static>
+     */
+    public function chunk(int $size): array
+    {
+        $chunks = [];
+
+        foreach (array_chunk($this->items, $size, true) as $chunk) {
+            $chunks[] = new static($chunk);
+        }
+
+        return $chunks;
+    }
+
+    /**
+     * Take a certain number of items from the collection.
+     */
+    public function take(int $limit): static
+    {
+        if ($limit < 0) {
+            return new static(array_slice($this->items, $limit, abs($limit), true));
+        }
+
+        return new static(array_slice($this->items, 0, $limit, true));
+    }
+
+    /**
      * @return array<string, array<string, mixed>>
      */
     public function toArray(): array
