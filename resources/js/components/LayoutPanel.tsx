@@ -121,20 +121,67 @@ export default function LayoutPanel() {
       if (!modal?.isOpen || !modal.sectionId) return;
       const matched = modal.blockTypes.find((t) => t.type === type);
       if (!matched) return;
+
       const defaults: Record<string, any> = {};
       (matched.settings || []).forEach((s: any) => {
         if (s.default !== undefined) defaults[s.id] = s.default;
       });
+
+      const preset = Array.isArray(matched.presets) ? matched.presets[0] : null;
+      if (preset?.settings && typeof preset.settings === "object") {
+        Object.assign(defaults, preset.settings);
+      }
+
+      let parsedBlocks: Record<string, any> = {};
+      let parsedOrder: string[] = [];
+
+      if (Array.isArray(preset?.blocks)) {
+        const parseBlocks = (presetBlocks: any[], pathPrefix: string) => {
+          const bMap: any = {};
+          const bOrder: string[] = [];
+
+          presetBlocks.forEach((pb: any, i: number) => {
+            const blockId = `${pb.type}_${Date.now()}_${pathPrefix}${i}`;
+
+            // Look up theme global block for defaults if possible
+            const childSchema = themeBlocks[pb.type]?.schema || {};
+            const childDefaults: any = {};
+            (childSchema.settings || []).forEach((s: any) => {
+               if (s.default !== undefined) childDefaults[s.id] = s.default;
+            });
+
+            const { bMap: cMap, bOrder: cOrder } = Array.isArray(pb.blocks)
+              ? parseBlocks(pb.blocks, `${pathPrefix}${i}_`)
+              : { bMap: {}, bOrder: [] };
+
+            bMap[blockId] = {
+              type: pb.type,
+              settings: { ...childDefaults, ...(pb.settings || {}) },
+              blocks: cMap,
+              order: cOrder,
+            };
+            bOrder.push(blockId);
+          });
+          return { bMap, bOrder };
+        };
+
+        const { bMap, bOrder } = parseBlocks(preset.blocks, "");
+        parsedBlocks = bMap;
+        parsedOrder = bOrder;
+      }
+
       handleAddBlock(
         modal.sectionId,
         type,
         defaults,
         modal.afterBlockId ?? null,
         modal.parentPath,
+        parsedBlocks,
+        parsedOrder
       );
       editor.layout.closeAddBlockModal();
     },
-    [layout.addBlockModal, handleAddBlock, editor],
+    [layout.addBlockModal, handleAddBlock, editor, themeBlocks],
   );
 
   const handleRemoveSection = useCallback(

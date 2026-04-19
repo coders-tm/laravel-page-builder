@@ -54,23 +54,41 @@ export const createSectionSlice: StateCreator<
             }
 
             if (preset.blocks) {
-                preset.blocks.forEach((pb: any, i: number) => {
-                    const blockId = `${pb.type}_${Date.now()}_${i}`;
-                    const blockSchema =
-                        (get().blocks[pb.type] as any)?.schema || {};
+                const parseBlocks = (presetBlocks: any[], pathPrefix: string) => {
+                    const bMap: any = {};
+                    const bOrder: string[] = [];
 
-                    const blockDefaults: any = {};
-                    (blockSchema.settings || []).forEach((s: any) => {
-                        if (s.default !== undefined)
-                            blockDefaults[s.id] = s.default;
+                    presetBlocks.forEach((pb: any, i: number) => {
+                        const blockId = `${pb.type}_${Date.now()}_${pathPrefix}${i}`;
+                        const blockSchema =
+                            (get().blocks[pb.type] as any)?.schema || {};
+
+                        const blockDefaults: any = {};
+                        (blockSchema.settings || []).forEach((s: any) => {
+                            if (s.default !== undefined)
+                                blockDefaults[s.id] = s.default;
+                        });
+
+                        const { bMap: childBlocks, bOrder: childOrder } =
+                            Array.isArray(pb.blocks)
+                                ? parseBlocks(pb.blocks, `${pathPrefix}${i}_`)
+                                : { bMap: {}, bOrder: [] };
+
+                        bMap[blockId] = {
+                            type: pb.type,
+                            settings: { ...blockDefaults, ...(pb.settings || {}) },
+                            blocks: childBlocks,
+                            order: childOrder,
+                        };
+                        bOrder.push(blockId);
                     });
 
-                    blocks[blockId] = {
-                        type: pb.type,
-                        settings: { ...blockDefaults, ...(pb.settings || {}) },
-                    };
-                    blockOrder.push(blockId);
-                });
+                    return { bMap, bOrder };
+                };
+
+                const { bMap, bOrder } = parseBlocks(preset.blocks, "");
+                Object.assign(blocks, bMap);
+                blockOrder.push(...bOrder);
             }
         }
 

@@ -343,14 +343,18 @@ export function useSectionActions({
             blockType: string,
             defaults: Record<string, any>,
             afterBlockId?: string | null,
-            parentPath: string[] = []
+            parentPath: string[] = [],
+            initialBlocks?: Record<string, any>,
+            initialOrder?: string[]
         ) => {
             const blockId = addBlock(
                 sectionId,
                 blockType,
                 defaults,
                 afterBlockId,
-                parentPath
+                parentPath,
+                initialBlocks,
+                initialOrder
             );
             if (parentPath.length > 0) {
                 // Push child block onto the path (section > ... > parent > newBlock)

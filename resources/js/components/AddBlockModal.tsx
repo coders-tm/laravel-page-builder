@@ -36,6 +36,28 @@ interface AddBlockModalProps {
 
 const PREVIEW_IFRAME_WIDTH = 1240;
 
+function parsePreviewBlocks(presetBlocks: any[], idPrefix: string) {
+    const parsedBlocks: Record<string, any> = {};
+    const parsedOrder: string[] = [];
+
+    presetBlocks.forEach((pb: any, i: number) => {
+        const blockId = `${pb.type || "block"}_preview_${idPrefix}${i}`;
+        const { blocks: childBlocks, order: childOrder } = Array.isArray(pb.blocks)
+            ? parsePreviewBlocks(pb.blocks, `${idPrefix}${i}_`)
+            : { blocks: {}, order: [] };
+
+        parsedBlocks[blockId] = {
+            type: pb.type,
+            settings: pb.settings || {},
+            blocks: childBlocks,
+            order: childOrder,
+        };
+        parsedOrder.push(blockId);
+    });
+
+    return { parsedBlocks, parsedOrder };
+}
+
 function buildBlockPreviewPayload(schema: BlockSchema) {
     const type = schema.type || "block";
     const values: Record<string, any> = {};
@@ -55,16 +77,9 @@ function buildBlockPreviewPayload(schema: BlockSchema) {
     }
 
     if (Array.isArray(preset?.blocks)) {
-        preset.blocks.forEach((pb: any, i: number) => {
-            const blockId = `${pb.type || "block"}_preview_${i}`;
-            blocks[blockId] = {
-                type: pb.type,
-                settings: pb.settings || {},
-                blocks: pb.blocks || {},
-                order: pb.order || [],
-            };
-            order.push(blockId);
-        });
+        const { parsedBlocks, parsedOrder } = parsePreviewBlocks(preset.blocks, "");
+        Object.assign(blocks, parsedBlocks);
+        order.push(...parsedOrder);
     }
 
     return {
