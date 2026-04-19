@@ -26,6 +26,15 @@ class BladeDirectives
      */
     public static function register(): void
     {
+        // @block($block, $parent) — renders a single block
+        Blade::directive('block', function (string $expression) {
+            return <<<PHP
+<?php
+echo app(\Coderstm\PageBuilder\Rendering\Renderer::class)->renderBlock({$expression});
+?>
+PHP;
+        });
+
         // @blocks($section) — renders all blocks within a section
         // @blocks($block)   — renders child blocks inside a container block
         Blade::directive('blocks', function (string $expression) {

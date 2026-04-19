@@ -518,23 +518,15 @@ export default function LayoutPanel() {
             const activeData = event.active.data.current;
             if (activeData?.type === "block") {
               const { sectionId, parentPath } = activeData;
-              const section = pageSections[sectionId];
-              if (section) {
-                const parent =
-                  parentPath.length > 0
-                    ? getNestedBlock(section.blocks, parentPath)
-                    : section;
-                const order =
-                  parent?.order || Object.keys(parent?.blocks || {});
+              const order = editor.blocks.getOrder(sectionId, parentPath);
 
-                editor.preview.reorderBlocks(
-                  sectionId,
-                  order,
-                  parentPath.length > 0
-                    ? parentPath[parentPath.length - 1]
-                    : null,
-                );
-              }
+              editor.preview.reorderBlocks(
+                sectionId,
+                order,
+                parentPath.length > 0
+                  ? parentPath[parentPath.length - 1]
+                  : null,
+              );
             }
           }}
           onDragCancel={() => {

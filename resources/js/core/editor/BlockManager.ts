@@ -110,6 +110,19 @@ export class BlockManager {
     return useStore.getState().currentPage?.sections[sectionId]?.blocks ?? {};
   }
 
+  /** Get the ordered list of block IDs for a section or nested container. */
+  getOrder(sectionId: string, parentPath: string[] = []): string[] {
+    const section = useStore.getState().currentPage?.sections[sectionId];
+    if (!section) return [];
+
+    const parentBlock =
+      parentPath.length > 0
+        ? getNestedBlock(section.blocks ?? {}, parentPath)
+        : section;
+
+    return parentBlock?.order || Object.keys(parentBlock?.blocks || {});
+  }
+
   /** Getter alias. */
   get(sectionId: string, blockPath: string[] = []) {
     return blockPath.length > 0
