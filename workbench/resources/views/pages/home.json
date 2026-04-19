@@ -89,56 +89,11 @@
                 "contact_info_block",
                 "socials_block"
             ]
-        },
-        "section_1776577350877": {
-            "type": "section",
-            "settings": {
-                "heading": "Default"
-            },
-            "blocks": {
-                "nav-links_1776577357506": {
-                    "type": "nav-links",
-                    "settings": {
-                        "align": "center",
-                        "gap": "6",
-                        "text_color": "#4b5563",
-                        "text_decoration": "none"
-                    },
-                    "blocks": {
-                        "nav-link_1776577360145": {
-                            "type": "nav-link",
-                            "settings": {
-                                "label": "Link",
-                                "url": "#",
-                                "text_color": null,
-                                "text_decoration": null
-                            }
-                        },
-                        "nav-link_1776577362239": {
-                            "type": "nav-link",
-                            "settings": {
-                                "label": "Link",
-                                "url": "#",
-                                "text_color": null,
-                                "text_decoration": null
-                            }
-                        }
-                    },
-                    "order": [
-                        "nav-link_1776577360145",
-                        "nav-link_1776577362239"
-                    ]
-                }
-            },
-            "order": [
-                "nav-links_1776577357506"
-            ]
         }
     },
     "order": [
         "banner-1",
-        "contact-form_1773542384140",
-        "section_1776577350877"
+        "contact-form_1773542384140"
     ],
     "layout": {
         "type": "page",
