@@ -89,15 +89,220 @@
                 "contact_info_block",
                 "socials_block"
             ]
+        },
+        "section_1776577350877": {
+            "type": "section",
+            "settings": {
+                "heading": "Default"
+            },
+            "blocks": {
+                "nav-links_1776577357506": {
+                    "type": "nav-links",
+                    "settings": {
+                        "align": "center",
+                        "gap": "6",
+                        "text_color": "#4b5563",
+                        "text_decoration": "none"
+                    },
+                    "blocks": {
+                        "nav-link_1776577360145": {
+                            "type": "nav-link",
+                            "settings": {
+                                "label": "Link",
+                                "url": "#",
+                                "text_color": null,
+                                "text_decoration": null
+                            }
+                        },
+                        "nav-link_1776577362239": {
+                            "type": "nav-link",
+                            "settings": {
+                                "label": "Link",
+                                "url": "#",
+                                "text_color": null,
+                                "text_decoration": null
+                            }
+                        }
+                    },
+                    "order": [
+                        "nav-link_1776577360145",
+                        "nav-link_1776577362239"
+                    ]
+                }
+            },
+            "order": [
+                "nav-links_1776577357506"
+            ]
         }
     },
     "order": [
         "banner-1",
-        "contact-form_1773542384140"
+        "contact-form_1773542384140",
+        "section_1776577350877"
     ],
+    "layout": {
+        "type": "page",
+        "header": {
+            "sections": {
+                "header": {
+                    "blocks": [],
+                    "order": [],
+                    "type": "header",
+                    "disabled": false,
+                    "settings": {
+                        "title": "My Site Header"
+                    }
+                }
+            },
+            "order": [
+                "header"
+            ]
+        },
+        "footer": {
+            "sections": {
+                "footer": {
+                    "blocks": {
+                        "brand_1": {
+                            "type": "brand",
+                            "settings": {
+                                "tagline": "Your ultimate fitness destination. We provide the best equipment, expert coaching, and a supportive community to help you reach your goals."
+                            }
+                        },
+                        "footer-column_1": {
+                            "type": "footer-column",
+                            "settings": {
+                                "title": "Quick Links"
+                            },
+                            "blocks": {
+                                "footer-link_1": {
+                                    "type": "footer-link",
+                                    "settings": {
+                                        "label": "About Us",
+                                        "url": "#about"
+                                    }
+                                },
+                                "footer-link_2": {
+                                    "type": "footer-link",
+                                    "settings": {
+                                        "label": "Services",
+                                        "url": "#services"
+                                    }
+                                },
+                                "footer-link_3": {
+                                    "type": "footer-link",
+                                    "settings": {
+                                        "label": "Pricing",
+                                        "url": "#pricing"
+                                    }
+                                },
+                                "footer-link_4": {
+                                    "type": "footer-link",
+                                    "settings": {
+                                        "label": "Contact",
+                                        "url": "#contact"
+                                    }
+                                }
+                            },
+                            "order": [
+                                "footer-link_1",
+                                "footer-link_2",
+                                "footer-link_3",
+                                "footer-link_4"
+                            ]
+                        },
+                        "footer-column_2": {
+                            "type": "footer-column",
+                            "settings": {
+                                "title": "Working Hours"
+                            },
+                            "blocks": {
+                                "footer-hours-item_1": {
+                                    "type": "footer-hours-item",
+                                    "settings": {
+                                        "label": "Mon \u2013 Fri",
+                                        "value": "5:00 AM \u2013 10:00 PM"
+                                    }
+                                },
+                                "footer-hours-item_2": {
+                                    "type": "footer-hours-item",
+                                    "settings": {
+                                        "label": "Saturday",
+                                        "value": "7:00 AM \u2013 9:00 PM"
+                                    }
+                                },
+                                "footer-hours-item_3": {
+                                    "type": "footer-hours-item",
+                                    "settings": {
+                                        "label": "Sunday",
+                                        "value": "7:00 AM \u2013 9:00 PM",
+                                        "is_accent": true
+                                    }
+                                }
+                            },
+                            "order": [
+                                "footer-hours-item_1",
+                                "footer-hours-item_2",
+                                "footer-hours-item_3"
+                            ]
+                        },
+                        "footer-column_3": {
+                            "type": "footer-column",
+                            "settings": {
+                                "title": "Contact Info"
+                            },
+                            "blocks": {
+                                "footer-contact-item_1": {
+                                    "type": "footer-contact-item",
+                                    "settings": {
+                                        "icon": "fas fa-location-dot",
+                                        "text": "123 Fitness Street, Muscle City"
+                                    }
+                                },
+                                "footer-contact-item_2": {
+                                    "type": "footer-contact-item",
+                                    "settings": {
+                                        "icon": "fas fa-phone",
+                                        "text": "+1 (555) 123-4567"
+                                    }
+                                },
+                                "footer-contact-item_3": {
+                                    "type": "footer-contact-item",
+                                    "settings": {
+                                        "icon": "fas fa-envelope",
+                                        "text": "info@yourgym.com"
+                                    }
+                                }
+                            },
+                            "order": [
+                                "footer-contact-item_1",
+                                "footer-contact-item_2",
+                                "footer-contact-item_3"
+                            ]
+                        }
+                    },
+                    "order": [
+                        "brand_1",
+                        "footer-column_1",
+                        "footer-column_2",
+                        "footer-column_3"
+                    ],
+                    "type": "footer",
+                    "disabled": false,
+                    "settings": {
+                        "style": "default"
+                    }
+                }
+            },
+            "order": [
+                "footer"
+            ]
+        }
+    },
     "title": "Home Page",
     "meta": {
+        "title": "Home Page",
         "meta_title": "SEO Home",
-        "meta_description": "Home description"
+        "meta_description": "Home description",
+        "meta_keywords": null
     }
 }
