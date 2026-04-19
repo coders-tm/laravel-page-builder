@@ -93,8 +93,8 @@ export class SectionManager {
   /* ── Mutations ───────────────────────────────────────────────────── */
 
   /** Add a new section from a schema. Returns the new section ID. */
-  add(type: string, schema: any, insertIndex: number | null = null): string {
-    const sectionId = useStore.getState().addSection(type, schema, insertIndex);
+  add(type: string, schema: any, insertIndex: number | null = null, presetIndex: number = 0): string {
+    const sectionId = useStore.getState().addSection(type, schema, insertIndex, presetIndex);
     this.events.emit("section:added", { sectionId, type });
     return sectionId;
   }

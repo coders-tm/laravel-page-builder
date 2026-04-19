@@ -25,6 +25,7 @@ import { useEditorLayout } from "@/hooks/useEditorLayout";
 import { useEditorNavigation } from "@/hooks/useEditorNavigation";
 import api from "@/services/api";
 import { BlockSchema, SectionInstance } from "@/types/page-builder";
+import { parsePresetBlocks } from "@/core/utils/blocks";
 import SortableSectionRow from "./layout/SortableSectionRow";
 import LayoutSectionRow from "./layout/LayoutSectionRow";
 
@@ -116,25 +117,48 @@ export default function LayoutPanel() {
   );
 
   const handleAddBlockFromModal = useCallback(
-    (type: string) => {
+    (type: string, presetIndex: number = 0) => {
       const modal = layout.addBlockModal;
       if (!modal?.isOpen || !modal.sectionId) return;
       const matched = modal.blockTypes.find((t) => t.type === type);
       if (!matched) return;
+
       const defaults: Record<string, any> = {};
       (matched.settings || []).forEach((s: any) => {
         if (s.default !== undefined) defaults[s.id] = s.default;
       });
+
+      const preset = Array.isArray(matched.presets) ? matched.presets[presetIndex] || matched.presets[0] : null;
+      if (preset?.settings && typeof preset.settings === "object") {
+        Object.assign(defaults, preset.settings);
+      }
+
+      let parsedBlocks: Record<string, any> = {};
+      let parsedOrder: string[] = [];
+
+      if (Array.isArray(preset?.blocks)) {
+        const result = parsePresetBlocks(
+            preset.blocks,
+            "",
+            themeBlocks,
+            (type, prefix, i) => `${type}_${Date.now()}_${prefix}${i}`
+        );
+        parsedBlocks = result.parsedBlocks;
+        parsedOrder = result.parsedOrder;
+      }
+
       handleAddBlock(
         modal.sectionId,
         type,
         defaults,
         modal.afterBlockId ?? null,
         modal.parentPath,
+        parsedBlocks,
+        parsedOrder
       );
       editor.layout.closeAddBlockModal();
     },
-    [layout.addBlockModal, handleAddBlock, editor],
+    [layout.addBlockModal, handleAddBlock, editor, themeBlocks],
   );
 
   const handleRemoveSection = useCallback(

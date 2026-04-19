@@ -13,7 +13,9 @@ export interface BlockSlice {
         blockType: string,
         defaultSettings: any,
         afterBlockId?: string | null,
-        parentPath?: string[]
+        parentPath?: string[],
+        initialBlocks?: Record<string, any>,
+        initialOrder?: string[]
     ) => string;
     removeBlock: (
         sectionId: string,
@@ -85,14 +87,16 @@ export const createBlockSlice: StateCreator<
         blockType,
         defaults,
         afterId = null,
-        parentPath = []
+        parentPath = [],
+        initialBlocks = {},
+        initialOrder = []
     ) => {
         const blockId = `${blockType}_${Date.now()}`;
         set((state) => {
             const section = state.currentPage?.sections[sectionId];
             if (!section) return;
 
-            const blockObj = { type: blockType, settings: defaults };
+            const blockObj = { type: blockType, settings: defaults, blocks: initialBlocks, order: initialOrder };
 
             if (parentPath.length > 0) {
                 const parent = getNestedBlock(section.blocks, parentPath);

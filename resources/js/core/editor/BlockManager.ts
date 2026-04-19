@@ -173,16 +173,18 @@ export class BlockManager {
    * Add a new block to a section.
    * Returns the new block ID.
    */
-  add(
+    add(
     sectionId: string,
     blockType: string,
     defaults: Record<string, any> = {},
     afterBlockId: string | null = null,
     parentPath: string[] = [],
+    initialBlocks?: Record<string, any>,
+    initialOrder?: string[]
   ): string {
     const blockId = useStore
       .getState()
-      .addBlock(sectionId, blockType, defaults, afterBlockId, parentPath);
+      .addBlock(sectionId, blockType, defaults, afterBlockId, parentPath, initialBlocks, initialOrder);
     this.events.emit("block:added", {
       sectionId,
       blockId,
