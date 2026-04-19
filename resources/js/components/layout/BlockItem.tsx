@@ -82,6 +82,7 @@ interface BlockItemProps {
     depth?: number;
     /** Incrementing counter — every time it changes, this block (and all its children) collapse. */
     collapseAllSignal?: number;
+    parentBlocksMap?: Record<string, any> | null;
 }
 
 export default function BlockItem({
@@ -104,6 +105,7 @@ export default function BlockItem({
     isDraggingGlobal = false,
     depth = 0,
     collapseAllSignal = 0,
+    parentBlocksMap = null,
 }: BlockItemProps) {
     // Resolve this block's own schema using the parent's raw blocks array
     const blockSchema = useMemo(
@@ -139,8 +141,8 @@ export default function BlockItem({
     const canAddChildren = addableChildTypes.length > 0;
 
     const addableSiblingBlockTypes = useMemo(
-        () => getAddableBlockTypes(parentRawBlocks, themeBlocks),
-        [parentRawBlocks, themeBlocks]
+        () => getAddableBlockTypes(parentRawBlocks, themeBlocks, parentBlocksMap),
+        [parentRawBlocks, themeBlocks, parentBlocksMap]
     );
 
     const currentPath = useMemo(
@@ -637,6 +639,7 @@ export default function BlockItem({
                                     isDraggingGlobal={isDraggingGlobal}
                                     depth={depth + 1}
                                     collapseAllSignal={collapseAllSignal}
+                                    parentBlocksMap={block.blocks}
                                 />
                             );
                         })}
