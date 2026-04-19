@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Coderstm\PageBuilder\Rendering;
 
 use Coderstm\PageBuilder\Collections\BlockCollection;
+use Coderstm\PageBuilder\Components\BaseComponent;
 use Coderstm\PageBuilder\Components\Block;
 use Coderstm\PageBuilder\Components\Section;
 use Coderstm\PageBuilder\Components\Settings;
@@ -57,10 +58,9 @@ class Renderer
 
     /**
      * Render a single Block into HTML.
-     *
-     * The parent $section is passed so block views can access section-level context.
+     * The parent (Section or Block) is passed so views can access context.
      */
-    public function renderBlock(Block $block, ?Section $section = null): string
+    public function renderBlock(Block $block, ?BaseComponent $parent = null): string
     {
         $viewName = "blocks.{$block->type}";
 
@@ -70,7 +70,7 @@ class Renderer
 
         return (string) view($viewName, [
             'block' => $block,
-            'section' => $section,
+            'parent' => $parent ?? $block->parent,
         ])->render();
     }
 
@@ -91,12 +91,12 @@ class Renderer
     /**
      * Render all child blocks within a Block (e.g. columns inside a row).
      */
-    public function renderBlockChildren(Block $block, ?Section $section = null): string
+    public function renderBlockChildren(Block $block): string
     {
         $html = '';
 
         foreach ($block->blocks as $child) {
-            $html .= $this->renderBlock($child, $section);
+            $html .= $this->renderBlock($child, $block);
         }
 
         return $html;
@@ -149,7 +149,7 @@ class Renderer
 
         $settingDefaults = $schema ? $schema->settingDefaults() : [];
 
-        return new Section([
+        $section = new Section([
             'id' => $sectionId,
             'type' => $type,
             'name' => $schema?->name,
@@ -165,6 +165,13 @@ class Renderer
                 editor: $editor,
             ),
         ]);
+
+        // Post-hydration: Connect blocks to section parent
+        foreach ($section->blocks as $block) {
+            $block->parent = $section;
+        }
+
+        return $section;
     }
 
     /**
@@ -220,7 +227,7 @@ class Renderer
                 editor: $editor,
             );
 
-            $ordered[$blockId] = new Block([
+            $block = new Block([
                 'id' => $blockId,
                 'type' => $blockType,
                 'name' => $blockSchema?->name,
@@ -231,6 +238,13 @@ class Renderer
                 ),
                 'blocks' => $nestedBlocks,
             ]);
+
+            // Post-hydration: Connect child blocks to parent block
+            foreach ($nestedBlocks as $child) {
+                $child->parent = $block;
+            }
+
+            $ordered[$blockId] = $block;
         }
 
         return new BlockCollection($ordered);

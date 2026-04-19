@@ -34,7 +34,7 @@ class BladeDirectives
 \$__pb_ctx = {$expression};
 if (\$__pb_ctx instanceof \Coderstm\PageBuilder\Components\Block) {
     echo app(\Coderstm\PageBuilder\Rendering\Renderer::class)
-        ->renderBlockChildren(\$__pb_ctx, \$section ?? null);
+        ->renderBlockChildren(\$__pb_ctx);
 } else {
     echo app(\Coderstm\PageBuilder\Rendering\Renderer::class)
         ->renderBlocks(\$__pb_ctx);

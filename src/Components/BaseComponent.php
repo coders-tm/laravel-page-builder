@@ -29,8 +29,11 @@ abstract class BaseComponent implements Arrayable, Jsonable, JsonSerializable
 
     public readonly BlockCollection $blocks;
 
+    public ?BaseComponent $parent = null;
+
     public function __construct(array $data)
     {
+        $this->parent = $data['parent'] ?? null;
         $this->id = $data['id'] ?? '';
         $this->type = $data['type'] ?? $this->defaultType();
         $this->name = $data['name'] ?? '';
@@ -80,6 +83,9 @@ abstract class BaseComponent implements Arrayable, Jsonable, JsonSerializable
 
     public function jsonSerialize(): mixed
     {
-        return $this->toArray();
+        $data = $this->toArray();
+        unset($data['parent']);
+
+        return $data;
     }
 }
