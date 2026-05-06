@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2026-05-07
+
+### Added
+
+- **Nested slug support in saving** — The `POST {slug}` route now uses a `.*` constraint, enabling the editor to save data for nested pages (e.g., `parent/child`).
+
+### Fixed
+
+- **Editor root path resolution** — Visiting the editor at the root path (`/`) now correctly maps to the `home` slug instead of redirecting to `/home`. This ensures the editor loads the home page data while maintaining the root URL.
+- **Navigation manager home mapping** — Navigating to the "home" page within the editor now correctly points back to the root path (`/`) instead of `/home`.
+- **Query parameter filtering on exit** — Updated the `pagebuilder:exit` logic in `layout.blade.php` to filter query parameters based on the `preserved_params` configuration in `config/pagebuilder.php`, ensuring only explicitly allowed parameters persist after leaving the editor.
+
 ## [1.3.1] - 2026-04-16
 
 ### Added
