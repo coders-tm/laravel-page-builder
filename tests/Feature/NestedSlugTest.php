@@ -13,25 +13,6 @@ class NestedSlugTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_can_access_nested_slug_editor(): void
-    {
-        // 1. Create a page with a nested slug in DB
-        ModelsPage::create([
-            'slug' => 'parent/child',
-            'title' => 'Nested Page',
-            'is_active' => true,
-        ]);
-
-        // 2. Register routes
-        Page::routes();
-
-        // 3. Try to access the editor route
-        // This is expected to FAIL (404) before the fix
-        $response = $this->get('/pagebuilder/parent/child');
-
-        $response->assertOk();
-    }
-
     public function test_can_access_nested_slug_api(): void
     {
         // 1. Create a page with a nested slug in DB

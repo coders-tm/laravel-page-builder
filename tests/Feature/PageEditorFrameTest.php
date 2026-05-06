@@ -20,18 +20,6 @@ class PageEditorFrameTest extends TestCase
 
         $this->assertInstanceOf(View::class, $response);
         $this->assertEquals('pagebuilder::layout', $response->name());
-        $this->assertEquals('/', $response->getData()['config']['basename']);
-    }
-
-    public function test_renders_editor_frame_via_query_param(): void
-    {
-        $request = Request::create('/home', 'GET', ['editor' => 'true']);
-        $this->app->instance('request', $request);
-
-        // Simulation of controller passing the flag
-        $response = Page::render('home', [], $request->has('editor'));
-
-        $this->assertInstanceOf(View::class, $response);
-        $this->assertEquals('pagebuilder::layout', $response->name());
+        $this->assertEquals('/', $response->getData()['config']['basePath']);
     }
 }

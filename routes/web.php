@@ -32,4 +32,3 @@ Route::prefix(config('pagebuilder.prefix', 'pagebuilder'))->as('pagebuilder.')->
     Route::get('{slug}.json', [PageBuilderController::class, 'page'])->where('slug', '[^.]+')->defaults('slug', 'home')->name('page');
     Route::post('{slug}', [PageBuilderController::class, 'savePage'])->where('slug', '.*')->name('save-page');
 });
-
