@@ -22,7 +22,7 @@ const PageBuilder = {
     configParams: Partial<EditorConfig> &
       Partial<PageBuilderConfig> & {
         container?: string | HTMLElement;
-        basename?: string;
+        basePath?: string;
       } = {},
   ) {
     // Set the internal configuration store
@@ -50,24 +50,12 @@ const PageBuilder = {
       rootInstance = ReactDOM.createRoot(container);
     }
 
-    // Derive basename from baseUrl if not explicitly provided
-    // baseUrl format: "https://example.com/foo" or "http://localhost:8000/pagebuilder"
-    // We need to extract just the path part: "/foo" or "/pagebuilder"
-    let basename = configParams.basename;
-    if (!basename && configParams.baseUrl) {
-      try {
-        const url = new URL(configParams.baseUrl, window.location.origin);
-        basename = url.pathname;
-      } catch {
-        basename = "/pagebuilder";
-      }
-    }
-    basename = basename || "/pagebuilder";
+    const basePath = configParams.basePath || "/";
 
     rootInstance.render(
       <React.StrictMode>
         <EditorProvider editor={editorInstance}>
-          <BrowserRouter basename={basename}>
+          <BrowserRouter basename={basePath}>
             <Routes>
               {/* Match any nested path (including slashes) and let the
                                 navigation hook derive the slug from the location. */}

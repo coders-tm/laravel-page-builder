@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-$basePath = config('pagebuilder.basePath', 'pagebuilder');
-
-Route::prefix($basePath)->as('pagebuilder.')->group(function () {
+Route::prefix(config('pagebuilder.prefix', 'pagebuilder'))->as('pagebuilder.')->group(function () {
     // Render routes
     Route::post('render-section', [PageBuilderController::class, 'renderSection'])->name('render-section');
     Route::post('render-block', [PageBuilderController::class, 'renderBlock'])->name('render-block');
@@ -35,8 +33,3 @@ Route::prefix($basePath)->as('pagebuilder.')->group(function () {
     Route::post('{slug}', [PageBuilderController::class, 'savePage'])->where('slug', '.*')->name('save-page');
 });
 
-// Redirect to home page builder editor if accessing /{basePath} without slug
-Route::redirect($basePath, $basePath.'/home', 301)->name('pagebuilder.index');
-
-// Editor routes (Blade layout)
-Route::get($basePath.'/{slug?}', [PageBuilderController::class, 'editor'])->where('slug', '.*')->name('pagebuilder.editor');

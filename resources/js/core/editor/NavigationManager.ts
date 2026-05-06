@@ -1,10 +1,12 @@
 import type { EventBus } from "./EventBus";
 import type { SelectionManager } from "./SelectionManager";
 import type { LayoutManager } from "./LayoutManager";
+import config from "@/config";
 
 interface NavigationAdapter {
   navigate: (path: string, options?: { replace?: boolean }) => void;
   setSearchParams: (params: Record<string, string>) => void;
+  getSearchParams: () => URLSearchParams;
   editorMode?: boolean;
 }
 
@@ -147,19 +149,50 @@ export class NavigationManager {
   }
 
   setPage(slug: string, options?: { replace?: boolean }): void {
-    this.adapter?.navigate(`/${slug}`, options);
+    const params = this.getPreservedParams();
+    const search = new URLSearchParams(params).toString();
+    const query = search ? `?${search}` : "";
+    const path = slug === "home" ? "/" : `/${slug}`;
+    this.adapter?.navigate(`${path}${query}`, options);
   }
 
   private writeSelectionToUrl(sectionId: string | null, path: string[]): void {
-    const params: Record<string, string> = {
-      editor: "true",
-      ...(this.device !== "desktop" ? { device: this.device } : {}),
-    };
+    const params = this.getPreservedParams();
 
+    if (this.device !== "desktop") params.device = this.device;
     if (sectionId) params.section = sectionId;
     if (path.length > 0) params.block = path.join(",");
 
     this.adapter?.setSearchParams(params);
+  }
+
+  private getPreservedParams(): Record<string, string> {
+    const current = this.adapter?.getSearchParams();
+    const params: Record<string, string> = {};
+
+    if (current) {
+      // Always preserve 'editor'
+      if (current.has("editor")) {
+        params.editor = current.get("editor")!;
+      }
+
+      // Preserve configurable params
+      const preserved = [
+        "editor",
+        ...(config.preservedParams || []),
+      ];
+
+      current.forEach((value, key) => {
+        if (preserved.includes(key)) {
+          params[key] = value;
+        }
+      });
+    } else {
+      // Fallback if no adapter (should not happen in browser)
+      params.editor = "true";
+    }
+
+    return params;
   }
 
   setSelection(sectionId: string | null, blockPath: string[] = []): void {
@@ -204,9 +237,7 @@ export class NavigationManager {
     this.layout.setDevice(device);
     this.setState({ device });
 
-    const params: Record<string, string> = {
-      editor: "true",
-    };
+    const params = this.getPreservedParams();
     if (this.selectedSection) params.section = this.selectedSection;
     if (this.blockPath.length > 0) params.block = this.blockPath.join(",");
     if (device !== "desktop") params.device = device;

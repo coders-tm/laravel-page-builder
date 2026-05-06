@@ -27,12 +27,33 @@
 
         // Listen for editor exit event, when using the editor in an iframe
         editor.onExit(() => {
-            window.parent.postMessage({ type: 'pagebuilder:exit' }, '*');
+            window.parent.postMessage({
+                type: 'pagebuilder:exit'
+            }, '*');
+
+            // remove all query params except preserved_params
+            const url = new URL(window.location.href);
+            const preserved = config.preservedParams || [];
+            const newParams = new URLSearchParams();
+
+            url.searchParams.forEach((value, key) => {
+                if (preserved.includes(key)) {
+                    newParams.set(key, value);
+                }
+            });
+
+            url.search = newParams.toString();
+            window.location.href = url.toString();
         });
 
         // Listen for page change event, when using the editor in an iframe
-        editor.onPageChange(({ slug }) => {
-            window.parent.postMessage({ type: 'pagebuilder:page-change', slug }, '*');
+        editor.onPageChange(({
+            slug
+        }) => {
+            window.parent.postMessage({
+                type: 'pagebuilder:page-change',
+                slug
+            }, '*');
         });
     </script>
 </body>

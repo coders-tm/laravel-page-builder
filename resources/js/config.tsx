@@ -10,7 +10,7 @@ import laravelAssetProvider from "./services/laravelAssetProvider";
 // Define the shape of our global configuration
 export interface PageBuilderConfig {
   baseUrl: string;
-  appUrl: string;
+  basePath: string;
   pages: Page[];
   sections: Record<string, SectionData>;
   blocks: Record<string, BlockData>;
@@ -23,6 +23,10 @@ export interface PageBuilderConfig {
    *               email/template editors where there is only one document to edit.
    */
   mode?: "page" | "email";
+  /**
+   * Additional query parameters to preserve during navigation.
+   */
+  preservedParams?: string[];
   fields: Record<
     string,
     | {
@@ -60,7 +64,7 @@ export interface EditorConfig {
 // Default configuration fallback
 const config: PageBuilderConfig = {
   baseUrl: "/pagebuilder",
-  appUrl: "/",
+  basePath: "/",
   pages: [],
   sections: {},
   blocks: {},

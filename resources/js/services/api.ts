@@ -73,8 +73,9 @@ const api = {
   getPreviewUrl(slug: string): string {
     const params = new URLSearchParams({ "pb-editor": "1" });
     // Home page is served at "/", other pages at "/{slug}"
-    const path = slug === "home" ? "/" : `/${slug}`;
-    return `${config.appUrl}${path}?${params.toString()}`;
+    const path = slug === "home" ? "" : `/${slug}`;
+    const base = config.basePath === "/" ? "" : config.basePath;
+    return `${base}${path}?${params.toString()}`;
   },
 };
 

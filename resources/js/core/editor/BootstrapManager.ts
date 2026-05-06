@@ -43,7 +43,9 @@ export class BootstrapManager {
    */
   async syncRoute(slug: string | undefined, pageList: any[]): Promise<void> {
     if (!slug) {
-      if (pageList.length > 0) {
+      // In email mode, we don't want to redirect to a page slug automatically.
+      // We also respect the root path if no pages are available.
+      if (config.mode !== "email" && pageList.length > 0) {
         this.navigation.setPage(pageList[0].slug, { replace: true });
       }
       return;

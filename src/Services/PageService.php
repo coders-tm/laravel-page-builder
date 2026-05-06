@@ -27,19 +27,20 @@ class PageService
     /**
      * Resolve and render a page by slug, returning the appropriate HTTP response.
      *
-     * Resolution order:
-     *   1. Editor mode  — always renders from the stored JSON (Blade views bypassed).
-     *   2. Custom Blade view  — view("pages.{slug}") if it exists.
-     *   3. Page builder JSON  — sections rendered through PageRenderer.
-     *   4. 404.
-     *
-     * @param  array<string, string|null>  $meta  Optional overrides for title, meta_title,
-     *                                            meta_description, meta_keywords.
+     * @param  array<string, string|null>  $meta  Optional overrides for title, meta_title, meta_description, meta_keywords
      */
-    public function render(string $slug, array $meta = []): mixed
+    public function render(string $slug, array $meta = [], bool $editor = false): mixed
     {
         if (! preg_match('#^[a-z0-9\-_/]+$#i', $slug)) {
             abort(404);
+        }
+
+        // ── 0. Editor frame mode ──────────────────────────────────────────
+        // Load the editor frame only when explicitly requested.
+        if ($editor) {
+            return view('pagebuilder::layout', [
+                'config' => PageBuilder::scriptVariables(),
+            ]);
         }
 
         $dbPage = $this->findBySlug($slug);
@@ -51,7 +52,20 @@ class PageService
         // so section views (e.g. page-content) can access $page->title, $page->content, etc.
         View::share('page', $dbPage);
 
-        // ── 1. Editor mode ────────────────────────────────────────────────
+        // ── 1. Custom Blade view ──────────────────────────────────────────
+        // When a page view exists, we load it even if pb-editor is true.
+        // This page is read-only and cannot be modified until the view is deleted.
+        if (View::exists("pages.{$slug}")) {
+            $page = $this->buildPage($stored, $defaultLayout, $dbPage);
+
+            return view("pages.{$slug}", [
+                ...$this->pageMeta($dbPage, $stored, $meta),
+                'slug' => $slug,
+                '__pb_layout' => $page,
+            ]);
+        }
+
+        // ── 2. Editor mode ────────────────────────────────────────────────
         if (PageBuilder::editor()) {
             $page = $this->buildPage($stored, $defaultLayout, $dbPage);
 
@@ -61,17 +75,6 @@ class PageService
                 '__pb_content' => request()->boolean('pb-preview')
                     ? $this->editorPreviewShell->render()
                     : $this->pageRenderer->renderPage($page, editor: true),
-                '__pb_layout' => $page,
-            ]);
-        }
-
-        // ── 2. Custom Blade view ──────────────────────────────────────────
-        if (View::exists("pages.{$slug}")) {
-            $page = $this->buildPage($stored, $defaultLayout, $dbPage);
-
-            return view("pages.{$slug}", [
-                ...$this->pageMeta($dbPage, $stored, $meta),
-                'slug' => $slug,
                 '__pb_layout' => $page,
             ]);
         }

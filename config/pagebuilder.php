@@ -13,8 +13,15 @@ return [
     */
 
     // Base URL path for the page builder routes (e.g., 'pagebuilder' or 'foo')
-    // The editor will be accessible at /{basePath}/* and API endpoints at /{basePath}/*
-    'basePath' => 'pagebuilder',
+    // The editor will be accessible at /{prefix}/* and API endpoints at /{prefix}/*
+    'prefix' => 'pagebuilder',
+
+    // The prefix for the page builder public pages and editor.
+    // If your pages are served at /foo/*, set this to 'foo'.
+    'basePath' => '/',
+
+    // Additional query parameters to preserve during editor navigation
+    'preserved_params' => [],
 
     // Path to the pages directory (JSON data files)
     'pages' => resource_path('views/pages'),

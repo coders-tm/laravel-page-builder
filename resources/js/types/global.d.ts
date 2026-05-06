@@ -10,7 +10,6 @@ declare global {
                 csrfToken: string;
             };
             baseUrl?: string;
-            appUrl?: string;
             fieldTypes?: Record<
                 string,
                 (args: {

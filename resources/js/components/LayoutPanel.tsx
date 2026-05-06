@@ -58,7 +58,7 @@ export default function LayoutPanel() {
 
   const blockPreviewUrl = useMemo(() => {
     if (!slug) return "about:blank";
-    const url = new URL(api.getPreviewUrl(slug));
+    const url = new URL(api.getPreviewUrl(slug), window.location.origin);
     url.searchParams.set("pb-editor", "1");
     url.searchParams.set("pb-preview", "1");
     url.searchParams.set("source", "block");

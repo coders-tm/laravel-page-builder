@@ -32,7 +32,7 @@ export function useEditorNavigation({
   const navigate = useNavigate();
   const location = useLocation();
   const rawPath = location.pathname || "/";
-  const slug = rawPath === "/" ? null : rawPath.replace(/^\//, "");
+  const slug = rawPath === "/" ? "home" : rawPath.replace(/^\//, "");
   const [searchParams, setSearchParams] = useSearchParams();
 
   const selectedSection = searchParams.get("section") || null;
@@ -50,6 +50,7 @@ export function useEditorNavigation({
     editor.navigation.setAdapter({
       navigate,
       setSearchParams,
+      getSearchParams: () => searchParams,
       editorMode: isEditorMode,
     });
 

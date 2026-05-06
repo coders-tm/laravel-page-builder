@@ -233,9 +233,12 @@ export default function PreviewCanvas() {
   const previewUrl = slug ? api.getPreviewUrl(slug) : null;
 
   /* ── Live URL ────────────────────────────────────────────────────── */
-  const liveUrl = slug
-    ? `${config.appUrl}${slug === "home" ? "/" : `/${slug}`}`
-    : null;
+  const liveUrl = useMemo(() => {
+    if (!slug) return null;
+    const base = config.basePath === "/" ? "" : config.basePath;
+    const path = slug === "home" ? "" : `/${slug}`;
+    return base + path || "/";
+  }, [slug]);
 
   return (
     <div className="flex-1 flex flex-col bg-gray-100 overflow-hidden relative">

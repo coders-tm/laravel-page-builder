@@ -103,7 +103,7 @@ class PageBuilder
             return static::$editorOverride;
         }
 
-        return request()->query('pb-editor') == '1';
+        return request()->boolean('pb-editor');
     }
 
     /**
@@ -172,11 +172,10 @@ class PageBuilder
         $pages = app(PageRegistry::class);
         $registry = app(SectionRegistry::class);
         $blocks = app(BlockRegistry::class);
-        $basePath = config('pagebuilder.basePath', 'pagebuilder');
 
         return [
-            'baseUrl' => url($basePath),
-            'appUrl' => config('app.url'),
+            'baseUrl' => url(config('pagebuilder.prefix', 'pagebuilder')),
+            'basePath' => config('pagebuilder.basePath', '/'),
             'pages' => array_merge(
                 [
                     [
@@ -196,6 +195,7 @@ class PageBuilder
             'sections' => $registry->get(),
             'blocks' => $blocks->get(),
             'themeSettings' => app(ThemeSettings::class)->toArray(),
+            'preservedParams' => config('pagebuilder.preserved_params', []),
         ];
     }
 
