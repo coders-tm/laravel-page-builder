@@ -62,6 +62,22 @@ abstract class BaseComponent implements Arrayable, Jsonable, JsonSerializable
         return '';
     }
 
+    /**
+     * Return a new instance of the component with the given settings.
+     */
+    public function withSettings(Settings $settings): static
+    {
+        return new static([
+            'id' => $this->id,
+            'type' => $this->type,
+            'name' => $this->name,
+            'disabled' => $this->disabled,
+            'settings' => $settings,
+            'blocks' => $this->blocks,
+            'parent' => $this->parent,
+        ]);
+    }
+
     // ─── Serialization ──────────────────────────────────────────
 
     public function toArray(): array

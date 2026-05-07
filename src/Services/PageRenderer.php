@@ -44,7 +44,7 @@ class PageRenderer
                 continue;
             }
 
-            $html .= $this->renderer->renderRawSection($sectionId, $sectionData, $editor);
+            $html .= $this->renderer->renderRawSection($sectionId, $sectionData, $editor, ['__pb_page' => $pageData]);
         }
 
         if ($wrapper = $pageData->wrapper()) {

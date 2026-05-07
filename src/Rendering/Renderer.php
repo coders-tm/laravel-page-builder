@@ -14,6 +14,7 @@ use Coderstm\PageBuilder\Registry\BlockRegistry;
 use Coderstm\PageBuilder\Registry\SectionRegistry;
 use Coderstm\PageBuilder\Schema\BlockSchema;
 use Coderstm\PageBuilder\Schema\SectionSchema;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 
 /**
@@ -25,6 +26,14 @@ use Illuminate\Support\Facades\View;
  */
 class Renderer
 {
+    /**
+     * Holds extra view variables (e.g. 'page') for the section currently being
+     * rendered, so that nested block renders can access them for Blade evaluation.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $renderContext = [];
+
     public function __construct(
         protected readonly SectionRegistry $registry,
         protected readonly BlockRegistry $blockRegistry,
@@ -32,8 +41,10 @@ class Renderer
 
     /**
      * Render a Section object into HTML.
+     *
+     * @param  array<string, mixed>  $data  Extra view variables (e.g. ['page' => $pageData])
      */
-    public function renderSection(Section $section): string
+    public function renderSection(Section $section, array $data = []): string
     {
         $meta = $this->registry->get($section->type);
 
@@ -47,13 +58,77 @@ class Renderer
             return "<!-- View '{$viewName}' not found -->";
         }
 
-        $html = (string) view($viewName, ['section' => $section])->render();
+        // Alias __pb_page to page for evaluation so that {{ $page->title }} works
+        // in settings, but we don't pass it to the view to avoid overwriting
+        // the shared database page model.
+        $evalData = $data;
+        if (! isset($evalData['page']) && isset($evalData['__pb_page'])) {
+            $evalData['page'] = $evalData['__pb_page'];
+        }
+
+        if (! empty($evalData)) {
+            $section = $this->evaluateBladeInComponentSettings($section, $evalData);
+        }
+
+        // Store context so nested @blocks() renders can pick it up.
+        $previous = $this->renderContext;
+        $this->renderContext = $evalData;
+
+        try {
+            $html = (string) view($viewName, array_merge($data, ['section' => $section]))->render();
+        } finally {
+            $this->renderContext = $previous;
+        }
 
         if (PageBuilder::editor()) {
             $html = EditorAttributes::autoInjectLiveText($html, $section);
         }
 
         return $html;
+    }
+
+    /**
+     * Evaluate Blade syntax in string setting values, returning a new instance
+     * of the component with re-evaluated settings so that expressions like
+     * {{ $page->title }} are resolved before the view escapes them.
+     *
+     * Only processes strings that actually contain {{ or @, so there is no
+     * overhead for plain-text settings.
+     *
+     * @template T of BaseComponent
+     *
+     * @param  T  $component
+     * @param  array<string, mixed>  $data  Variables available to Blade expressions.
+     * @return T
+     */
+    protected function evaluateBladeInComponentSettings(BaseComponent $component, array $data): BaseComponent
+    {
+        $raw = $component->settings->raw();
+        $defaults = $component->settings->defaults();
+        $changed = false;
+
+        foreach ($raw as $key => $value) {
+            if (! is_string($value)) {
+                continue;
+            }
+
+            if (! str_contains($value, '{{') && ! str_contains($value, '@')) {
+                continue;
+            }
+
+            try {
+                $raw[$key] = Blade::render($value, $data, deleteCachedView: true);
+                $changed = true;
+            } catch (\Throwable) {
+                // Leave unchanged on any compile/runtime error
+            }
+        }
+
+        if (! $changed) {
+            return $component;
+        }
+
+        return $component->withSettings(new Settings($raw, $defaults));
     }
 
     /**
@@ -66,6 +141,12 @@ class Renderer
 
         if (! View::exists($viewName)) {
             return "<!-- Block view '{$viewName}' not found -->";
+        }
+
+        // Evaluate Blade syntax in block settings using the active render context
+        // (populated by renderSection when $data contains variables like 'page').
+        if (! empty($this->renderContext)) {
+            $block = $this->evaluateBladeInComponentSettings($block, $this->renderContext);
         }
 
         return (string) view($viewName, [
@@ -254,8 +335,10 @@ class Renderer
      * Render a raw section array directly (for API preview calls).
      *
      * Hydrates the data into a Section object, then renders it.
+     *
+     * @param  array<string, mixed>  $data  Extra view variables (e.g. ['page' => $pageData])
      */
-    public function renderRawSection(string $sectionId, array $sectionData, bool $editor = false): string
+    public function renderRawSection(string $sectionId, array $sectionData, bool $editor = false, array $data = []): string
     {
         if ($editor) {
             PageBuilder::enableEditor();
@@ -264,7 +347,7 @@ class Renderer
         try {
             $section = $this->hydrateSection($sectionId, $sectionData, $editor);
 
-            return $this->renderSection($section);
+            return $this->renderSection($section, $data);
         } finally {
             if ($editor) {
                 PageBuilder::disableEditor();
