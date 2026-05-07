@@ -103,15 +103,23 @@ class ThemeSettingsTest extends TestCase
         $this->assertFileExists($this->valuesPath);
 
         $raw = json_decode(File::get($this->valuesPath), true);
-        $this->assertSame($values, $raw);
+        $this->assertSame($values, $raw['pagebuilder']);
     }
 
     public function test_values_are_loaded_from_disk(): void
     {
-        File::put($this->valuesPath, json_encode(['primary_color' => '#ABCDEF']));
+        File::put($this->valuesPath, json_encode(['pagebuilder' => ['primary_color' => '#ABCDEF']]));
 
         $fresh = new ThemeSettings($this->app->make(PageStorage::class));
         $this->assertSame(['primary_color' => '#ABCDEF'], $fresh->values());
+    }
+
+    public function test_values_returns_empty_if_pagebuilder_key_missing(): void
+    {
+        File::put($this->valuesPath, json_encode(['primary_color' => '#FEDCBA']));
+
+        $fresh = new ThemeSettings($this->app->make(PageStorage::class));
+        $this->assertSame([], $fresh->values());
     }
 
     public function test_values_cache_is_refreshed_after_save(): void
@@ -149,5 +157,19 @@ class ThemeSettingsTest extends TestCase
         $this->assertArrayHasKey('schema', $result);
         $this->assertArrayHasKey('values', $result);
         $this->assertSame(['primary_color' => '#FF00FF'], $result['values']);
+    }
+
+    public function test_save_preserves_other_keys(): void
+    {
+        File::put($this->valuesPath, json_encode([
+            'other_setting' => 'keep-me',
+            'pagebuilder' => ['primary_color' => '#000000'],
+        ]));
+
+        $this->themeSettings->save(['primary_color' => '#FFFFFF']);
+
+        $raw = json_decode(File::get($this->valuesPath), true);
+        $this->assertSame('keep-me', $raw['other_setting']);
+        $this->assertSame('#FFFFFF', $raw['pagebuilder']['primary_color']);
     }
 }

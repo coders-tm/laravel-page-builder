@@ -120,6 +120,9 @@ return [
     'cache' => [
         'enabled' => env('PAGEBUILDER_CACHE_ENABLED', false),
     ],
+
+    // Path to the JSON file storing theme setting values
+    'theme_settings_path' => resource_path('settings.json'),
 ];
 ```
 
@@ -985,7 +988,7 @@ Block::add(base_path('themes/my-theme/views/blocks'));
 
 ### Global Theme Settings
 
-Define global design tokens (colors, fonts, spacing) in `config/pagebuilder.php`. Settings are grouped for display in the editor's Theme Settings panel:
+Define global design tokens (colors, fonts, spacing) in `config/pagebuilder.php`. Values are persisted to a JSON file (default: `resources/settings.json`) under a `pagebuilder` key, allowing them to coexist with other application settings.
 
 ```php
 'theme_settings_schema' => [

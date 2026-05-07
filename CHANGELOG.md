@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.10] - 2026-05-07
+
+### Changed
+
+- **Nested Theme Settings** — Theme settings are now persisted under a `pagebuilder` key in the configured JSON file (`settings.json`). This allows theme settings to coexist with other application settings in the same file without conflict.
+- **Strict Settings Loading** — Removed backward compatibility for the legacy flat JSON structure. Settings must now reside under the `pagebuilder` key to be loaded.
+- **Updated Configuration** — Renamed default theme settings path to `resource_path('settings.json')` in `config/pagebuilder.php`.
+
+### Fixed
+
+- **Other Settings Preservation** — The `ThemeSettings` service now preserves any other top-level keys in the JSON file when saving theme settings.
+
 ## [1.3.9] - 2026-05-07
 
 ### Added

@@ -51,7 +51,14 @@ class ThemeSettings
         }
 
         $data = json_decode(File::get($this->valuesPath), true);
-        $this->cachedValues = is_array($data) ? $data : [];
+
+        if (! is_array($data)) {
+            $this->cachedValues = [];
+
+            return [];
+        }
+
+        $this->cachedValues = $data['pagebuilder'] ?? [];
 
         return $this->cachedValues;
     }
@@ -67,7 +74,18 @@ class ThemeSettings
             File::makeDirectory($dir, 0755, true);
         }
 
-        $json = json_encode($values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        // Read existing content to preserve other keys
+        $existing = [];
+        if (File::exists($this->valuesPath)) {
+            $existing = json_decode(File::get($this->valuesPath), true);
+            if (! is_array($existing)) {
+                $existing = [];
+            }
+        }
+
+        $existing['pagebuilder'] = $values;
+
+        $json = json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $result = File::put($this->valuesPath, $json) !== false;
 
         if ($result) {

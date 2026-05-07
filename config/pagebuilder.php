@@ -233,7 +233,7 @@ return [
         ],
     ],
 
-    'theme_settings_path' => resource_path('theme-settings.json'),
+    'theme_settings_path' => resource_path('settings.json'),
 
     /*
     |--------------------------------------------------------------------------
