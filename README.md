@@ -82,6 +82,16 @@ php artisan migrate
 
 ```php
 return [
+    // Base URL path for the page builder routes (e.g., 'pagebuilder' or 'foo')
+    'prefix' => 'pagebuilder',
+
+    // The prefix for the page builder public pages and editor.
+    // If your pages are served at /foo/*, set this to 'foo'.
+    'basePath' => '/',
+
+    // Additional query parameters to preserve during editor navigation
+    'preserved_params' => [],
+
     // Path to page JSON data files
     'pages' => resource_path('views/pages'),
 
@@ -104,7 +114,14 @@ return [
     'asset_directory' => 'pagebuilder',
 
     // Reserved slugs that cannot be used for dynamic pages
-    'preserved_pages' => ['home'],
+    'preserved_pages' => ['home', 'admin', 'user', 'api', 'storage', 'uploads', 'files', 'vendor'],
+
+    // Page HTML Cache settings
+    'cache' => [
+        'enabled' => env('PAGEBUILDER_CACHE_ENABLED', false),
+        'ttl' => env('PAGEBUILDER_CACHE_TTL', 3600),
+        'prefix' => 'pagebuilder.page',
+    ],
 ];
 ```
 
@@ -386,12 +403,12 @@ Place template files in `resources/views/templates/` (configurable via `config('
 ```json
 // resources/views/templates/page.json  — default template used by all pages
 {
-    "sections": {
-        "main": {
-            "type": "page-content"
-        }
-    },
-    "order": ["main"]
+  "sections": {
+    "main": {
+      "type": "page-content"
+    }
+  },
+  "order": ["main"]
 }
 ```
 
@@ -399,12 +416,12 @@ The `page.json` file is the **default template**. Any page without a page JSON, 
 
 ### Template JSON schema
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `sections` | object | yes | Section data map — same format as page JSON sections |
-| `order` | string[] | yes | Section render order |
-| `layout` | string \| false | no | Layout type (e.g. `"page"`, `"full-width"`). Defaults to `"page"`. Pass `false` to render without header/footer zones |
-| `wrapper` | string | no | CSS-selector string that wraps all sections in an HTML element |
+| Field      | Type            | Required | Description                                                                                                           |
+| ---------- | --------------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
+| `sections` | object          | yes      | Section data map — same format as page JSON sections                                                                  |
+| `order`    | string[]        | yes      | Section render order                                                                                                  |
+| `layout`   | string \| false | no       | Layout type (e.g. `"page"`, `"full-width"`). Defaults to `"page"`. Pass `false` to render without header/footer zones |
+| `wrapper`  | string          | no       | CSS-selector string that wraps all sections in an HTML element                                                        |
 
 ### Assigning a template to a page
 
@@ -429,12 +446,12 @@ Page::create([
 
 Template names map to filenames without the `.json` extension:
 
-| `template` field | File loaded |
-|---|---|
-| `null` or `""` | `templates/page.json` |
-| `"page"` | `templates/page.json` |
+| `template` field   | File loaded                     |
+| ------------------ | ------------------------------- |
+| `null` or `""`     | `templates/page.json`           |
+| `"page"`           | `templates/page.json`           |
 | `"page.alternate"` | `templates/page.alternate.json` |
-| `"product"` | `templates/product.json` |
+| `"product"`        | `templates/product.json`        |
 
 If the selected template file does not exist, the package falls back to `page.json`. If `page.json` also does not exist, a 404 is returned.
 
@@ -450,9 +467,9 @@ Supported wrapper tags: `<div>`, `<main>`, `<section>`.
 
 ```json
 {
-    "wrapper": "div#div_id.div_class[attribute-one=value]",
-    "sections": { "main": { "type": "page-content" } },
-    "order": ["main"]
+  "wrapper": "div#div_id.div_class[attribute-one=value]",
+  "sections": { "main": { "type": "page-content" } },
+  "order": ["main"]
 }
 ```
 
@@ -460,7 +477,7 @@ Output:
 
 ```html
 <div id="div_id" class="div_class" attribute-one="value">
-    <!-- rendered page sections -->
+  <!-- rendered page sections -->
 </div>
 ```
 
@@ -470,17 +487,17 @@ Template section settings support `{{ $page->attribute }}` placeholders. At rend
 
 ```json
 {
-    "sections": {
-        "hero": {
-            "type": "hero",
-            "settings": {
-                "title":       "{{ $page->title }}",
-                "description": "{{ $page->meta_description }}"
-            }
-        },
-        "main": { "type": "page-content" }
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "title": "{{ $page->title }}",
+        "description": "{{ $page->meta_description }}"
+      }
     },
-    "order": ["hero", "main"]
+    "main": { "type": "page-content" }
+  },
+  "order": ["hero", "main"]
 }
 ```
 
@@ -491,13 +508,13 @@ Any column on the `Page` model can be used: `title`, `slug`, `content`, `meta_ti
 ```json
 // resources/views/templates/page.alternate.json
 {
-    "wrapper": "main#page-alternate.page-wrapper",
-    "sections": {
-        "main": {
-            "type": "page-content"
-        }
-    },
-    "order": ["main"]
+  "wrapper": "main#page-alternate.page-wrapper",
+  "sections": {
+    "main": {
+      "type": "page-content"
+    }
+  },
+  "order": ["main"]
 }
 ```
 
@@ -507,11 +524,11 @@ Set `"layout": false` to skip the layout zone system entirely. No `@sections('he
 
 ```json
 {
-    "layout": false,
-    "sections": {
-        "main": { "type": "hero" }
-    },
-    "order": ["main"]
+  "layout": false,
+  "sections": {
+    "main": { "type": "hero" }
+  },
+  "order": ["main"]
 }
 ```
 
@@ -625,7 +642,7 @@ The `@schema` settings array supports these built-in types:
 The editor is available at:
 
 ```
-GET /pagebuilder/{slug?}
+GET /{slug}?editor=true
 ```
 
 Protect it with authentication middleware in your config:
@@ -635,12 +652,32 @@ Protect it with authentication middleware in your config:
 'middleware' => ['web', 'auth'],
 ```
 
+### Editor Authorization
+
+In addition to middleware, you can protect the editor frame from unauthorized access by registering a custom authorization callback. This is useful for more granular checks, such as verifying user roles or permissions.
+
+When the callback returns `false`, the editor frame will not load, and the page will be rendered as a regular public page even if `?editor=true` is present in the URL.
+
+Register the callback in your `AppServiceProvider` or a dedicated service provider:
+
+```php
+use Coderstm\PageBuilder\PageBuilder;
+
+public function boot()
+{
+    PageBuilder::auth(function ($request) {
+        // Return true if the user is authorized to access the editor
+        return auth()->check() && auth()->user()->is_admin;
+    });
+}
+```
+
 ### Editor API Endpoints
 
 | Method | URL                           | Description           |
 | ------ | ----------------------------- | --------------------- |
 | `GET`  | `/pagebuilder/pages`          | List all pages        |
-| `GET`  | `/pagebuilder/page/{slug}`    | Get page JSON         |
+| `GET`  | `/pagebuilder/{slug}.json`    | Get page JSON         |
 | `POST` | `/pagebuilder/render-section` | Live-render a section |
 | `POST` | `/pagebuilder/save-page`      | Save page JSON        |
 | `GET`  | `/pagebuilder/assets`         | List uploaded assets  |
@@ -1002,13 +1039,13 @@ Define global design tokens (colors, fonts, spacing) in `config/pagebuilder.php`
 
 **Schema fields**
 
-| Field     | Required | Description                                                                 |
-| --------- | -------- | --------------------------------------------------------------------------- |
-| `key`     | Yes      | Dot-notation key used to store and retrieve the value (`colors.primary`)    |
-| `type`    | Yes      | Field type: `color`, `text`, `select`, `google_font`, etc.                  |
-| `label`   | Yes      | Human-readable label shown in the editor panel                              |
-| `default` | Yes      | Fallback value used when no override has been saved                         |
-| `css_var` | No       | CSS custom property (e.g. `--colors-primary`) updated live in the preview   |
+| Field     | Required | Description                                                               |
+| --------- | -------- | ------------------------------------------------------------------------- |
+| `key`     | Yes      | Dot-notation key used to store and retrieve the value (`colors.primary`)  |
+| `type`    | Yes      | Field type: `color`, `text`, `select`, `google_font`, etc.                |
+| `label`   | Yes      | Human-readable label shown in the editor panel                            |
+| `default` | Yes      | Fallback value used when no override has been saved                       |
+| `css_var` | No       | CSS custom property (e.g. `--colors-primary`) updated live in the preview |
 
 **`css_var` — live preview sync**
 
@@ -1016,14 +1053,20 @@ When a `css_var` is declared on a setting, the editor updates that CSS custom pr
 
 ```css
 :root {
-    --colors-primary: #10b981;
-    --fonts-body: Inter, sans-serif;
-    --radius-base: 0.25rem;
+  --colors-primary: #10b981;
+  --fonts-body: Inter, sans-serif;
+  --radius-base: 0.25rem;
 }
 
-.btn-primary  { background-color: var(--colors-primary); }
-body          { font-family: var(--fonts-body); }
-.card         { border-radius: var(--radius-base); }
+.btn-primary {
+  background-color: var(--colors-primary);
+}
+body {
+  font-family: var(--fonts-body);
+}
+.card {
+  border-radius: var(--radius-base);
+}
 ```
 
 **`google_font` setting type**
@@ -1053,6 +1096,7 @@ Use `$theme->get('key', 'default')` for dot-notation access with a fallback, or 
 **Editor reset options**
 
 In the Theme Settings panel editors can:
+
 - **Reset individual setting** — hover a setting row and click the reset icon to restore its `default` value.
 - **Reset all** — click **Reset all** in the panel header to restore every setting to its schema default in one action. Both reset paths trigger live CSS var updates immediately.
 

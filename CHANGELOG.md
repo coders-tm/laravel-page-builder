@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.8] - 2026-05-07
+
+### Added
+
+- **Editor Authorization Hook** — Added `PageBuilder::auth()` to allow projects to register custom authorization callbacks for guarding the editor frame access. Unauthorized requests are automatically downgraded to regular page rendering.
+- **Improved Test Reliability** — Added `RefreshDatabase` to `PageEditorFrameTest` to prevent "no such table" errors during full test suite runs.
+
 ## [1.3.7] - 2026-05-07
 
 ### Added
