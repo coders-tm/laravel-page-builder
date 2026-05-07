@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Coderstm\PageBuilder;
 
+use Closure;
 use Coderstm\PageBuilder\Facades\Page;
 use Coderstm\PageBuilder\Observers\PageObserver;
 use Coderstm\PageBuilder\Registry\BlockRegistry;
@@ -11,6 +12,7 @@ use Coderstm\PageBuilder\Registry\SectionRegistry;
 use Coderstm\PageBuilder\Services\PageRegistry;
 use Coderstm\PageBuilder\Services\TemplateStorage;
 use Coderstm\PageBuilder\Services\ThemeSettings;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use RuntimeException;
@@ -22,6 +24,13 @@ class PageBuilder
      * null = detect via ?pb-editor=1 query param | true/false = forced.
      */
     protected static ?bool $editorOverride = null;
+
+    /**
+     * The callback used to authorize the editor.
+     *
+     * @var Closure|null
+     */
+    public static $authCallback;
 
     /**
      * Set to true to prevent the service provider from auto-registering any routes.
@@ -104,6 +113,28 @@ class PageBuilder
         }
 
         return request()->boolean('pb-editor');
+    }
+
+    /**
+     * Register the editor authorization callback.
+     *
+     * @return void
+     */
+    public static function auth(Closure $callback)
+    {
+        static::$authCallback = $callback;
+    }
+
+    /**
+     * Check if the request is authorized to access the editor.
+     *
+     * @return bool
+     */
+    public static function checkAuth(Request $request)
+    {
+        return (static::$authCallback ?: function () {
+            return true;
+        })($request);
     }
 
     /**

@@ -35,6 +35,12 @@ class PageService
             abort(404);
         }
 
+        $dbPage = $this->findBySlug($slug);
+
+        // Share the DB page model with all views rendered in this request,
+        // so section views (e.g. page-content) can access $page->title, $page->content, etc.
+        View::share('page', $dbPage);
+
         // ── 0. Editor frame mode ──────────────────────────────────────────
         // Load the editor frame only when explicitly requested.
         if ($editor) {
@@ -43,14 +49,9 @@ class PageService
             ]);
         }
 
-        $dbPage = $this->findBySlug($slug);
         $stored = $this->pageStorage->load($slug);
         $layoutType = $stored?->layoutType() ?? 'page';
         $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
-
-        // Share the DB page model with all views rendered in this request,
-        // so section views (e.g. page-content) can access $page->title, $page->content, etc.
-        View::share('page', $dbPage);
 
         // ── 1. Custom Blade view ──────────────────────────────────────────
         // When a page view exists, we load it even if pb-editor is true.

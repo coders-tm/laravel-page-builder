@@ -6,11 +6,14 @@ namespace Coderstm\PageBuilder\Tests\Feature;
 
 use Coderstm\PageBuilder\Facades\Page;
 use Coderstm\PageBuilder\Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PageEditorFrameTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_renders_editor_frame_when_editor_param_present(): void
     {
         $request = Request::create('/home', 'GET', ['editor' => 'true']);
