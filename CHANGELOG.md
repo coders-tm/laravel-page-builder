@@ -5,41 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.10] - 2026-05-07
+## [1.3.8] - 2026-05-07
+
+### Added
+
+- **Blade view-based caching** — Replaced the custom `PageCache` service with a native Laravel approach. Rendered pages are now persisted as `.blade.php` files in the `resources/views/pages` directory, leveraging Laravel's built-in view compiler for performance and automatic invalidation.
+- **PageViewCacheTest** — Added a comprehensive test suite for the new view-based caching lifecycle.
+- **Editor Authorization Hook** — Added `PageBuilder::auth()` to allow projects to register custom authorization callbacks for guarding the editor frame access. Unauthorized requests are automatically downgraded to regular page rendering.
+- **Improved Test Reliability** — Added `RefreshDatabase` to `PageEditorFrameTest` to prevent "no such table" errors during full test suite runs.
 
 ### Changed
 
 - **Nested Theme Settings** — Theme settings are now persisted under a `pagebuilder` key in the configured JSON file (`settings.json`). This allows theme settings to coexist with other application settings in the same file without conflict.
 - **Strict Settings Loading** — Removed backward compatibility for the legacy flat JSON structure. Settings must now reside under the `pagebuilder` key to be loaded.
 - **Updated Configuration** — Renamed default theme settings path to `resource_path('settings.json')` in `config/pagebuilder.php`.
+- **Refactored caching logic** — Migrated `PageRenderer`, `PageService`, `Theme`, and `ThemeSettings` to use the new `PageStorage` based view caching flow.
+- **Simplified configuration** — Removed legacy `ttl` and `prefix` settings from `config/pagebuilder.php`.
 
 ### Fixed
 
 - **Other Settings Preservation** — The `ThemeSettings` service now preserves any other top-level keys in the JSON file when saving theme settings.
 
-## [1.3.9] - 2026-05-07
-
-### Added
-
-- **Blade view-based caching** — Replaced the custom `PageCache` service with a native Laravel approach. Rendered pages are now persisted as `.blade.php` files in the `resources/views/pages` directory, leveraging Laravel's built-in view compiler for performance and automatic invalidation.
-- **PageViewCacheTest** — Added a comprehensive test suite for the new view-based caching lifecycle.
-
-### Changed
-
-- **Refactored caching logic** — Migrated `PageRenderer`, `PageService`, `Theme`, and `ThemeSettings` to use the new `PageStorage` based view caching flow.
-- **Simplified configuration** — Removed legacy `ttl` and `prefix` settings from `config/pagebuilder.php`.
-
 ### Removed
 
 - `PageCache` service and its associated generation-based invalidation logic.
 - `PageCacheTest` and legacy unit tests for the removed service.
-
-## [1.3.8] - 2026-05-07
-
-### Added
-
-- **Editor Authorization Hook** — Added `PageBuilder::auth()` to allow projects to register custom authorization callbacks for guarding the editor frame access. Unauthorized requests are automatically downgraded to regular page rendering.
-- **Improved Test Reliability** — Added `RefreshDatabase` to `PageEditorFrameTest` to prevent "no such table" errors during full test suite runs.
 
 ## [1.3.7] - 2026-05-07
 
