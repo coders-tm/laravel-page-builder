@@ -137,7 +137,8 @@ PHP;
                     continue;
                 }
 
-                $family = $values[$setting['id']] ?? ($setting['default'] ?? null);
+                $key = $setting['key'] ?? null;
+                $family = ($key ? ($values[$key] ?? null) : null) ?? ($setting['default'] ?? null);
 
                 if ($family) {
                     $fonts[] = $family;

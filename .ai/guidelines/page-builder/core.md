@@ -91,17 +91,17 @@ Rules:
 
 **Purpose:** High-level orchestrators for page loading, rendering, and persistence.
 
-| Class                     | Responsibility                                                                |
-| ------------------------- | ----------------------------------------------------------------------------- |
-| `PageRenderer`            | Loads page JSON → hydrates all sections → renders complete HTML; applies wrapper |
-| `PageStorage`             | JSON file I/O for page data (reads/writes from `config('pagebuilder.pages')`) |
-| `TemplateStorage`         | JSON file I/O for template data (theme-aware, `config('pagebuilder.templates')`) |
-| `TemplateVariableResolver`| Resolves `{{ $page->attr }}` placeholders in template section settings        |
-| `WrapperParser`           | Parses CSS-selector wrapper strings (e.g. `div#id.class`) into HTML elements  |
-| `PageRegistry`            | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                |
-| `PageService`             | Route registration + page resolution (Blade → JSON → template → 404)         |
-| `ThemeSettings`           | Global theme settings persistence (JSON file)                                 |
-| `Theme`                   | Active theme management wrapper                                               |
+| Class                      | Responsibility                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| `PageRenderer`             | Loads page JSON → hydrates all sections → renders complete HTML; applies wrapper |
+| `PageStorage`              | JSON file I/O for page data (reads/writes from `config('pagebuilder.pages')`)    |
+| `TemplateStorage`          | JSON file I/O for template data (theme-aware, `config('pagebuilder.templates')`) |
+| `TemplateVariableResolver` | Resolves `{{ $page->attr }}` placeholders in template section settings           |
+| `WrapperParser`            | Parses CSS-selector wrapper strings (e.g. `div#id.class`) into HTML elements     |
+| `PageRegistry`             | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                   |
+| `PageService`              | Route registration + page resolution (Blade → JSON → template → 404)             |
+| `ThemeSettings`            | Global theme settings persistence (JSON file)                                    |
+| `Theme`                    | Active theme management wrapper                                                  |
 
 ---
 
@@ -158,7 +158,7 @@ return [
     'disk'                  => 'public',                               // Storage disk for assets
     'asset_directory'       => 'pagebuilder',                          // Sub-dir on disk
     'theme_settings_schema' => [],                                     // Global theme settings
-    'theme_settings_path'   => resource_path('theme-settings.json'),   // Theme settings file
+    'theme_settings_path'   => resource_path('settings.json'),   // Theme settings file
 ];
 ```
 

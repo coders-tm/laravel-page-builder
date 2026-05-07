@@ -90,12 +90,12 @@ The master layout integrates layout sections (header/footer) and yields the page
 
 ### Key directives
 
-| Directive | Purpose |
-|---|---|
-| `@pbEditorClass` | Adds `js pb-design-mode` class to `<html>` in editor mode |
-| `@sections('header')` | Renders the `header` layout section |
-| `@sections('footer')` | Renders the `footer` layout section |
-| `@yield('content')` | Where the page's sections are output |
+| Directive             | Purpose                                                   |
+| --------------------- | --------------------------------------------------------- |
+| `@pbEditorClass`      | Adds `js pb-design-mode` class to `<html>` in editor mode |
+| `@sections('header')` | Renders the `header` layout section                       |
+| `@sections('footer')` | Renders the `footer` layout section                       |
+| `@yield('content')`   | Where the page's sections are output                      |
 
 ---
 
@@ -226,7 +226,7 @@ Theme settings are global settings that apply across all pages. They are configu
 ```php
 'theme_settings_schema' => [
     [
-        'id'      => 'primary_color',
+        'id'      => 'colors.primary',
         'type'    => 'color',
         'label'   => 'Primary Color',
         'default' => '#1d4ed8',
@@ -243,16 +243,13 @@ Theme settings are global settings that apply across all pages. They are configu
         ],
     ],
 ],
-'theme_settings_path' => resource_path('theme-settings.json'),
+'theme_settings_path' => resource_path('settings.json'),
 ```
 
 ### Accessing theme settings in Blade
 
 ```blade
-{{-- Via the Theme facade --}}
-@php $themeSettings = app(\Coderstm\PageBuilder\Services\ThemeSettings::class) @endphp
-
-<body style="--primary: {{ $themeSettings->get('primary_color', '#1d4ed8') }}">
+<body style="--primary: {{ $theme->get('colors.primary', '#1d4ed8') }}">
 ```
 
 ---
@@ -295,49 +292,79 @@ Page JSON files live at `themes/{name}/views/pages/{slug}.json` (or `resources/v
 
 ```json
 {
+  "sections": {
+    "header-hero": {
+      "type": "hero",
+      "settings": {
+        "title": "Welcome to My Theme",
+        "subtitle": "Built with Laravel Page Builder"
+      },
+      "blocks": {},
+      "order": []
+    },
+    "features": {
+      "type": "features",
+      "settings": { "heading": "Why Choose Us" },
+      "blocks": {
+        "f1": {
+          "type": "feature-item",
+          "settings": { "title": "Fast" },
+          "blocks": {},
+          "order": []
+        },
+        "f2": {
+          "type": "feature-item",
+          "settings": { "title": "Secure" },
+          "blocks": {},
+          "order": []
+        },
+        "f3": {
+          "type": "feature-item",
+          "settings": { "title": "Flexible" },
+          "blocks": {},
+          "order": []
+        }
+      },
+      "order": ["f1", "f2", "f3"]
+    }
+  },
+  "order": ["header-hero", "features"],
+  "layout": {
+    "type": "page",
     "sections": {
-        "header-hero": {
-            "type": "hero",
-            "settings": {
-                "title": "Welcome to My Theme",
-                "subtitle": "Built with Laravel Page Builder"
-            },
+      "header": {
+        "type": "site-header",
+        "settings": { "sticky": true },
+        "blocks": {
+          "nav-home": {
+            "type": "nav-item",
+            "settings": { "label": "Home", "url": "/" },
             "blocks": {},
             "order": []
+          },
+          "nav-about": {
+            "type": "nav-item",
+            "settings": { "label": "About", "url": "/about" },
+            "blocks": {},
+            "order": []
+          },
+          "nav-contact": {
+            "type": "nav-item",
+            "settings": { "label": "Contact", "url": "/contact" },
+            "blocks": {},
+            "order": []
+          }
         },
-        "features": {
-            "type": "features",
-            "settings": { "heading": "Why Choose Us" },
-            "blocks": {
-                "f1": { "type": "feature-item", "settings": { "title": "Fast" }, "blocks": {}, "order": [] },
-                "f2": { "type": "feature-item", "settings": { "title": "Secure" }, "blocks": {}, "order": [] },
-                "f3": { "type": "feature-item", "settings": { "title": "Flexible" }, "blocks": {}, "order": [] }
-            },
-            "order": ["f1", "f2", "f3"]
-        }
-    },
-    "order": ["header-hero", "features"],
-    "layout": {
-        "type": "page",
-        "sections": {
-            "header": {
-                "type": "site-header",
-                "settings": { "sticky": true },
-                "blocks": {
-                    "nav-home":    { "type": "nav-item", "settings": { "label": "Home",    "url": "/" },        "blocks": {}, "order": [] },
-                    "nav-about":   { "type": "nav-item", "settings": { "label": "About",   "url": "/about" },   "blocks": {}, "order": [] },
-                    "nav-contact": { "type": "nav-item", "settings": { "label": "Contact", "url": "/contact" }, "blocks": {}, "order": [] }
-                },
-                "order": ["nav-home", "nav-about", "nav-contact"]
-            },
-            "footer": {
-                "type": "site-footer",
-                "settings": {},
-                "blocks": {},
-                "order": []
-            }
-        }
+        "order": ["nav-home", "nav-about", "nav-contact"]
+      },
+      "footer": {
+        "type": "site-footer",
+        "settings": {},
+        "blocks": {},
+        "order": []
+      }
     }
+  }
 }
 ```
 
@@ -357,11 +384,11 @@ Page JSON files live at `themes/{name}/views/pages/{slug}.json` (or `resources/v
 
 ## Naming Conventions
 
-| Item | Convention | Example |
-|---|---|---|
-| Section Blade file | `kebab-case.blade.php` | `site-header.blade.php` |
-| Block Blade file | `kebab-case.blade.php` | `image-text.blade.php` |
-| Setting `id` | `snake_case` | `background_color` |
-| Page JSON file | `kebab-case.json` | `landing-page.json` |
-| Layout slot key | `kebab-case` | `header`, `footer`, `top-bar` |
-| Section type | Matches Blade filename | `site-header`, `image-text` |
+| Item               | Convention             | Example                       |
+| ------------------ | ---------------------- | ----------------------------- |
+| Section Blade file | `kebab-case.blade.php` | `site-header.blade.php`       |
+| Block Blade file   | `kebab-case.blade.php` | `image-text.blade.php`        |
+| Setting `id`       | `snake_case`           | `background_color`            |
+| Page JSON file     | `kebab-case.json`      | `landing-page.json`           |
+| Layout slot key    | `kebab-case`           | `header`, `footer`, `top-bar` |
+| Section type       | Matches Blade filename | `site-header`, `image-text`   |
