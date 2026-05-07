@@ -18,7 +18,7 @@ class ThemeSettings
 
     protected ?array $cachedValues = null;
 
-    public function __construct(protected readonly PageCache $pageCache)
+    public function __construct(protected readonly PageStorage $pageStorage)
     {
         $this->valuesPath = config('pagebuilder.theme_settings_path');
     }
@@ -72,7 +72,7 @@ class ThemeSettings
 
         if ($result) {
             $this->cachedValues = $values;
-            $this->pageCache->flush();
+            $this->pageStorage->flushViews();
         }
 
         return $result;

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.9] - 2026-05-07
+
+### Added
+
+- **Blade view-based caching** — Replaced the custom `PageCache` service with a native Laravel approach. Rendered pages are now persisted as `.blade.php` files in the `resources/views/pages` directory, leveraging Laravel's built-in view compiler for performance and automatic invalidation.
+- **PageViewCacheTest** — Added a comprehensive test suite for the new view-based caching lifecycle.
+
+### Changed
+
+- **Refactored caching logic** — Migrated `PageRenderer`, `PageService`, `Theme`, and `ThemeSettings` to use the new `PageStorage` based view caching flow.
+- **Simplified configuration** — Removed legacy `ttl` and `prefix` settings from `config/pagebuilder.php`.
+
+### Removed
+
+- `PageCache` service and its associated generation-based invalidation logic.
+- `PageCacheTest` and legacy unit tests for the removed service.
+
 ## [1.3.8] - 2026-05-07
 
 ### Added

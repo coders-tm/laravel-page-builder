@@ -65,7 +65,6 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         // ─── Page services ───────────────────────────────────────
 
-        $this->app->singleton(Services\PageCache::class);
         $this->app->singleton(PageRegistry::class);
         $this->app->singleton(PageStorage::class);
         $this->app->singleton(TemplateStorage::class);
@@ -90,7 +89,6 @@ class PageBuilderServiceProvider extends ServiceProvider
                 $app->make(Rendering\Renderer::class),
                 $app->make(PageStorage::class),
                 $app->make(WrapperParser::class),
-                $app->make(Services\PageCache::class),
             );
         });
     }

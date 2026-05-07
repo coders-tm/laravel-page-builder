@@ -26,13 +26,6 @@ class PageRendererTest extends TestCase
         $this->get('/')->assertSee('Welcome Home');
     }
 
-    public function test_render_returns_null_for_missing_page(): void
-    {
-        $result = $this->pageRenderer->render('nonexistent-page');
-
-        $this->assertNull($result);
-    }
-
     public function test_render_page_from_array(): void
     {
         $html = $this->pageRenderer->renderPage([

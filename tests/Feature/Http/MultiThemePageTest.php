@@ -6,7 +6,6 @@ namespace Coderstm\PageBuilder\Tests\Feature\Http;
 
 use Coderstm\PageBuilder\Http\Controllers\WebPageController;
 use Coderstm\PageBuilder\Http\Middleware\RequestThemeMiddleware;
-use Coderstm\PageBuilder\Services\PageCache;
 use Coderstm\PageBuilder\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
@@ -30,8 +29,6 @@ class MultiThemePageTest extends TestCase
 
     private string $themeBase;
 
-    private PageCache $pageCache;
-
     protected function defineRoutes($router): void
     {
         $router->middleware([RequestThemeMiddleware::class])
@@ -44,7 +41,6 @@ class MultiThemePageTest extends TestCase
         parent::setUp();
 
         $this->themeBase = sys_get_temp_dir().'/pb-multi-theme-http-'.uniqid();
-        $this->pageCache = $this->app->make(PageCache::class);
 
         foreach (['alpha', 'beta'] as $theme) {
             $pagesDir = "{$this->themeBase}/{$theme}/views/pages";

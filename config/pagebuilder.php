@@ -270,7 +270,5 @@ return [
 
     'cache' => [
         'enabled' => env('PAGEBUILDER_CACHE_ENABLED', false),
-        'ttl' => env('PAGEBUILDER_CACHE_TTL', 3600),
-        'prefix' => 'pagebuilder.page',
     ],
 ];

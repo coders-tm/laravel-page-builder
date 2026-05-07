@@ -116,11 +116,9 @@ return [
     // Reserved slugs that cannot be used for dynamic pages
     'preserved_pages' => ['home', 'admin', 'user', 'api', 'storage', 'uploads', 'files', 'vendor'],
 
-    // Page HTML Cache settings
+    // Page HTML Cache settings (Blade view-based)
     'cache' => [
         'enabled' => env('PAGEBUILDER_CACHE_ENABLED', false),
-        'ttl' => env('PAGEBUILDER_CACHE_TTL', 3600),
-        'prefix' => 'pagebuilder.page',
     ],
 ];
 ```
