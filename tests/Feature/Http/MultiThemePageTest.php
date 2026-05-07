@@ -12,16 +12,15 @@ use Illuminate\Support\Facades\File;
 
 /**
  * Verifies that ?theme= query parameter routes each request to the correct
- * theme's page JSON, and that per-theme caches do not bleed into each other.
+ * theme's page JSON.
  *
  * Two fixture themes are created in a temp directory:
  *   alpha  — shop.json renders "Alpha Shop Content"
  *   beta   — shop.json renders "Beta Shop Content"
  *
  * The RequestThemeMiddleware (registered globally by PageBuilderServiceProvider)
- * intercepts the ?theme= parameter and calls Theme::set(), which updates both
- * config('pagebuilder.pages') and config('pagebuilder.cache.prefix') for the
- * lifetime of that request.
+ * intercepts the ?theme= parameter and calls Theme::set(), which updates
+ * config('pagebuilder.pages') for the lifetime of that request.
  */
 class MultiThemePageTest extends TestCase
 {
@@ -96,45 +95,12 @@ class MultiThemePageTest extends TestCase
             ->assertDontSee('ALPHA Shop Content');
     }
 
-    // ─── Cache isolation ──────────────────────────────────────────────────────
+    // ─── Fresh rendering ──────────────────────────────────────────────────────
 
-    public function test_cached_alpha_response_is_not_served_for_beta_request(): void
+    public function test_second_request_for_same_theme_reflects_disk_updates(): void
     {
-        $this->app['config']->set('pagebuilder.cache.enabled', true);
-
-        // Warm the cache for alpha.
         $this->get('/shop?theme=alpha')->assertSee('ALPHA Shop Content');
 
-        // Beta must render fresh from its own JSON, not the alpha cache.
-        $this->get('/shop?theme=beta')
-            ->assertOk()
-            ->assertSee('BETA Shop Content')
-            ->assertDontSee('ALPHA Shop Content');
-    }
-
-    public function test_cached_beta_response_is_not_served_for_alpha_request(): void
-    {
-        $this->app['config']->set('pagebuilder.cache.enabled', true);
-
-        // Warm the cache for beta.
-        $this->get('/shop?theme=beta')->assertSee('BETA Shop Content');
-
-        // Alpha must render fresh from its own JSON, not the beta cache.
-        $this->get('/shop?theme=alpha')
-            ->assertOk()
-            ->assertSee('ALPHA Shop Content')
-            ->assertDontSee('BETA Shop Content');
-    }
-
-    public function test_second_request_for_same_theme_is_served_from_cache(): void
-    {
-        $this->app['config']->set('pagebuilder.cache.enabled', true);
-
-        // First request — populates cache.
-        $this->get('/shop?theme=alpha')->assertSee('ALPHA Shop Content');
-
-        // Overwrite the JSON on disk directly, bypassing PageStorage::save()
-        // so the cache entry is NOT invalidated. Simulates a warm cache.
         File::put("{$this->themeBase}/alpha/views/pages/shop.json", json_encode([
             'sections' => [
                 'banner-1' => ['type' => 'banner', 'settings' => ['text' => 'Alpha Updated On Disk']],
@@ -142,10 +108,9 @@ class MultiThemePageTest extends TestCase
             'order' => ['banner-1'],
         ]));
 
-        // Second request — must return the cached version, not the disk update.
         $this->get('/shop?theme=alpha')
             ->assertOk()
-            ->assertSee('ALPHA Shop Content')
-            ->assertDontSee('Alpha Updated On Disk');
+            ->assertSee('Alpha Updated On Disk')
+            ->assertDontSee('ALPHA Shop Content');
     }
 }

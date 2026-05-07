@@ -146,6 +146,19 @@ class PageBuilder
     }
 
     /**
+     * Get the full class attribute for the <html> tag.
+     */
+    public static function classAttribute(string ...$classes): string
+    {
+        $class = trim(implode(' ', array_filter([
+            ...$classes,
+            static::class(),
+        ], static fn (string $class): bool => trim($class) !== '')));
+
+        return $class === '' ? '' : 'class="'.e($class).'"';
+    }
+
+    /**
      * Get the CSS for the PageBuilder editor.
      *
      * @return HtmlString

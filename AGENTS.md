@@ -151,7 +151,7 @@ use Coderstm\PageBuilder\Facades\Theme;
 @blocks($section)      {{-- render section's top-level blocks --}}
 @blocks($block)        {{-- render block's child blocks --}}
 @sections('header')    {{-- render a layout slot (header/footer) --}}
-@pbEditorClass         {{-- adds editor class to <html> in editor mode --}}
+@pbEditorClass('dark') {{-- renders the <html> class attribute --}}
 ```
 
 ---

@@ -256,19 +256,4 @@ return [
         'vendor',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Page HTML Cache
-    |--------------------------------------------------------------------------
-    |
-    | When enabled, the rendered HTML of each page is stored in the Laravel
-    | cache and served on subsequent requests without re-rendering sections.
-    | Cache is automatically invalidated when a page is saved or theme
-    | settings change.
-    |
-    */
-
-    'cache' => [
-        'enabled' => env('PAGEBUILDER_CACHE_ENABLED', false),
-    ],
 ];

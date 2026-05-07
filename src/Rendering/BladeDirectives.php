@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Blade;
  *
  *   @schema([...])            — no-op (extracted at registration time)
  *
- *   @pbEditorClass            — injects editor CSS class when in editor mode
+ *   @pbEditorClass(...)       — renders the <html> class attribute
  */
 class BladeDirectives
 {
@@ -68,9 +68,13 @@ PHP;
             );
         });
 
-        // @pbEditorClass
-        Blade::directive('pbEditorClass', function () {
-            return "<?php echo \Coderstm\PageBuilder\PageBuilder::class(); ?>";
+        // @pbEditorClass('dark') — renders class="dark js pb-design-mode" in editor mode.
+        Blade::directive('pbEditorClass', function (string $expression) {
+            $expression = trim($expression);
+
+            return $expression === ''
+                ? "<?php echo \Coderstm\PageBuilder\PageBuilder::classAttribute(); ?>"
+                : "<?php echo \Coderstm\PageBuilder\PageBuilder::classAttribute({$expression}); ?>";
         });
 
         // @themeFont — emits Google Fonts <link> tags for any google_font settings
@@ -109,7 +113,10 @@ PHP;
         // Reuse existing Renderer::renderRawSection() — same path as body sections
         $renderer = app(Renderer::class);
 
-        return $renderer->renderRawSection($key, $raw, PageBuilder::editor());
+        return $renderer->renderRawSection($key, $raw, PageBuilder::editor(), [
+            '__pb_layout' => $layout,
+            '__pb_page' => $layout,
+        ]);
     }
 
     /**
@@ -156,37 +163,5 @@ PHP;
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
             '<link href="'.e($href).'" rel="stylesheet">',
         ]);
-    }
-
-    /**
-     * Register the Blade precompiler for auto-injecting editor directives
-     * into layouts that contain <html> and </body> tags.
-     */
-    public static function registerPrecompiler(): void
-    {
-        Blade::precompiler(function (string $value) {
-            if (! str_contains($value, '<html') || ! str_contains($value, '</body>')) {
-                return $value;
-            }
-
-            // Inject @pbEditorClass into the <html> tag
-            if (preg_match('/<html[^>]*class=["\']([^"\']*)["\']/i', $value)) {
-                $value = preg_replace(
-                    '/(<html[^>]*class=["\'])([^"\']*)(["\'])/i',
-                    '$1$2 @pbEditorClass$3',
-                    $value,
-                    1,
-                );
-            } else {
-                $value = preg_replace(
-                    '/(<html)/i',
-                    '$1 class="@pbEditorClass"',
-                    $value,
-                    1,
-                );
-            }
-
-            return $value;
-        });
     }
 }

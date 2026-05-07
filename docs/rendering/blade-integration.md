@@ -28,10 +28,10 @@ Used in layout files to render specific layout zones (e.g., header, footer).
 
 ### `@pbEditorClass`
 
-Outputs a CSS class if the page is currently being viewed inside the editor.
+Renders the full `<html>` class attribute. Any classes you pass are included first, then editor classes are added when the page is viewed inside the editor.
 
 ```blade
-<body class="@pbEditorClass">
+<html @pbEditorClass('dark', 'theme-default')>
 ```
 
 ## Component Variables

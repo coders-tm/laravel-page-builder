@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Coderstm\PageBuilder\Tests\Feature\Rendering;
 
 use Coderstm\PageBuilder\PageBuilder;
+use Coderstm\PageBuilder\Rendering\BladeDirectives;
+use Coderstm\PageBuilder\Support\PageData;
 use Coderstm\PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\Blade;
 
@@ -28,7 +30,14 @@ class BladeDirectivesTest extends TestCase
     {
         $compiled = $this->compileBladeString('@pbEditorClass');
 
-        $this->assertStringContainsString('PageBuilder::class()', $compiled);
+        $this->assertStringContainsString('PageBuilder::classAttribute()', $compiled);
+    }
+
+    public function test_pb_editor_class_directive_accepts_classes(): void
+    {
+        $compiled = $this->compileBladeString("@pbEditorClass('foo', 'bar')");
+
+        $this->assertStringContainsString("PageBuilder::classAttribute('foo', 'bar')", $compiled);
     }
 
     public function test_pb_editor_class_outputs_empty_when_disabled(): void
@@ -64,43 +73,6 @@ class BladeDirectivesTest extends TestCase
         $this->assertStringContainsString('renderBlockChildren', $compiled);
     }
 
-    public function test_precompiler_injects_class_into_html_tag(): void
-    {
-        $html = '<html lang="en"><body></body></html>';
-
-        // Simulate the precompiler logic
-        $result = $this->applyPrecompiler($html);
-
-        $this->assertStringContainsString('@pbEditorClass', $result);
-    }
-
-    public function test_precompiler_appends_to_existing_class(): void
-    {
-        $html = '<html class="no-js" lang="en"><body></body></html>';
-
-        $result = $this->applyPrecompiler($html);
-
-        $this->assertStringContainsString('no-js @pbEditorClass', $result);
-    }
-
-    public function test_precompiler_skips_without_html_tag(): void
-    {
-        $html = '<div>no html tag</div>';
-
-        $result = $this->applyPrecompiler($html);
-
-        $this->assertSame($html, $result);
-    }
-
-    public function test_precompiler_skips_without_body_close_tag(): void
-    {
-        $html = '<html lang="en"><div>no body close</div></html>';
-
-        $result = $this->applyPrecompiler($html);
-
-        $this->assertSame($html, $result);
-    }
-
     // ─── @sections Directive Tests ─────────────────────────────
 
     public function test_sections_directive_compiles(): void
@@ -123,6 +95,34 @@ class BladeDirectivesTest extends TestCase
         $this->assertStringContainsString("'footer'", $compiled);
     }
 
+    public function test_layout_section_settings_render_blade_syntax(): void
+    {
+        $layout = PageData::fromArray([
+            'title' => 'Layout Blade Page',
+            'layout' => [
+                'type' => 'page',
+                'header' => [
+                    'sections' => [
+                        'header' => [
+                            'type' => 'header',
+                            'settings' => [
+                                'title' => '{{ $page->title }} @if(config(\'app.name\') === \'My App\')header @endif',
+                            ],
+                            'blocks' => [],
+                            'order' => [],
+                        ],
+                    ],
+                    'order' => ['header'],
+                ],
+            ],
+        ]);
+
+        $html = BladeDirectives::renderLayoutSection($layout, 'header');
+
+        $this->assertStringContainsString('Layout Blade Page header', $html);
+        $this->assertStringNotContainsString('{{ $page->title }}', $html);
+    }
+
     // ─── Helpers ────────────────────────────────────────────────
 
     /**
@@ -132,31 +132,5 @@ class BladeDirectivesTest extends TestCase
     private function compileBladeString(string $value): string
     {
         return Blade::compileString($value);
-    }
-
-    /**
-     * Apply the precompiler logic from BladeDirectives.
-     */
-    private function applyPrecompiler(string $value): string
-    {
-        if (! str_contains($value, '<html') || ! str_contains($value, '</body>')) {
-            return $value;
-        }
-
-        if (preg_match('/<html[^>]*class=["\']([^"\']*)["\']/i', $value)) {
-            return preg_replace(
-                '/(<html[^>]*class=["\'])([^"\']*)(["\'])/i',
-                '$1$2 @pbEditorClass$3',
-                $value,
-                1,
-            );
-        }
-
-        return preg_replace(
-            '/(<html)/i',
-            '$1 class="@pbEditorClass"',
-            $value,
-            1,
-        );
     }
 }

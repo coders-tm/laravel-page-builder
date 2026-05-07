@@ -149,8 +149,7 @@ class PageBuilderServiceProvider extends ServiceProvider
         // Share $theme globally with all Blade views
         View::share('theme', $this->app->make(ThemeSettings::class));
 
-        // ─── Blade directives & precompiler ──────────────────────
+        // ─── Blade directives ────────────────────────────────────
         Rendering\BladeDirectives::register();
-        Rendering\BladeDirectives::registerPrecompiler();
     }
 }

@@ -55,6 +55,30 @@ class PageBuilderTest extends TestCase
         $this->assertSame('', PageBuilder::class());
     }
 
+    public function test_class_attribute_returns_empty_without_classes_when_editor_disabled(): void
+    {
+        PageBuilder::disableEditor();
+
+        $this->assertSame('', PageBuilder::classAttribute());
+    }
+
+    public function test_class_attribute_returns_custom_classes_when_editor_disabled(): void
+    {
+        PageBuilder::disableEditor();
+
+        $this->assertSame('class="dark"', PageBuilder::classAttribute('dark'));
+    }
+
+    public function test_class_attribute_merges_custom_classes_with_editor_classes(): void
+    {
+        PageBuilder::enableEditor();
+
+        $this->assertSame(
+            'class="foo bar js pb-design-mode"',
+            PageBuilder::classAttribute('foo', 'bar'),
+        );
+    }
+
     public function test_css_returns_html_string_when_editor_enabled(): void
     {
         PageBuilder::enableEditor();

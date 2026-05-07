@@ -182,7 +182,7 @@ In a section's `@schema()` `blocks` array:
 @blocks($section)      {{-- render all top-level blocks of a section --}}
 @blocks($block)        {{-- render all child blocks of a container block --}}
 @sections('header')    {{-- render a layout section slot (header / footer) --}}
-@pbEditorClass         {{-- adds editor class to <html> in editor mode --}}
+@pbEditorClass('dark') {{-- renders the <html> class attribute --}}
 ```
 
 ---

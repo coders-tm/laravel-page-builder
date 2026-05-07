@@ -75,7 +75,7 @@ Your layout Blade file (e.g., `theme/views/layouts/page.blade.php`) should use t
 
 ```blade
 <!DOCTYPE html>
-<html>
+<html @pbEditorClass>
 <head>
     <title>@yield('title')</title>
 </head>

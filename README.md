@@ -116,11 +116,6 @@ return [
     // Reserved slugs that cannot be used for dynamic pages
     'preserved_pages' => ['home', 'admin', 'user', 'api', 'storage', 'uploads', 'files', 'vendor'],
 
-    // Page HTML Cache settings (Blade view-based)
-    'cache' => [
-        'enabled' => env('PAGEBUILDER_CACHE_ENABLED', false),
-    ],
-
     // Path to the JSON file storing theme setting values
     'theme_settings_path' => resource_path('settings.json'),
 ];
@@ -842,7 +837,7 @@ For the full provider contract and additional examples, see the [Developer Docum
 | `@blocks($section)` | Renders all top-level blocks of a section                         |
 | `@blocks($block)`   | Renders child blocks inside a container block                     |
 | `@schema([...])`    | Declares schema (no-op at render time, extracted at registration) |
-| `@pbEditorClass`    | Outputs CSS class when editor mode is active                      |
+| `@pbEditorClass`    | Renders the `<html>` class attribute with editor mode classes      |
 
 ---
 
@@ -914,7 +909,7 @@ Render layout sections in your Blade layout file using `@sections()`:
 
 ```blade
 {{-- resources/views/layouts/page.blade.php --}}
-<html class="dark" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html @pbEditorClass('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

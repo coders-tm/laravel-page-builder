@@ -39,7 +39,7 @@ Five layers — dependencies flow **downward only**:
 | `@blocks($section)` | Renders all top-level blocks of a section |
 | `@blocks($block)` | Renders all child blocks of a container block |
 | `@sections('header')` | Renders a layout slot (header / footer) |
-| `@pbEditorClass` | Adds `js pb-design-mode` to `<html>` in editor mode |
+| `@pbEditorClass('dark')` | Renders the `<html>` class attribute and adds editor classes in editor mode |
 
 > Never call `@blocks()` outside a Blade view. Never call the renderer directly from a template.
 
@@ -366,7 +366,7 @@ Every page is backed by a JSON document at `config('pagebuilder.pages')/{slug}.j
 
 ```
 - [ ] Create themes/{name}/views/layouts/page.blade.php
-- [ ] Add @pbEditorClass to <html>, @sections('header'), @yield('content'), @sections('footer')
+- [ ] Add @pbEditorClass(...) to <html>, @sections('header'), @yield('content'), @sections('footer')
 - [ ] Create theme sections in themes/{name}/views/sections/
 - [ ] Create theme blocks in themes/{name}/views/blocks/
 - [ ] Register theme in config/themer.php

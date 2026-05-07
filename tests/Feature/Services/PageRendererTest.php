@@ -60,6 +60,45 @@ class PageRendererTest extends TestCase
         $this->assertStringContainsString('PageData Page', $html);
     }
 
+    public function test_render_page_renders_blade_syntax_in_section_and_block_settings(): void
+    {
+        $pageData = PageData::fromArray([
+            'title' => 'Blade Settings Page',
+            'sections' => [
+                'banner-1' => [
+                    'type' => 'banner',
+                    'settings' => [
+                        'text' => 'Section: {{ $page->title }} @if(config(\'app.name\') === \'My App\')ready @endif',
+                    ],
+                    'blocks' => [],
+                    'order' => [],
+                ],
+                'content-1' => [
+                    'type' => 'content',
+                    'settings' => [],
+                    'blocks' => [
+                        'text-1' => [
+                            'type' => 'text',
+                            'settings' => [
+                                'content' => 'Block: {{ strtoupper($page->title) }}',
+                            ],
+                            'blocks' => [],
+                            'order' => [],
+                        ],
+                    ],
+                    'order' => ['text-1'],
+                ],
+            ],
+            'order' => ['banner-1', 'content-1'],
+        ]);
+
+        $html = $this->pageRenderer->renderPage($pageData);
+
+        $this->assertStringContainsString('Section: Blade Settings Page ready', $html);
+        $this->assertStringContainsString('Block: BLADE SETTINGS PAGE', $html);
+        $this->assertStringNotContainsString('{{ $page->title }}', $html);
+    }
+
     public function test_render_page_multiple_sections_in_order(): void
     {
         $html = $this->pageRenderer->renderPage([
