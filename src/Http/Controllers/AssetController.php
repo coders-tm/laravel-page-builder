@@ -99,9 +99,9 @@ class AssetController extends Controller
         // not from the client-supplied filename. This prevents stored files from retaining
         // malicious client-controlled extensions.
         $ext = $file->extension();
-        $filename = time() . '_' . Str::slug(
+        $filename = time().'_'.Str::slug(
             pathinfo($originalName, PATHINFO_FILENAME)
-        ) . '.' . $ext;
+        ).'.'.$ext;
 
         $path = $file->storeAs($this->directory, $filename, $this->disk);
 

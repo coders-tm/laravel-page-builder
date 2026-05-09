@@ -91,7 +91,7 @@ class AssetControllerTest extends TestCase
         $validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif'];
         $hasValidExtension = false;
         foreach ($validExtensions as $ext) {
-            if (str_ends_with($storedName, '.' . $ext)) {
+            if (str_ends_with($storedName, '.'.$ext)) {
                 $hasValidExtension = true;
                 break;
             }
@@ -133,7 +133,7 @@ class AssetControllerTest extends TestCase
             $statusOk = in_array($response->status(), [201, 422], true);
             $this->assertTrue(
                 $statusOk,
-                "Format {$format} failed with status {$response->status()}: " . json_encode($response->json())
+                "Format {$format} failed with status {$response->status()}: ".json_encode($response->json())
             );
         }
     }
@@ -222,7 +222,7 @@ class AssetControllerTest extends TestCase
 
         // Should find hero-banner but not footer-logo
         $this->assertTrue(
-            collect($data)->some(fn($asset) => str_contains($asset['name'], 'hero')),
+            collect($data)->some(fn ($asset) => str_contains($asset['name'], 'hero')),
             'Expected to find asset with "hero" in the name'
         );
     }
