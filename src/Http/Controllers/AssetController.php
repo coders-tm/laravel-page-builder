@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Coderstm\PageBuilder\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
@@ -93,9 +95,13 @@ class AssetController extends Controller
         $originalName = $file->getClientOriginalName();
 
         // Prefix with timestamp for unique naming and sorting
-        $filename = time().'_'.Str::slug(
+        // Use Laravel's extension() method which derives the extension from the actual MIME type,
+        // not from the client-supplied filename. This prevents stored files from retaining
+        // malicious client-controlled extensions.
+        $ext = $file->extension();
+        $filename = time() . '_' . Str::slug(
             pathinfo($originalName, PATHINFO_FILENAME)
-        ).'.'.$file->getClientOriginalExtension();
+        ) . '.' . $ext;
 
         $path = $file->storeAs($this->directory, $filename, $this->disk);
 
