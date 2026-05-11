@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import api from "@/services/api";
 import { useDebounce } from "./useDebounce";
 import { IMessageBus } from "@/core/messaging/MessageBus";
+import { useStore } from "@/core/store/useStore";
 
 /**
  * Manages live preview synchronization with the iframe.
@@ -16,6 +17,7 @@ export function usePreviewSync(
     currentPage: any,
     messageBus: IMessageBus | null
 ) {
+    const { currentSlug } = useStore();
     const [isSyncing, setIsSyncing] = useState(false);
 
     /** Render a single section via the API and push the HTML into the iframe. */
@@ -29,6 +31,7 @@ export function usePreviewSync(
             setIsSyncing(true);
             try {
                 const { html } = await api.renderSection({
+                    slug: currentSlug,
                     section_id: sectionId,
                     section_type: sec.type,
                     settings: sec.settings || {},
@@ -175,6 +178,7 @@ export function usePreviewSync(
 
                 try {
                     const { html } = await api.renderSection({
+                        slug: currentSlug,
                         section_id: sectionId,
                         section_type: sec.type,
                         settings: sec.settings || {},
@@ -196,7 +200,7 @@ export function usePreviewSync(
             messageBus.send("reorder-sections", { order });
             setIsSyncing(false);
         },
-        [messageBus]
+        [messageBus, currentSlug]
     );
 
     return {

@@ -216,7 +216,10 @@ export default function AddBlockModal({
             setIsPreviewLoading(true);
             setPreviewError(null);
             try {
-                const payload = buildBlockPreviewPayload(previewBlock, selectedPresetIndex, blockTypes);
+                const payload = {
+                    ...buildBlockPreviewPayload(previewBlock, selectedPresetIndex, blockTypes),
+                    slug,
+                };
                 const { html } = await api.renderBlock(payload);
                 if (cancelled) return;
                 setPreviewHtml(html || "");

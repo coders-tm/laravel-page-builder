@@ -239,12 +239,15 @@ export default function AddSectionModal() {
             setIsPreviewLoading(true);
             setPreviewError(null);
             try {
-                const payload = buildSectionPreviewPayload(
-                    previewEntry.type,
-                    previewEntry.meta,
-                    selectedPresetIndex,
-                    themeBlocks
-                );
+                const payload = {
+                    ...buildSectionPreviewPayload(
+                        previewEntry.type,
+                        previewEntry.meta,
+                        selectedPresetIndex,
+                        themeBlocks
+                    ),
+                    slug,
+                };
                 const { html } = await api.renderSection(payload);
                 if (cancelled) return;
                 setPreviewHtml(html || "");

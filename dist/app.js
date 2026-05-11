@@ -21635,7 +21635,10 @@ function cxe({
     const ee = async () => {
       R(!0), F(null);
       try {
-        const $ = sxe(U, G, r), { html: le } = await rl.renderBlock($);
+        const $ = {
+          ...sxe(U, G, r),
+          slug
+        }, { html: le } = await rl.renderBlock($);
         if (W) return;
         A(le || "");
       } catch {
@@ -24119,12 +24122,15 @@ function Lxe() {
     const le = async () => {
       F(!0), Z(null);
       try {
-        const ve = kxe(
-          Y.type,
-          Y.meta,
-          V,
-          r
-        ), { html: ze } = await rl.renderSection(ve);
+        const ve = {
+          ...kxe(
+            Y.type,
+            Y.meta,
+            V,
+            r
+          ),
+          slug: l
+        }, { html: ze } = await rl.renderSection(ve);
         if ($) return;
         R(ze || "");
       } catch {
@@ -25393,13 +25399,14 @@ class Kxe {
    */
   async rerender(e) {
     var o;
-    const t = _e.getState().currentPage;
+    const l = _e.getState(), t = l.currentPage;
     if (!t || !e || !this.messageBus) return;
     const r = (o = t.sections) == null ? void 0 : o[e];
     if (r) {
       this.events.emit("preview:rerender", { sectionId: e });
       try {
         const { html: i } = await rl.renderSection({
+          slug: l.currentSlug,
           section_id: e,
           section_type: r.type,
           settings: r.settings || {},
@@ -25518,6 +25525,7 @@ class Kxe {
       if (i)
         try {
           const { html: s } = await rl.renderSection({
+            slug: _e.getState().currentSlug,
             section_id: o,
             section_type: i.type,
             settings: i.settings || {},

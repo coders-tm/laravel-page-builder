@@ -64,6 +64,7 @@ export class PreviewManager {
 
         try {
             const { html } = await api.renderSection({
+                slug: state.currentSlug,
                 section_id: sectionId,
                 section_type: sec.type,
                 settings: sec.settings || {},
@@ -205,6 +206,7 @@ export class PreviewManager {
 
             try {
                 const { html } = await api.renderSection({
+                    slug: useStore.getState().currentSlug,
                     section_id: sectionId,
                     section_type: sec.type,
                     settings: sec.settings || {},

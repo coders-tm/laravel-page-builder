@@ -15,6 +15,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\View as FacadesView;
 
 class PageBuilderController extends Controller
 {
@@ -79,12 +80,26 @@ class PageBuilderController extends Controller
     public function renderSection(Request $request): JsonResponse
     {
         $request->validate([
+            'slug' => 'nullable|string',
             'section_id' => 'required|string',
             'section_type' => 'required|string',
             'settings' => 'nullable|array',
             'blocks' => 'nullable|array',
             'order' => 'nullable|array',
         ]);
+
+        $slug = $request->input('slug');
+        $extraData = [];
+
+        if ($slug) {
+            $dbPage = Page::findBySlug($slug);
+            [$page, $isResolved] = Page::resolve($slug, $dbPage);
+
+            // Share the DB page model with all views rendered in this request
+            FacadesView::share('page', $dbPage);
+            $extraData['page'] = $dbPage;
+            $extraData['__pb_page'] = $dbPage;
+        }
 
         $sectionId = $request->input('section_id');
         $sectionData = [
@@ -94,7 +109,7 @@ class PageBuilderController extends Controller
             'order' => $request->input('order', []),
         ];
 
-        $html = $this->renderer->renderRawSection($sectionId, $sectionData, editor: true);
+        $html = $this->renderer->renderRawSection($sectionId, $sectionData, editor: true, data: $extraData);
 
         return response()->json([
             'html' => $html,
@@ -110,11 +125,19 @@ class PageBuilderController extends Controller
     public function renderBlock(Request $request): JsonResponse
     {
         $request->validate([
+            'slug' => 'nullable|string',
             'type' => 'required|string',
             'settings' => 'nullable|array',
             'blocks' => 'nullable|array',
             'order' => 'nullable|array',
         ]);
+
+        $slug = $request->input('slug');
+
+        if ($slug) {
+            $dbPage = Page::findBySlug($slug);
+            View::share('page', $dbPage);
+        }
 
         $blockData = [
             'type' => $request->input('type'),
