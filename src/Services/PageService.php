@@ -49,15 +49,12 @@ class PageService
             ]);
         }
 
-        $stored = $this->pageStorage->load($slug);
-        $layoutType = $stored?->layoutType() ?? 'page';
-        $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
-        $page = $this->buildPage($stored, $defaultLayout, $dbPage);
+        [$page, $isResolved] = $this->resolve($slug, $dbPage);
 
         // ── 1. Custom page view ───────────────────────────────────────────
         if (View::exists("pages.{$slug}")) {
             return view("pages.{$slug}", [
-                ...$this->pageMeta($dbPage, $stored, $meta),
+                ...$this->pageMeta($dbPage, $page, $meta),
                 'slug' => $slug,
                 '__pb_layout' => $page,
             ]);
@@ -75,24 +72,44 @@ class PageService
             ]);
         }
 
-        // ── 3. Page builder JSON ──────────────────────────────────────────
-        if ($stored !== null) {
+        // ── 3. Page builder JSON / Template ───────────────────────────────
+        if ($isResolved) {
             return $this->renderPage($slug, $page, $dbPage, $meta);
         }
 
-        // ── 4. Template fallback ──────────────────────────────────────────
+        // ── 4. Nothing found ──────────────────────────────────────────────
+        abort(404);
+    }
+
+    /**
+     * Resolve a PageData instance for the given slug, trying stored JSON first,
+     * then template fallback, and finally a blank page.
+     *
+     * @return array{0: PageData, 1: bool}
+     */
+    public function resolve(string $slug, ?Model $dbPage = null): array
+    {
+        $stored = $this->pageStorage->load($slug);
+
+        if ($stored !== null) {
+            $layoutType = $stored->layoutType() ?? 'page';
+            $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
+
+            return [$this->buildPage($stored, $defaultLayout, $dbPage), true];
+        }
+
         $templateData = $this->resolveTemplate($dbPage);
 
         if ($templateData !== null) {
             $resolvedData = $this->variableResolver->resolve($templateData, $dbPage);
             $templateLayout = $this->resolveTemplateLayout($resolvedData);
-            $page = $this->buildPageFromTemplate($resolvedData, $templateLayout, $dbPage);
 
-            return $this->renderPage($slug, $page, $dbPage, $meta);
+            return [$this->buildPageFromTemplate($resolvedData, $templateLayout, $dbPage), true];
         }
 
-        // ── 5. Nothing found ──────────────────────────────────────────────
-        abort(404);
+        $defaultLayout = $this->layoutParser->defaultLayout('page');
+
+        return [$this->buildPage(null, $defaultLayout, $dbPage), false];
     }
 
     /**

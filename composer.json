@@ -94,6 +94,7 @@
       "@php vendor/bin/testbench serve --ansi"
     ],
     "lint": "@php vendor/bin/phpstan analyse",
+    "format": "@php vendor/bin/pint --ansi",
     "test": "@php vendor/bin/phpunit"
   }
 }

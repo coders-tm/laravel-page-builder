@@ -11,7 +11,6 @@ use Coderstm\PageBuilder\Rendering\Renderer;
 use Coderstm\PageBuilder\Services\PageRenderer;
 use Coderstm\PageBuilder\Services\PageStorage;
 use Coderstm\PageBuilder\Services\ThemeSettings;
-use Coderstm\PageBuilder\Support\PageData;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,7 +41,7 @@ class PageBuilderController extends Controller
     }
 
     /**
-     * GET /pagebuilder/page/{slug}
+     * GET /pagebuilder/{slug}.json
      *
      * Get a specific page JSON data.
      * Returns an empty page structure when no JSON file exists,
@@ -54,18 +53,10 @@ class PageBuilderController extends Controller
      */
     public function page(string $slug = 'home'): JsonResponse
     {
-        $stored = $this->pageStorage->load($slug);
-        $layoutType = $stored?->layoutType() ?? 'page';
-        $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
-
-        $page = $stored !== null
-            ? PageData::fromArray($stored->toArray(), $defaultLayout)
-            : PageData::fromArray([], $defaultLayout);
+        $dbPage = Page::findBySlug($slug);
+        [$page, $isResolved] = Page::resolve($slug, $dbPage);
 
         $data = $page->toArray();
-
-        // Merge database meta into the response so the editor has it.
-        $dbPage = Page::findBySlug($slug);
 
         if ($dbPage) {
             $data['title'] = $dbPage->title;

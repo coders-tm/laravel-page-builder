@@ -6,6 +6,7 @@ use Coderstm\PageBuilder\Services\PageService;
 use Illuminate\Support\Facades\Facade;
 
 /**
+ * @method static array resolve(string $slug, ?\Illuminate\Database\Eloquent\Model $dbPage = null)
  * @method static mixed render(string $slug, array $meta = [])
  * @method static void routes()
  * @method static array allActive()
