@@ -10,6 +10,7 @@ use Coderstm\PageBuilder\Registry\LayoutParser;
 use Coderstm\PageBuilder\Support\PageData;
 use Coderstm\PageBuilder\Support\TemplateVariableResolver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 
@@ -36,6 +37,11 @@ class PageService
         }
 
         $dbPage = $this->findBySlug($slug);
+
+        // Render the blade snippets in the page's content
+        if ($dbPage?->content) {
+            $dbPage->content = Blade::render($dbPage->content);
+        }
 
         // Share the DB page model with all views rendered in this request,
         // so section views (e.g. page-content) can access $page->title, $page->content, etc.

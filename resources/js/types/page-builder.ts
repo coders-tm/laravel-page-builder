@@ -152,4 +152,6 @@ export interface SettingSchema {
     content?: string;
     /** CSS custom-property name (e.g. `--colors-primary`) to update live in the preview. */
     css_var?: string;
+    /** Format of the value (e.g. 'hsl' for space-separated HSL). */
+    mode?: string;
 }
