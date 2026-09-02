@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
+import { version } from "../../../package.json"
 
 interface InfoModalProps {
   isOpen: boolean
@@ -14,7 +15,7 @@ interface InfoModalProps {
 }
 
 const PACKAGE_NAME = "laravel-page-builder"
-const VERSION = "1.0.0"
+const VERSION = version
 const DESCRIPTION =
   "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes."
 const AUTHOR = "Dipak Sarkar"
