@@ -1,5 +1,5 @@
-import React, { createContext, useContext } from "react";
-import type { Editor } from "./editor/Editor";
+import React, { createContext, useContext } from "react"
+import type { Editor } from "./editor/Editor"
 
 /**
  * React context for the Editor instance.
@@ -7,7 +7,7 @@ import type { Editor } from "./editor/Editor";
  * Provides access to all editor managers, services, and the
  * event bus to any component in the tree via the useEditorInstance() hook.
  */
-const EditorContext = createContext<Editor | null>(null);
+const EditorContext = createContext<Editor | null>(null)
 
 /**
  * Provider component that makes the Editor instance
@@ -19,17 +19,13 @@ const EditorContext = createContext<Editor | null>(null);
  * </EditorProvider>
  */
 export function EditorProvider({
-    editor,
-    children,
+  editor,
+  children,
 }: {
-    editor: Editor;
-    children: React.ReactNode;
+  editor: Editor
+  children: React.ReactNode
 }) {
-    return (
-        <EditorContext.Provider value={editor}>
-            {children}
-        </EditorContext.Provider>
-    );
+  return <EditorContext.Provider value={editor}>{children}</EditorContext.Provider>
 }
 
 /**
@@ -59,13 +55,11 @@ export function EditorProvider({
  * editor.on('section:added', ({ sectionId }) => { … });
  */
 export function useEditorInstance(): Editor {
-    const editor = useContext(EditorContext);
-    if (!editor) {
-        throw new Error(
-            "useEditorInstance must be used within an EditorProvider"
-        );
-    }
-    return editor;
+  const editor = useContext(EditorContext)
+  if (!editor) {
+    throw new Error("useEditorInstance must be used within an EditorProvider")
+  }
+  return editor
 }
 
-export default EditorContext;
+export default EditorContext

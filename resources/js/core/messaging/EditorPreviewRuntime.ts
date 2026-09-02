@@ -26,7 +26,7 @@ export const EDITOR_CSS = `
 .pb-disabled-block {
     display: none;
 }
-`;
+`
 
 export const EDITOR_JS = `
 (function() {
@@ -964,4 +964,4 @@ export const EDITOR_JS = `
         type: 'preview-ready'
     }, '*');
 })();
-`;
+`

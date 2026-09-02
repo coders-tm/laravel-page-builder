@@ -1,12 +1,12 @@
-import config from "@/config";
-import type { AssetProvider, AssetList, Asset } from "@/types/asset";
+import config from "@/config"
+import type { AssetProvider, AssetList, Asset } from "@/types/asset"
 
 /**
  * Get the CSRF token from the meta tag.
  */
 function getCsrfToken(): string {
-    const meta = document.querySelector('meta[name="csrf-token"]');
-    return meta ? meta.getAttribute("content") || "" : "";
+  const meta = document.querySelector('meta[name="csrf-token"]')
+  return meta ? meta.getAttribute("content") || "" : ""
 }
 
 /**
@@ -21,33 +21,31 @@ function getCsrfToken(): string {
  * config object is fully constructed.
  */
 const laravelAssetProvider: AssetProvider = {
-    async list(
-        params: { page?: number; search?: string } = {}
-    ): Promise<AssetList> {
-        const query = new URLSearchParams();
-        if (params.page) query.set("page", String(params.page));
-        if (params.search) query.set("q", params.search);
+  async list(params: { page?: number; search?: string } = {}): Promise<AssetList> {
+    const query = new URLSearchParams()
+    if (params.page) query.set("page", String(params.page))
+    if (params.search) query.set("q", params.search)
 
-        const res = await fetch(`${config.baseUrl}/assets?${query.toString()}`);
-        if (!res.ok) throw new Error("Failed to fetch assets");
-        return res.json();
-    },
+    const res = await fetch(`${config.baseUrl}/assets?${query.toString()}`)
+    if (!res.ok) throw new Error("Failed to fetch assets")
+    return res.json()
+  },
 
-    async upload(file: File): Promise<Asset> {
-        const formData = new FormData();
-        formData.append("file", file);
+  async upload(file: File): Promise<Asset> {
+    const formData = new FormData()
+    formData.append("file", file)
 
-        const res = await fetch(`${config.baseUrl}/assets/upload`, {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": getCsrfToken(),
-            },
-            body: formData,
-        });
+    const res = await fetch(`${config.baseUrl}/assets/upload`, {
+      method: "POST",
+      headers: {
+        "X-CSRF-TOKEN": getCsrfToken(),
+      },
+      body: formData,
+    })
 
-        if (!res.ok) throw new Error("Failed to upload asset");
-        return res.json();
-    },
-};
+    if (!res.ok) throw new Error("Failed to upload asset")
+    return res.json()
+  },
+}
 
-export default laravelAssetProvider;
+export default laravelAssetProvider

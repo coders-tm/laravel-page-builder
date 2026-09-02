@@ -1,20 +1,20 @@
-import type { EventBus } from "./EventBus";
-import type { SelectionManager } from "./SelectionManager";
-import type { LayoutManager } from "./LayoutManager";
-import config from "@/config";
+import type { EventBus } from "./EventBus"
+import type { SelectionManager } from "./SelectionManager"
+import type { LayoutManager } from "./LayoutManager"
+import config from "@/config"
 
 interface NavigationAdapter {
-  navigate: (path: string, options?: { replace?: boolean }) => void;
-  setSearchParams: (params: Record<string, string>) => void;
-  getSearchParams: () => URLSearchParams;
-  editorMode?: boolean;
+  navigate: (path: string, options?: { replace?: boolean }) => void
+  setSearchParams: (params: Record<string, string>) => void
+  getSearchParams: () => URLSearchParams
+  editorMode?: boolean
 }
 
 interface NavigationState {
-  slug?: string;
-  device: string;
-  selectedSection: string | null;
-  blockPath: string[];
+  slug?: string
+  device: string
+  selectedSection: string | null
+  blockPath: string[]
 }
 
 /**
@@ -25,17 +25,17 @@ interface NavigationState {
  * SelectionManager + LayoutManager synchronized.
  */
 export class NavigationManager {
-  private adapter: NavigationAdapter | null = null;
+  private adapter: NavigationAdapter | null = null
 
   private state: NavigationState = {
     slug: undefined,
     device: "desktop",
     selectedSection: null,
     blockPath: [],
-  };
+  }
 
-  private listeners = new Set<() => void>();
-  private version = 0;
+  private listeners = new Set<() => void>()
+  private version = 0
 
   constructor(
     private events: EventBus,
@@ -44,56 +44,56 @@ export class NavigationManager {
   ) {}
 
   setAdapter(adapter: NavigationAdapter | null): void {
-    this.adapter = adapter;
+    this.adapter = adapter
   }
 
   subscribe(listener: () => void): () => void {
-    this.listeners.add(listener);
+    this.listeners.add(listener)
     return () => {
-      this.listeners.delete(listener);
-    };
+      this.listeners.delete(listener)
+    }
   }
 
   getVersion(): number {
-    return this.version;
+    return this.version
   }
 
   private notify(): void {
-    this.version += 1;
+    this.version += 1
     for (const listener of this.listeners) {
-      listener();
+      listener()
     }
   }
 
   private setState(next: Partial<NavigationState>): void {
-    this.state = { ...this.state, ...next };
-    this.notify();
+    this.state = { ...this.state, ...next }
+    this.notify()
   }
 
   get slug(): string | undefined {
-    return this.state.slug;
+    return this.state.slug
   }
 
   get device(): string {
-    return this.state.device;
+    return this.state.device
   }
 
   get selectedSection(): string | null {
-    return this.state.selectedSection;
+    return this.state.selectedSection
   }
 
   get blockPath(): string[] {
-    return this.state.blockPath;
+    return this.state.blockPath
   }
 
   get selectedBlock(): string | null {
-    const path = this.state.blockPath;
-    return path.length > 0 ? path[path.length - 1] : null;
+    const path = this.state.blockPath
+    return path.length > 0 ? path[path.length - 1] : null
   }
 
   get parentBlockId(): string | null {
-    const path = this.state.blockPath;
-    return path.length > 1 ? path[path.length - 2] : null;
+    const path = this.state.blockPath
+    return path.length > 1 ? path[path.length - 2] : null
   }
 
   getSnapshot() {
@@ -104,7 +104,7 @@ export class NavigationManager {
       selectedBlock: this.selectedBlock,
       parentBlockId: this.parentBlockId,
       blockPath: this.blockPath,
-    };
+    }
   }
 
   /**
@@ -112,141 +112,135 @@ export class NavigationManager {
    * Called by the React Router bridge hook.
    */
   syncFromRoute(input: {
-    slug?: string;
-    device: string;
-    selectedSection: string | null;
-    blockPath: string[];
+    slug?: string
+    device: string
+    selectedSection: string | null
+    blockPath: string[]
   }): void {
-    const prev = this.state;
-    const pageChanged = prev.slug !== input.slug;
+    const prev = this.state
+    const pageChanged = prev.slug !== input.slug
     const changed =
       pageChanged ||
       prev.device !== input.device ||
       prev.selectedSection !== input.selectedSection ||
-      prev.blockPath.join(",") !== input.blockPath.join(",");
+      prev.blockPath.join(",") !== input.blockPath.join(",")
 
-    if (!changed) return;
+    if (!changed) return
 
     this.setState({
       slug: input.slug,
       device: input.device,
       selectedSection: input.selectedSection,
       blockPath: [...input.blockPath],
-    });
+    })
 
-    this.layout.setDevice(input.device);
-    this.selection.syncFromExternal(input.selectedSection, input.blockPath);
+    this.layout.setDevice(input.device)
+    this.selection.syncFromExternal(input.selectedSection, input.blockPath)
 
-    this.events.emit("navigation:changed", this.getSnapshot());
+    this.events.emit("navigation:changed", this.getSnapshot())
 
     if (pageChanged) {
       window.dispatchEvent(
         new CustomEvent("pagebuilder:page-change", {
           detail: { slug: input.slug ?? null },
         }),
-      );
+      )
     }
   }
 
   setPage(slug: string, options?: { replace?: boolean }): void {
-    const params = this.getPreservedParams();
-    const search = new URLSearchParams(params).toString();
-    const query = search ? `?${search}` : "";
-    const path = slug === "home" ? "/" : `/${slug}`;
-    this.adapter?.navigate(`${path}${query}`, options);
+    const params = this.getPreservedParams()
+    const search = new URLSearchParams(params).toString()
+    const query = search ? `?${search}` : ""
+    const path = slug === "home" ? "/" : `/${slug}`
+    this.adapter?.navigate(`${path}${query}`, options)
   }
 
   private writeSelectionToUrl(sectionId: string | null, path: string[]): void {
-    const params = this.getPreservedParams();
+    const params = this.getPreservedParams()
 
-    if (this.device !== "desktop") params.device = this.device;
-    if (sectionId) params.section = sectionId;
-    if (path.length > 0) params.block = path.join(",");
+    if (this.device !== "desktop") params.device = this.device
+    if (sectionId) params.section = sectionId
+    if (path.length > 0) params.block = path.join(",")
 
-    this.adapter?.setSearchParams(params);
+    this.adapter?.setSearchParams(params)
   }
 
   private getPreservedParams(): Record<string, string> {
-    const current = this.adapter?.getSearchParams();
-    const params: Record<string, string> = {};
+    const current = this.adapter?.getSearchParams()
+    const params: Record<string, string> = {}
 
     if (current) {
       // Always preserve 'editor'
       if (current.has("editor")) {
-        params.editor = current.get("editor")!;
+        params.editor = current.get("editor")!
       }
 
       // Preserve configurable params
-      const preserved = [
-        "editor",
-        ...(config.preservedParams || []),
-      ];
+      const preserved = ["editor", ...(config.preservedParams || [])]
 
       current.forEach((value, key) => {
         if (preserved.includes(key)) {
-          params[key] = value;
+          params[key] = value
         }
-      });
+      })
     } else {
       // Fallback if no adapter (should not happen in browser)
-      params.editor = "true";
+      params.editor = "true"
     }
 
-    return params;
+    return params
   }
 
   setSelection(sectionId: string | null, blockPath: string[] = []): void {
-    const path = [...blockPath];
+    const path = [...blockPath]
 
     // Update internal stores immediately for responsive UI.
     if (sectionId === null) {
-      this.selection.clear();
+      this.selection.clear()
     } else if (path.length > 0) {
-      this.selection.selectBlock(sectionId, path);
+      this.selection.selectBlock(sectionId, path)
     } else {
-      this.selection.selectSection(sectionId);
+      this.selection.selectSection(sectionId)
     }
 
-    this.setState({ selectedSection: sectionId, blockPath: path });
-    this.writeSelectionToUrl(sectionId, path);
+    this.setState({ selectedSection: sectionId, blockPath: path })
+    this.writeSelectionToUrl(sectionId, path)
   }
 
-  setSection(
-    sectionId: string | null,
-    block: string | string[] | null = null,
-  ): void {
+  setSection(sectionId: string | null, block: string | string[] | null = null): void {
     const path = Array.isArray(block)
       ? block
       : block
         ? String(block).split(",").filter(Boolean)
-        : [];
+        : []
 
-    this.setSelection(sectionId, path);
+    this.setSelection(sectionId, path)
   }
 
   pushBlock(blockId: string): void {
-    if (!this.selectedSection) return;
-    this.setSelection(this.selectedSection, [...this.blockPath, blockId]);
+    if (!this.selectedSection) return
+    this.setSelection(this.selectedSection, [...this.blockPath, blockId])
   }
 
   clearSelection(): void {
-    this.setSelection(null, []);
+    this.setSelection(null, [])
   }
 
   setDevice(device: string): void {
-    this.layout.setDevice(device);
-    this.setState({ device });
+    this.layout.setDevice(device)
+    this.setState({ device })
 
-    const params = this.getPreservedParams();
-    if (this.selectedSection) params.section = this.selectedSection;
-    if (this.blockPath.length > 0) params.block = this.blockPath.join(",");
-    if (device !== "desktop") params.device = device;
-    this.adapter?.setSearchParams(params);
+    const params = this.getPreservedParams()
+    if (this.selectedSection) params.section = this.selectedSection
+    if (this.blockPath.length > 0) params.block = this.blockPath.join(",")
+    if (device !== "desktop") params.device = device
+    this.adapter?.setSearchParams(params)
   }
 
   goBack(): void {
     // UX rule: Back from settings should always return to the layout list
     // directly (no nested breadcrumb stepping).
-    this.clearSelection();
+    this.clearSelection()
   }
 }

@@ -1,8 +1,5 @@
-import { useMemo, useSyncExternalStore } from "react";
-import {
-    drawerManager,
-    type MobileDrawerPanel,
-} from "@/core/editor/DrawerManager";
+import { useMemo, useSyncExternalStore } from "react"
+import { drawerManager, type MobileDrawerPanel } from "@/core/editor/DrawerManager"
 
 /**
  * React adapter for the DrawerManager singleton.
@@ -14,20 +11,20 @@ import {
  * never need to import drawerManager directly.
  */
 export function useDrawer() {
-    const version = useSyncExternalStore(
-        (listener) => drawerManager.subscribe(listener),
-        () => drawerManager.getVersion(),
-        () => 0
-    );
+  const version = useSyncExternalStore(
+    (listener) => drawerManager.subscribe(listener),
+    () => drawerManager.getVersion(),
+    () => 0,
+  )
 
-    return useMemo(
-        () => ({
-            ...drawerManager.getSnapshot(),
-            open: (panel: MobileDrawerPanel) => drawerManager.open(panel),
-            close: () => drawerManager.close(),
-            toggle: (panel: MobileDrawerPanel) => drawerManager.toggle(panel),
-        }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [version]
-    );
+  return useMemo(
+    () => ({
+      ...drawerManager.getSnapshot(),
+      open: (panel: MobileDrawerPanel) => drawerManager.open(panel),
+      close: () => drawerManager.close(),
+      toggle: (panel: MobileDrawerPanel) => drawerManager.toggle(panel),
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [version],
+  )
 }

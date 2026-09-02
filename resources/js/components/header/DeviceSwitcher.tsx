@@ -1,6 +1,6 @@
-import React from "react";
-import { Monitor, Smartphone, Maximize2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React from "react"
+import { Monitor, Smartphone, Maximize2 } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 /**
  * Device definitions.
@@ -9,21 +9,21 @@ import { cn } from "@/lib/utils";
  * PreviewCanvas can reference the same source of truth.
  */
 export const DEVICES = [
-    { key: "desktop", icon: Monitor, label: "Desktop", width: "100%" },
-    { key: "mobile", icon: Smartphone, label: "Mobile", width: "390px" },
-    {
-        key: "fullscreen",
-        icon: Maximize2,
-        label: "Full width",
-        width: "100%",
-    },
-] as const;
+  { key: "desktop", icon: Monitor, label: "Desktop", width: "100%" },
+  { key: "mobile", icon: Smartphone, label: "Mobile", width: "390px" },
+  {
+    key: "fullscreen",
+    icon: Maximize2,
+    label: "Full width",
+    width: "100%",
+  },
+] as const
 
 interface DeviceSwitcherProps {
-    /** Currently active device key */
-    device: string;
-    /** Called with the selected device key when user clicks a button */
-    onDeviceChange: (device: string) => void;
+  /** Currently active device key */
+  device: string
+  /** Called with the selected device key when user clicks a button */
+  onDeviceChange: (device: string) => void
 }
 
 /**
@@ -32,31 +32,28 @@ interface DeviceSwitcherProps {
  * SRP: solely responsible for rendering the device toggle buttons
  * and forwarding the selection upward.
  */
-export default function DeviceSwitcher({
-    device,
-    onDeviceChange,
-}: DeviceSwitcherProps) {
-    return (
-        <div className="flex items-center bg-transparent rounded-lg p-0.5 gap-0.5">
-            {DEVICES.map((d) => {
-                const isActive = device === d.key;
-                return (
-                    <button
-                        key={d.key}
-                        type="button"
-                        title={d.label}
-                        onClick={() => onDeviceChange(d.key)}
-                        className={cn(
-                            "flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-150",
-                            isActive
-                                ? "bg-white text-gray-900 shadow-sm"
-                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        )}
-                    >
-                        <d.icon className="w-[18px] h-[18px]" />
-                    </button>
-                );
-            })}
-        </div>
-    );
+export default function DeviceSwitcher({ device, onDeviceChange }: DeviceSwitcherProps) {
+  return (
+    <div className="flex items-center gap-0.5 rounded-lg bg-transparent p-0.5">
+      {DEVICES.map((d) => {
+        const isActive = device === d.key
+        return (
+          <button
+            key={d.key}
+            type="button"
+            title={d.label}
+            onClick={() => onDeviceChange(d.key)}
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-150",
+              isActive
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+            )}
+          >
+            <d.icon className="h-[18px] w-[18px]" />
+          </button>
+        )
+      })}
+    </div>
+  )
 }

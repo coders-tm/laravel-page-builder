@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useSyncExternalStore } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { useEditorInstance } from "@/core/editorContext";
+import { useEffect, useMemo, useSyncExternalStore } from "react"
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom"
+import { useEditorInstance } from "@/core/editorContext"
 
 interface UseEditorNavigationOptions {
   /**
@@ -15,7 +15,7 @@ interface UseEditorNavigationOptions {
    *
    * Only the root-level useEditor hook should use registerAdapter: true.
    */
-  registerAdapter?: boolean;
+  registerAdapter?: boolean
 }
 
 /**
@@ -24,40 +24,38 @@ interface UseEditorNavigationOptions {
  * Parses current URL state, syncs it into `editor.navigation`, and exposes
  * the manager snapshot + commands to components.
  */
-export function useEditorNavigation({
-  registerAdapter = false,
-}: UseEditorNavigationOptions = {}) {
-  const editor = useEditorInstance();
+export function useEditorNavigation({ registerAdapter = false }: UseEditorNavigationOptions = {}) {
+  const editor = useEditorInstance()
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const rawPath = location.pathname || "/";
-  const slug = rawPath === "/" ? "home" : rawPath.replace(/^\//, "");
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate()
+  const location = useLocation()
+  const rawPath = location.pathname || "/"
+  const slug = rawPath === "/" ? "home" : rawPath.replace(/^\//, "")
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const selectedSection = searchParams.get("section") || null;
-  const device = searchParams.get("device") || "desktop";
-  const rawBlock = searchParams.get("block") || "";
-  const blockPath: string[] = rawBlock ? rawBlock.split(",") : [];
-  const isEditorMode = searchParams.get("editor") === "true";
+  const selectedSection = searchParams.get("section") || null
+  const device = searchParams.get("device") || "desktop"
+  const rawBlock = searchParams.get("block") || ""
+  const blockPath: string[] = rawBlock ? rawBlock.split(",") : []
+  const isEditorMode = searchParams.get("editor") === "true"
 
   // Register router adapter for URL updates originating from manager commands.
   // Only the root-level caller (useEditor) opts in via registerAdapter: true.
   // Child panel components must NOT register the adapter — their unmount
   // cleanup would null it out, breaking navigation in PreviewCanvas.
   useEffect(() => {
-    if (!registerAdapter) return;
+    if (!registerAdapter) return
     editor.navigation.setAdapter({
       navigate,
       setSearchParams,
       getSearchParams: () => searchParams,
       editorMode: isEditorMode,
-    });
+    })
 
     return () => {
-      editor.navigation.setAdapter(null);
-    };
-  }, [editor, navigate, setSearchParams, registerAdapter, isEditorMode]);
+      editor.navigation.setAdapter(null)
+    }
+  }, [editor, navigate, setSearchParams, registerAdapter, isEditorMode])
 
   // Sync current route into the manager.
   useEffect(() => {
@@ -66,15 +64,15 @@ export function useEditorNavigation({
       device,
       selectedSection,
       blockPath,
-    });
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, slug, device, selectedSection, blockPath.join(",")]);
+  }, [editor, slug, device, selectedSection, blockPath.join(",")])
 
   const version = useSyncExternalStore(
     (listener) => editor.navigation.subscribe(listener),
     () => editor.navigation.getVersion(),
     () => 0,
-  );
+  )
 
   return useMemo(
     () => ({
@@ -82,17 +80,14 @@ export function useEditorNavigation({
       setPage: (nextSlug: string) => editor.navigation.setPage(nextSlug),
       setSelection: (sectionId: string | null, path: string[] = []) =>
         editor.navigation.setSelection(sectionId, path),
-      setSection: (
-        sectionId: string | null,
-        block: string | string[] | null = null,
-      ) => editor.navigation.setSection(sectionId, block),
+      setSection: (sectionId: string | null, block: string | string[] | null = null) =>
+        editor.navigation.setSection(sectionId, block),
       pushBlock: (blockId: string) => editor.navigation.pushBlock(blockId),
       clearSection: () => editor.navigation.clearSelection(),
-      setDevice: (nextDevice: string) =>
-        editor.navigation.setDevice(nextDevice),
+      setDevice: (nextDevice: string) => editor.navigation.setDevice(nextDevice),
       goBack: () => editor.navigation.goBack(),
       navigate,
     }),
     [editor, navigate, version],
-  );
+  )
 }

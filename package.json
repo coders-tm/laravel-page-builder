@@ -7,7 +7,24 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "generate:icons": "node generate-icons.mjs"
+    "generate:icons": "node generate-icons.mjs",
+    "lint": "eslint resources/js/",
+    "lint:fix": "eslint resources/js/ --fix",
+    "format": "prettier --write \"resources/js/**/*.{ts,tsx,css}\"",
+    "format:check": "prettier --check \"resources/js/**/*.{ts,tsx,css}\"",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -39,15 +56,25 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@material-design-icons/svg": "^0.14.15",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.27",
+    "eslint": "^10.9.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.6",
+    "lint-staged": "^16.4.0",
     "postcss": "^8.5.8",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "simple-git-hooks": "^2.14.0",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.69.0",
     "vite": "^6.0.0"
   }
 }

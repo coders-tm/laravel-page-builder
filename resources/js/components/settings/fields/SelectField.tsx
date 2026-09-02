@@ -1,36 +1,36 @@
-import React, { memo } from "react";
-import { SettingSchema } from "@/types/page-builder";
+import React, { memo } from "react"
+import { SettingSchema } from "@/types/page-builder"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface SelectFieldProps {
-    setting: SettingSchema;
-    value: string;
-    onChange: (val: string) => void;
+  setting: SettingSchema
+  value: string
+  onChange: (val: string) => void
 }
 
 function SelectField({ setting, value, onChange }: SelectFieldProps) {
-    return (
-        <Select value={value} onValueChange={onChange}>
-            <SelectTrigger className="w-full">
-                <SelectValue
-                    placeholder={setting.placeholder || "Select an option"}
-                />
-            </SelectTrigger>
-            <SelectContent>
-                {(setting.options || []).filter((opt) => opt.value !== "").map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-    );
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder={setting.placeholder || "Select an option"} />
+      </SelectTrigger>
+      <SelectContent>
+        {(setting.options || [])
+          .filter((opt) => opt.value !== "")
+          .map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+      </SelectContent>
+    </Select>
+  )
 }
 
-export default memo(SelectField);
+export default memo(SelectField)

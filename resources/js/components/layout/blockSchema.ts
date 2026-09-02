@@ -1,4 +1,4 @@
-import { BlockData, BlockInstance, BlockSchema } from "@/types/page-builder";
+import { BlockData, BlockInstance, BlockSchema } from "@/types/page-builder"
 
 /* ── Schema Resolution Utilities ─────────────────────────────────────── */
 
@@ -12,11 +12,8 @@ import { BlockData, BlockInstance, BlockSchema } from "@/types/page-builder";
  *  { type: '@theme' }                          → @theme wildcard reference (bare)
  *  { type: 'column', name: 'Column', settings: [...] } → local block definition
  */
-export function isLocalBlockEntry(entry: {
-    type: string;
-    [key: string]: any;
-}): boolean {
-    return Object.keys(entry).some((k) => k !== "type");
+export function isLocalBlockEntry(entry: { type: string; [key: string]: any }): boolean {
+  return Object.keys(entry).some((k) => k !== "type")
 }
 
 /**
@@ -24,9 +21,9 @@ export function isLocalBlockEntry(entry: {
  * exactly one entry `{ type: '@theme' }`.
  */
 export function isThemeMode(
-    raw: Array<{ type: string; [key: string]: any }> | undefined | null
+  raw: Array<{ type: string; [key: string]: any }> | undefined | null,
 ): boolean {
-    return Array.isArray(raw) && raw.length === 1 && raw[0].type === "@theme";
+  return Array.isArray(raw) && raw.length === 1 && raw[0].type === "@theme"
 }
 
 /**
@@ -51,34 +48,31 @@ export function isThemeMode(
  *  No match found        │ Fallback to themeBlocks.
  */
 export function resolveBlockSchema(
-    blockType: string,
-    parentRawBlocks:
-        | Array<{ type: string; [key: string]: any }>
-        | undefined
-        | null,
-    themeBlocks: Record<string, BlockData>
+  blockType: string,
+  parentRawBlocks: Array<{ type: string; [key: string]: any }> | undefined | null,
+  themeBlocks: Record<string, BlockData>,
 ): BlockSchema | null {
-    const raw = parentRawBlocks || [];
+  const raw = parentRawBlocks || []
 
-    // ── @theme wildcard ────────────────────────────────────────────────
-    if (isThemeMode(raw)) {
-        return themeBlocks[blockType]?.schema ?? null;
+  // ── @theme wildcard ────────────────────────────────────────────────
+  if (isThemeMode(raw)) {
+    return themeBlocks[blockType]?.schema ?? null
+  }
+
+  const entry = raw.find((b) => b.type === blockType)
+
+  if (entry) {
+    if (isLocalBlockEntry(entry)) {
+      // Local definition — authoritative as-is (no theme merge for child-slot).
+      return entry as unknown as BlockSchema
+    } else {
+      // Bare theme-block reference → resolve full schema from theme registry.
+      return themeBlocks[blockType]?.schema ?? null
     }
+  }
 
-    const entry = raw.find((b) => b.type === blockType);
-
-    if (entry) {
-        if (isLocalBlockEntry(entry)) {
-            // Local definition — authoritative as-is (no theme merge for child-slot).
-            return entry as unknown as BlockSchema;
-        } else {
-            // Bare theme-block reference → resolve full schema from theme registry.
-            return themeBlocks[blockType]?.schema ?? null;
-        }
-    }
-
-    // Fallback: block added when schema mode differed, or unknown type.
-    return themeBlocks[blockType]?.schema ?? null;
+  // Fallback: block added when schema mode differed, or unknown type.
+  return themeBlocks[blockType]?.schema ?? null
 }
 
 /**
@@ -95,53 +89,47 @@ export function resolveBlockSchema(
  * `disabled: true` — it remains visible in the picker but cannot be added.
  */
 export function getAddableBlockTypes(
-    parentRawBlocks:
-        | Array<{ type: string; [key: string]: any }>
-        | undefined
-        | null,
-    themeBlocks: Record<string, BlockData>,
-    currentBlocks?: Record<string, BlockInstance> | null
+  parentRawBlocks: Array<{ type: string; [key: string]: any }> | undefined | null,
+  themeBlocks: Record<string, BlockData>,
+  currentBlocks?: Record<string, BlockInstance> | null,
 ): BlockSchema[] {
-    const raw = parentRawBlocks || [];
+  const raw = parentRawBlocks || []
 
-    // Count existing blocks per type so we can enforce per-type limits.
-    const countByType: Record<string, number> = {};
-    if (currentBlocks) {
-        for (const block of Object.values(currentBlocks)) {
-            countByType[block.type] = (countByType[block.type] ?? 0) + 1;
+  // Count existing blocks per type so we can enforce per-type limits.
+  const countByType: Record<string, number> = {}
+  if (currentBlocks) {
+    for (const block of Object.values(currentBlocks)) {
+      countByType[block.type] = (countByType[block.type] ?? 0) + 1
+    }
+  }
+
+  const markIfAtLimit = (schema: BlockSchema): BlockSchema => {
+    const limit = schema.limit ?? 0
+    if (limit <= 0) return schema
+    const atLimit = (countByType[schema.type] ?? 0) >= limit
+    return atLimit ? { ...schema, disabled: true } : schema
+  }
+
+  if (isThemeMode(raw)) {
+    return Object.values(themeBlocks).map((bd) => markIfAtLimit(bd.schema))
+  }
+
+  if (raw.length > 0) {
+    return raw
+      .filter((b) => b.type !== "@theme") // safety: skip stray @theme entries
+      .map((entry) => {
+        if (isLocalBlockEntry(entry)) {
+          // Local definition — used as-is for the picker; mark as local
+          // so callers (e.g. AddBlockModal) can skip the preview API call.
+          return markIfAtLimit({ ...(entry as unknown as BlockSchema), local: true })
         }
-    }
+        // Bare theme-block reference — resolve from registry.
+        const schema = themeBlocks[entry.type]?.schema ?? (entry as unknown as BlockSchema)
+        return markIfAtLimit(schema)
+      })
+  }
 
-    const markIfAtLimit = (schema: BlockSchema): BlockSchema => {
-        const limit = schema.limit ?? 0;
-        if (limit <= 0) return schema;
-        const atLimit = (countByType[schema.type] ?? 0) >= limit;
-        return atLimit ? { ...schema, disabled: true } : schema;
-    };
-
-    if (isThemeMode(raw)) {
-        return Object.values(themeBlocks)
-            .map((bd) => markIfAtLimit(bd.schema));
-    }
-
-    if (raw.length > 0) {
-        return raw
-            .filter((b) => b.type !== "@theme") // safety: skip stray @theme entries
-            .map((entry) => {
-                if (isLocalBlockEntry(entry)) {
-                    // Local definition — used as-is for the picker; mark as local
-                    // so callers (e.g. AddBlockModal) can skip the preview API call.
-                    return markIfAtLimit({ ...(entry as unknown as BlockSchema), local: true });
-                }
-                // Bare theme-block reference — resolve from registry.
-                const schema =
-                    themeBlocks[entry.type]?.schema ??
-                    (entry as unknown as BlockSchema);
-                return markIfAtLimit(schema);
-            });
-    }
-
-    return [];
+  return []
 }
 
 /**
@@ -152,13 +140,10 @@ export function getAddableBlockTypes(
  *  empty       → false
  */
 export function canShowAddBlock(
-    parentRawBlocks:
-        | Array<{ type: string; [key: string]: any }>
-        | undefined
-        | null
+  parentRawBlocks: Array<{ type: string; [key: string]: any }> | undefined | null,
 ): boolean {
-    const raw = parentRawBlocks || [];
-    if (raw.length === 0) return false;
-    // True for @theme mode, bare theme refs, and local definitions alike.
-    return true;
+  const raw = parentRawBlocks || []
+  if (raw.length === 0) return false
+  // True for @theme mode, bare theme refs, and local definitions alike.
+  return true
 }

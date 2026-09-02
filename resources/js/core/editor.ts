@@ -1,5 +1,5 @@
-import { Editor } from "./editor/Editor";
-import type { EditorConfig, PageBuilderConfig } from "@/config";
+import { Editor } from "./editor/Editor"
+import type { EditorConfig, PageBuilderConfig } from "@/config"
 
 /**
  * Create an editor instance with injected configuration.
@@ -20,11 +20,10 @@ import type { EditorConfig, PageBuilderConfig } from "@/config";
  * editor.assets.list({ page: 1 });
  */
 export function createEditor(
-    config: Partial<EditorConfig> & Partial<PageBuilderConfig> = {}
+  config: Partial<EditorConfig> & Partial<PageBuilderConfig> = {},
 ): Editor {
-    return new Editor(config);
+  return new Editor(config)
 }
 
 // Re-export types for convenience
-export type { Editor };
-
+export type { Editor }

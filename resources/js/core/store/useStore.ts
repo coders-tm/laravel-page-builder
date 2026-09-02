@@ -1,43 +1,40 @@
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
+import { create } from "zustand"
+import { immer } from "zustand/middleware/immer"
 
 import {
-    createPageSlice,
-    createSelectionSlice,
-    createSectionSlice,
-    createBlockSlice,
-    type PageSlice,
-    type SelectionSlice,
-    type SectionSlice,
-    type BlockSlice,
-} from "./slices";
+  createPageSlice,
+  createSelectionSlice,
+  createSectionSlice,
+  createBlockSlice,
+  type PageSlice,
+  type SelectionSlice,
+  type SectionSlice,
+  type BlockSlice,
+} from "./slices"
 
 /**
  * Walk a block tree following `path` and return the block at that depth.
  */
 export function getNestedBlock(
-    sectionBlocks: Record<string, any>,
-    path: string[]
+  sectionBlocks: Record<string, any>,
+  path: string[],
 ): Record<string, any> | undefined {
-    if (path.length === 0) return undefined;
-    let node: any = sectionBlocks[path[0]];
-    for (let i = 1; i < path.length; i++) {
-        if (!node) return undefined;
-        node = node.blocks?.[path[i]];
-    }
-    return node;
+  if (path.length === 0) return undefined
+  let node: any = sectionBlocks[path[0]]
+  for (let i = 1; i < path.length; i++) {
+    if (!node) return undefined
+    node = node.blocks?.[path[i]]
+  }
+  return node
 }
 
-export type PageBuilderState = PageSlice &
-    SelectionSlice &
-    SectionSlice &
-    BlockSlice;
+export type PageBuilderState = PageSlice & SelectionSlice & SectionSlice & BlockSlice
 
 export const useStore = create<PageBuilderState>()(
-    immer((...a) => ({
-        ...createPageSlice(...a),
-        ...createSelectionSlice(...a),
-        ...createSectionSlice(...a),
-        ...createBlockSlice(...a),
-    }))
-);
+  immer((...a) => ({
+    ...createPageSlice(...a),
+    ...createSelectionSlice(...a),
+    ...createSectionSlice(...a),
+    ...createBlockSlice(...a),
+  })),
+)

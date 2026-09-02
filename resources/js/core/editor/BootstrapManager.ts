@@ -1,16 +1,16 @@
-import type { EventBus } from "./EventBus";
-import type { PageManager } from "./PageManager";
-import type { HistoryManager } from "./HistoryManager";
-import type { NavigationManager } from "./NavigationManager";
-import config from "@/config";
-import { useStore } from "@/core/store/useStore";
+import type { EventBus } from "./EventBus"
+import type { PageManager } from "./PageManager"
+import type { HistoryManager } from "./HistoryManager"
+import type { NavigationManager } from "./NavigationManager"
+import config from "@/config"
+import { useStore } from "@/core/store/useStore"
 
 /**
  * BootstrapManager — class-based startup/page-switch orchestration.
  */
 export class BootstrapManager {
-  private initialLoaded = false;
-  private loadedSlug: string | null = null;
+  private initialLoaded = false
+  private loadedSlug: string | null = null
 
   constructor(
     private events: EventBus,
@@ -20,20 +20,20 @@ export class BootstrapManager {
   ) {}
 
   async loadInitialData(): Promise<void> {
-    if (this.initialLoaded) return;
-    this.initialLoaded = true;
+    if (this.initialLoaded) return
+    this.initialLoaded = true
 
     // Hydrate pages from config into the store now that setConfig() has run.
     // The store is created at module-load time (before setConfig is called),
     // so config.pages is [] at store creation. We sync it here.
     if (config.pages?.length > 0) {
-      useStore.getState().setPages(config.pages);
+      useStore.getState().setPages(config.pages)
     }
 
-    await this.pages.loadSections();
-    this.pages.loadBlocks();
+    await this.pages.loadSections()
+    this.pages.loadBlocks()
 
-    this.events.emit("bootstrap:loaded", {});
+    this.events.emit("bootstrap:loaded", {})
   }
 
   /**
@@ -46,22 +46,22 @@ export class BootstrapManager {
       // In email mode, we don't want to redirect to a page slug automatically.
       // We also respect the root path if no pages are available.
       if (config.mode !== "email" && pageList.length > 0) {
-        this.navigation.setPage(pageList[0].slug, { replace: true });
+        this.navigation.setPage(pageList[0].slug, { replace: true })
       }
-      return;
+      return
     }
 
-    if (this.loadedSlug === slug) return;
+    if (this.loadedSlug === slug) return
 
-    this.loadedSlug = slug;
-    this.history.reset();
-    await this.pages.load(slug);
+    this.loadedSlug = slug
+    this.history.reset()
+    await this.pages.load(slug)
 
-    this.events.emit("bootstrap:page-loaded", { slug });
+    this.events.emit("bootstrap:page-loaded", { slug })
   }
 
   reset(): void {
-    this.loadedSlug = null;
-    this.initialLoaded = false;
+    this.loadedSlug = null
+    this.initialLoaded = false
   }
 }

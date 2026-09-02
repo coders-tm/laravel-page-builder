@@ -1,20 +1,21 @@
-import React, { memo } from "react";
-import { Layers, FileText, Palette } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useDrawer } from "@/hooks/useDrawer";
-import type { MobileDrawerPanel } from "@/core/editor/DrawerManager";
+import React, { memo, useState } from "react"
+import { Layers, FileText, Palette, Info } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useDrawer } from "@/hooks/useDrawer"
+import InfoModal from "@/components/InfoModal"
+import type { MobileDrawerPanel } from "@/core/editor/DrawerManager"
 
 interface DockItem {
-    id: MobileDrawerPanel;
-    label: string;
-    icon: React.ReactNode;
+  id: MobileDrawerPanel
+  label: string
+  icon: React.ReactNode
 }
 
 const DOCK_ITEMS: DockItem[] = [
-    { id: "sections", label: "Layers", icon: <Layers size={20} /> },
-    { id: "page",     label: "Pages",  icon: <FileText size={20} /> },
-    { id: "theme",    label: "Theme",  icon: <Palette size={20} /> },
-];
+  { id: "sections", label: "Layers", icon: <Layers size={20} /> },
+  { id: "page", label: "Pages", icon: <FileText size={20} /> },
+  { id: "theme", label: "Theme", icon: <Palette size={20} /> },
+]
 
 /**
  * MobileDock — bottom dock bar for the mobile editor.
@@ -23,32 +24,47 @@ const DOCK_ITEMS: DockItem[] = [
  * toggles the corresponding panel open/closed in the MobileDrawer.
  * The active panel button is highlighted in blue.
  *
+ * Includes an info button that opens the about modal.
+ *
  * Only rendered on small screens (controlled by the parent).
  */
 function MobileDock() {
-    const { activePanel, toggle } = useDrawer();
+  const { activePanel, toggle } = useDrawer()
+  const [infoOpen, setInfoOpen] = useState(false)
 
-    return (
-        <div className="flex items-center justify-around border-t border-gray-200 bg-white px-2 py-1 shrink-0">
-            {DOCK_ITEMS.map((item) => (
-                <button
-                    key={item.id}
-                    type="button"
-                    title={item.label}
-                    onClick={() => toggle(item.id)}
-                    className={cn(
-                        "flex flex-col items-center gap-0.5 flex-1 py-2 rounded-lg transition-colors text-xs font-medium",
-                        activePanel === item.id
-                            ? "text-blue-600"
-                            : "text-gray-500 hover:text-gray-700"
-                    )}
-                >
-                    {item.icon}
-                    <span>{item.label}</span>
-                </button>
-            ))}
-        </div>
-    );
+  return (
+    <>
+      <div className="flex shrink-0 items-center justify-around border-t border-gray-200 bg-white px-2 py-1">
+        {DOCK_ITEMS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            title={item.label}
+            onClick={() => toggle(item.id)}
+            className={cn(
+              "flex flex-1 flex-col items-center gap-0.5 rounded-lg py-2 text-xs font-medium transition-colors",
+              activePanel === item.id ? "text-blue-600" : "text-gray-500 hover:text-gray-700",
+            )}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+
+        <button
+          type="button"
+          title="About"
+          onClick={() => setInfoOpen(true)}
+          className="flex flex-1 flex-col items-center gap-0.5 rounded-lg py-2 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700"
+        >
+          <Info size={20} />
+          <span>About</span>
+        </button>
+      </div>
+
+      <InfoModal isOpen={infoOpen} onClose={() => setInfoOpen(false)} />
+    </>
+  )
 }
 
-export default memo(MobileDock);
+export default memo(MobileDock)

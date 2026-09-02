@@ -1,0 +1,4 @@
+dist/
+node_modules/
+resources/js/types/google-fonts.json
+resources/js/components/settings/fields/icon-data/

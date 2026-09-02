@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useStore } from "@/core/store/useStore";
-import { useEditorInstance } from "@/core/editorContext";
-import { useEditorNavigation } from "./useEditorNavigation";
+import { useEffect } from "react"
+import { useStore } from "@/core/store/useStore"
+import { useEditorInstance } from "@/core/editorContext"
+import { useEditorNavigation } from "./useEditorNavigation"
 
 /**
  * Root orchestration hook — sets up editor side-effects that must
@@ -14,40 +14,40 @@ import { useEditorNavigation } from "./useEditorNavigation";
  * useEditorLayout(), useEditorNavigation(), and useStore().
  */
 export function useEditor() {
-    const editor = useEditorInstance();
+  const editor = useEditorInstance()
 
-    // Register the router adapter (must be done at root level only).
-    const { slug } = useEditorNavigation({ registerAdapter: true });
-    const { pages, currentPage, loading } = useStore();
+  // Register the router adapter (must be done at root level only).
+  const { slug } = useEditorNavigation({ registerAdapter: true })
+  const { pages, currentPage, loading } = useStore()
 
-    // ── Bootstrap ──────────────────────────────────────────────────────
-    useEffect(() => {
-        void editor.bootstrap.loadInitialData();
-    }, [editor]);
+  // ── Bootstrap ──────────────────────────────────────────────────────
+  useEffect(() => {
+    void editor.bootstrap.loadInitialData()
+  }, [editor])
 
-    useEffect(() => {
-        void editor.bootstrap.syncRoute(slug, pages);
-    }, [editor, slug, pages]);
+  useEffect(() => {
+    void editor.bootstrap.syncRoute(slug, pages)
+  }, [editor, slug, pages])
 
-    // ── History snapshots ──────────────────────────────────────────────
-    useEffect(() => {
-        if (!currentPage) return;
-        editor.history.maybeSnapshot(currentPage);
-    }, [currentPage, editor]);
+  // ── History snapshots ──────────────────────────────────────────────
+  useEffect(() => {
+    if (!currentPage) return
+    editor.history.maybeSnapshot(currentPage)
+  }, [currentPage, editor])
 
-    // ── Keyboard shortcuts ─────────────────────────────────────────────
-    useEffect(() => {
-        editor.shortcuts.configure({
-            onUndo: () => editor.undo(),
-            onRedo: () => editor.redo(),
-            onInspectorToggle: () => editor.layout.toggleInspector(),
-        });
-    }, [editor]);
+  // ── Keyboard shortcuts ─────────────────────────────────────────────
+  useEffect(() => {
+    editor.shortcuts.configure({
+      onUndo: () => editor.undo(),
+      onRedo: () => editor.redo(),
+      onInspectorToggle: () => editor.layout.toggleInspector(),
+    })
+  }, [editor])
 
-    useEffect(() => {
-        editor.shortcuts.mount();
-        return () => editor.shortcuts.unmount();
-    }, [editor]);
+  useEffect(() => {
+    editor.shortcuts.mount()
+    return () => editor.shortcuts.unmount()
+  }, [editor])
 
-    return { loading };
+  return { loading }
 }

@@ -1,12 +1,12 @@
-import React, { memo } from "react";
-import { SettingSchema } from "@/types/page-builder";
-import IconPickerField from "./IconPickerField";
-import FA_ICONS from "./icon-data/fa-icons";
+import React, { memo } from "react"
+import { SettingSchema } from "@/types/page-builder"
+import IconPickerField from "./IconPickerField"
+import FA_ICONS from "./icon-data/fa-icons"
 
 interface FontAwesomeFieldProps {
-    setting: SettingSchema;
-    value: string;
-    onChange: (val: string) => void;
+  setting: SettingSchema
+  value: string
+  onChange: (val: string) => void
 }
 
 /**
@@ -28,15 +28,15 @@ interface FontAwesomeFieldProps {
  * ```
  */
 function FontAwesomeField({ setting, value, onChange }: FontAwesomeFieldProps) {
-    return (
-        <IconPickerField
-            value={value}
-            onChange={onChange}
-            icons={FA_ICONS}
-            variant="fa"
-            placeholder={setting.placeholder || "Select a FontAwesome icon…"}
-        />
-    );
+  return (
+    <IconPickerField
+      value={value}
+      onChange={onChange}
+      icons={FA_ICONS}
+      variant="fa"
+      placeholder={setting.placeholder || "Select a FontAwesome icon…"}
+    />
+  )
 }
 
-export default memo(FontAwesomeField);
+export default memo(FontAwesomeField)

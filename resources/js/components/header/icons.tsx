@@ -6,11 +6,11 @@
  */
 
 export {
-    Monitor as DesktopIcon,
-    Smartphone as MobileIcon,
-    Maximize2 as FullWidthIcon,
-    Undo2 as UndoIcon,
-    Redo2 as RedoIcon,
-    Crosshair as InspectorIcon,
-    RotateCcw as ResetIcon,
-} from "lucide-react";
+  Monitor as DesktopIcon,
+  Smartphone as MobileIcon,
+  Maximize2 as FullWidthIcon,
+  Undo2 as UndoIcon,
+  Redo2 as RedoIcon,
+  Crosshair as InspectorIcon,
+  RotateCcw as ResetIcon,
+} from "lucide-react"
