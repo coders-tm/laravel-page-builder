@@ -19,7 +19,6 @@ const DESCRIPTION =
   "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes."
 const AUTHOR = "Dipak Sarkar"
 const AUTHOR_EMAIL = "dipak@coderstm.com"
-const AUTHOR_URL = "https://dipaksarkar.in"
 const REPO_URL = "https://github.com/coders-tm/laravel-page-builder"
 const LICENSE = "Source-Available Non-Commercial"
 
