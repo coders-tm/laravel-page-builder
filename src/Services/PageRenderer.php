@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Services;
+namespace PageBuilder\Services;
 
-use Coderstm\PageBuilder\Rendering\Renderer;
-use Coderstm\PageBuilder\Support\PageData;
-use Coderstm\PageBuilder\Support\WrapperParser;
+use PageBuilder\Rendering\Renderer;
+use PageBuilder\Support\PageData;
+use PageBuilder\Support\WrapperParser;
 
 /**
  * Responsible exclusively for rendering page data into HTML.

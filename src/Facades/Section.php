@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Facades;
+namespace PageBuilder\Facades;
 
-use Coderstm\PageBuilder\Registry\SectionRegistry;
+use PageBuilder\Registry\SectionRegistry;
 use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static void add(string|array $paths)
- * @method static void register(string $type, \Coderstm\PageBuilder\Schema\SectionSchema $schema, string|null $view = null)
+ * @method static void register(string $type, \PageBuilder\Schema\SectionSchema $schema, string|null $view = null)
  * @method static array|null get(string|null $type = null)
  * @method static bool has(string $type)
  * @method static array types()

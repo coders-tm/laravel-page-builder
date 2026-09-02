@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit;
+namespace PageBuilder\Tests\Unit;
 
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\PageBuilder;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Http\Request;
 
 class EditorDetectionTest extends TestCase

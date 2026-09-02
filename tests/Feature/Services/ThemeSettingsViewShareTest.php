@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Services;
+namespace PageBuilder\Tests\Feature\Services;
 
-use Coderstm\PageBuilder\Services\ThemeSettings;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Services\ThemeSettings;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
 

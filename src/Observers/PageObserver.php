@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Observers;
+namespace PageBuilder\Observers;
 
 use Illuminate\Support\Facades\Artisan;
 

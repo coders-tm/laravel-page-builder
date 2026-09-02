@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Schema;
+namespace PageBuilder\Tests\Unit\Schema;
 
-use Coderstm\PageBuilder\Schema\SettingSchema;
+use PageBuilder\Schema\SettingSchema;
 use PHPUnit\Framework\TestCase;
 
 class SettingSchemaTest extends TestCase

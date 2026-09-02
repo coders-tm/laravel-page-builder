@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Rendering;
+namespace PageBuilder\Tests\Feature\Rendering;
 
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Rendering\BladeDirectives;
-use Coderstm\PageBuilder\Support\PageData;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\PageBuilder;
+use PageBuilder\Rendering\BladeDirectives;
+use PageBuilder\Support\PageData;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\Blade;
 
 class BladeDirectivesTest extends TestCase

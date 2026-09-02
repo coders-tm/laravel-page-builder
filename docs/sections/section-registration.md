@@ -15,7 +15,7 @@ The default path is `resources/views/sections/`. This is defined in `config/page
 You can add additional paths in your `AppServiceProvider` or a dedicated `ThemeServiceProvider` using the `Section` facade.
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;
+use PageBuilder\Facades\Section;
 
 public function boot()
 {
@@ -35,8 +35,8 @@ public function boot()
 If you need to register a section that doesn't exist as a Blade file (e.g., from a database or remote API), you can register a schema directly:
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;
-use Coderstm\PageBuilder\Schema\SectionSchema;
+use PageBuilder\Facades\Section;
+use PageBuilder\Schema\SectionSchema;
 
 Section::register('dynamic-section', new SectionSchema([
     'name' => 'Dynamic Section',

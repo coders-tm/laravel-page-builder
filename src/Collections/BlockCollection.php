@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Collections;
+namespace PageBuilder\Collections;
 
-use Coderstm\PageBuilder\Components\Block;
+use PageBuilder\Components\Block;
 
 /**
  * Ordered collection of Block instances within a section.

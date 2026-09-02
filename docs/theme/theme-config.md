@@ -35,7 +35,7 @@ Ensure you have a `pagebuilder` disk defined in `config/filesystems.php` for ass
 Use the `Section::add()` and `BlockCollection::add()` methods in your Service Provider to register theme-specific directories:
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;
+use PageBuilder\Facades\Section;
 
 public function boot()
 {

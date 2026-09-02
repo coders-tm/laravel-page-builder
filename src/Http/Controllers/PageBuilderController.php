@@ -1,16 +1,16 @@
 <?php
 
-namespace Coderstm\PageBuilder\Http\Controllers;
+namespace PageBuilder\Http\Controllers;
 
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Registry\BlockRegistry;
-use Coderstm\PageBuilder\Registry\LayoutParser;
-use Coderstm\PageBuilder\Registry\SectionRegistry;
-use Coderstm\PageBuilder\Rendering\Renderer;
-use Coderstm\PageBuilder\Services\PageRenderer;
-use Coderstm\PageBuilder\Services\PageStorage;
-use Coderstm\PageBuilder\Services\ThemeSettings;
+use PageBuilder\Facades\Page;
+use PageBuilder\PageBuilder;
+use PageBuilder\Registry\BlockRegistry;
+use PageBuilder\Registry\LayoutParser;
+use PageBuilder\Registry\SectionRegistry;
+use PageBuilder\Rendering\Renderer;
+use PageBuilder\Services\PageRenderer;
+use PageBuilder\Services\PageStorage;
+use PageBuilder\Services\ThemeSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

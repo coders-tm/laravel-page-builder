@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Registry;
+namespace PageBuilder\Tests\Unit\Registry;
 
-use Coderstm\PageBuilder\Registry\SchemaExtractor;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Registry\SchemaExtractor;
+use PageBuilder\Tests\TestCase;
 
 class SchemaExtractorTest extends TestCase
 {

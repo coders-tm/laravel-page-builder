@@ -1,9 +1,9 @@
 <?php
 
-namespace Coderstm\PageBuilder\Services;
+namespace PageBuilder\Services;
 
-use Coderstm\PageBuilder\Facades\Block;
-use Coderstm\PageBuilder\Facades\Section;
+use PageBuilder\Facades\Block;
+use PageBuilder\Facades\Section;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Coderstm\PageBuilder\Support;
+namespace PageBuilder\Support;
 
-use Coderstm\PageBuilder\Services\Theme;
+use PageBuilder\Services\Theme;
 
 class Vite extends \Illuminate\Foundation\Vite
 {

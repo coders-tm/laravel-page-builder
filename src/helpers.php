@@ -1,8 +1,8 @@
 <?php
 
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Support\Mix;
-use Coderstm\PageBuilder\Support\Vite;
+use PageBuilder\PageBuilder;
+use PageBuilder\Support\Mix;
+use PageBuilder\Support\Vite;
 use Illuminate\Support\HtmlString;
 
 if (! function_exists('pb_editor')) {

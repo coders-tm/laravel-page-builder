@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Components;
+namespace PageBuilder\Tests\Unit\Components;
 
-use Coderstm\PageBuilder\Components\Settings;
-use Coderstm\PageBuilder\Schema\SettingSchema;
+use PageBuilder\Components\Settings;
+use PageBuilder\Schema\SettingSchema;
 use PHPUnit\Framework\TestCase;
 
 class SettingsTest extends TestCase

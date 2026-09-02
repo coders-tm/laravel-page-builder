@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Registry;
+namespace PageBuilder\Registry;
 
-use Coderstm\PageBuilder\Schema\SectionSchema;
+use PageBuilder\Schema\SectionSchema;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
 

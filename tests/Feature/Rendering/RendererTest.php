@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Rendering;
+namespace PageBuilder\Tests\Feature\Rendering;
 
-use Coderstm\PageBuilder\Collections\BlockCollection;
-use Coderstm\PageBuilder\Components\Block;
-use Coderstm\PageBuilder\Components\Section;
-use Coderstm\PageBuilder\Components\Settings;
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Rendering\Renderer;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Collections\BlockCollection;
+use PageBuilder\Components\Block;
+use PageBuilder\Components\Section;
+use PageBuilder\Components\Settings;
+use PageBuilder\PageBuilder;
+use PageBuilder\Rendering\Renderer;
+use PageBuilder\Tests\TestCase;
 
 class RendererTest extends TestCase
 {

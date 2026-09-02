@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Services;
+namespace PageBuilder\Tests\Feature\Services;
 
-use Coderstm\PageBuilder\Services\PageStorage;
-use Coderstm\PageBuilder\Support\PageData;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Services\PageStorage;
+use PageBuilder\Support\PageData;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\File;
 
 class PageStorageTest extends TestCase

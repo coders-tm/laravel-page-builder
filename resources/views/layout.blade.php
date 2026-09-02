@@ -8,14 +8,14 @@
     <title>Page Builder Editor - {{ config('app.name') }}</title>
 
     <!-- Page Builder Assets -->
-    {{ Coderstm\PageBuilder\PageBuilder::css() }}
+    {{ PageBuilder\PageBuilder::css() }}
 </head>
 
 <body class="bg-primary-50">
     <div id="editor"></div>
 
     <!-- Page Builder Scripts -->
-    {{ Coderstm\PageBuilder\PageBuilder::js() }}
+    {{ PageBuilder\PageBuilder::js() }}
 
     <script type="module">
         const config = @json($config);

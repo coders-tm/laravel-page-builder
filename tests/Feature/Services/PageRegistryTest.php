@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Services;
+namespace PageBuilder\Tests\Feature\Services;
 
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Services\PageRegistry;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\PageBuilder;
+use PageBuilder\Services\PageRegistry;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\Cache;
 
 class PageRegistryTest extends TestCase

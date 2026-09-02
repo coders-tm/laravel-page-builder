@@ -2,8 +2,8 @@
 
 namespace Workbench\App\Providers;
 
-use Coderstm\PageBuilder\Facades\Theme;
-use Coderstm\PageBuilder\PageBuilder;
+use PageBuilder\Facades\Theme;
+use PageBuilder\PageBuilder;
 use Illuminate\Support\ServiceProvider;
 use Workbench\App\Models\Page;
 

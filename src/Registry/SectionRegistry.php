@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Registry;
+namespace PageBuilder\Registry;
 
-use Coderstm\PageBuilder\Schema\SectionSchema;
+use PageBuilder\Schema\SectionSchema;
 
 /**
  * Discovers and provides section schemas from registered Blade file paths.

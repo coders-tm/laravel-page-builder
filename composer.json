@@ -47,7 +47,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Coderstm\\PageBuilder\\": "src/"
+      "PageBuilder\\": "src/"
     },
     "files": [
       "src/helpers.php"
@@ -55,8 +55,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Coderstm\\PageBuilder\\Tests\\": "tests/",
-      "Coderstm\\PageBuilder\\Tests\\Stubs\\": "tests/Stubs/",
+      "PageBuilder\\Tests\\": "tests/",
+      "PageBuilder\\Tests\\Stubs\\": "tests/Stubs/",
       "Workbench\\App\\": "workbench/app/",
       "Workbench\\Database\\Factories\\": "workbench/database/factories/",
       "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
@@ -74,7 +74,7 @@
     },
     "laravel": {
       "providers": [
-        "Coderstm\\PageBuilder\\Providers\\PageBuilderServiceProvider"
+        "PageBuilder\\Providers\\PageBuilderServiceProvider"
       ]
     }
   },

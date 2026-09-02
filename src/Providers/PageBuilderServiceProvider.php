@@ -1,22 +1,22 @@
 <?php
 
-namespace Coderstm\PageBuilder\Providers;
+namespace PageBuilder\Providers;
 
-use Coderstm\PageBuilder\Commands;
-use Coderstm\PageBuilder\Facades;
-use Coderstm\PageBuilder\Http\Middleware;
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Registry;
-use Coderstm\PageBuilder\Rendering;
-use Coderstm\PageBuilder\Services;
-use Coderstm\PageBuilder\Services\PageRegistry;
-use Coderstm\PageBuilder\Services\PageRenderer;
-use Coderstm\PageBuilder\Services\PageStorage;
-use Coderstm\PageBuilder\Services\TemplateStorage;
-use Coderstm\PageBuilder\Services\ThemeSettings;
-use Coderstm\PageBuilder\Support;
-use Coderstm\PageBuilder\Support\TemplateVariableResolver;
-use Coderstm\PageBuilder\Support\WrapperParser;
+use PageBuilder\Commands;
+use PageBuilder\Facades;
+use PageBuilder\Http\Middleware;
+use PageBuilder\PageBuilder;
+use PageBuilder\Registry;
+use PageBuilder\Rendering;
+use PageBuilder\Services;
+use PageBuilder\Services\PageRegistry;
+use PageBuilder\Services\PageRenderer;
+use PageBuilder\Services\PageStorage;
+use PageBuilder\Services\TemplateStorage;
+use PageBuilder\Services\ThemeSettings;
+use PageBuilder\Support;
+use PageBuilder\Support\TemplateVariableResolver;
+use PageBuilder\Support\WrapperParser;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Registry;
+namespace PageBuilder\Registry;
 
-use Coderstm\PageBuilder\Schema\BlockSchema;
+use PageBuilder\Schema\BlockSchema;
 
 /**
  * Discovers and provides block schemas from registered Blade file paths.

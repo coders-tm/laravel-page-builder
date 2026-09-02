@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Http;
+namespace PageBuilder\Tests\Feature\Http;
 
-use Coderstm\PageBuilder\Http\Controllers\WebPageController;
-use Coderstm\PageBuilder\Http\Middleware\RequestThemeMiddleware;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Http\Controllers\WebPageController;
+use PageBuilder\Http\Middleware\RequestThemeMiddleware;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 

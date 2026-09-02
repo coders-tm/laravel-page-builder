@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Commands;
+namespace PageBuilder\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;

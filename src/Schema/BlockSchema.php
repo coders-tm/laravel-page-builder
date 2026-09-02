@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Schema;
+namespace PageBuilder\Schema;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;

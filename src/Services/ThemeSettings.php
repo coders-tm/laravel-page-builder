@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Services;
+namespace PageBuilder\Services;
 
 use Illuminate\Support\Facades\File;
 

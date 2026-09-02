@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Support;
+namespace PageBuilder\Tests\Unit\Support;
 
-use Coderstm\PageBuilder\Support\WrapperParser;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Support\WrapperParser;
+use PageBuilder\Tests\TestCase;
 
 class WrapperParserTest extends TestCase
 {

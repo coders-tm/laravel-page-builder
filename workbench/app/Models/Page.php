@@ -2,7 +2,7 @@
 
 namespace Workbench\App\Models;
 
-use Coderstm\PageBuilder\Models\Page as Model;
+use PageBuilder\Models\Page as Model;
 use Workbench\Database\Factories\PageFactroy;
 
 class Page extends Model

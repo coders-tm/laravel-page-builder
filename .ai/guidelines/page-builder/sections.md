@@ -98,21 +98,21 @@ The `@schema()` array is extracted at **registration time** by `SchemaExtractor`
 
 ## Setting Types
 
-| type | Description | Extra fields |
-|---|---|---|
-| `text` | Single-line text input | — |
-| `textarea` | Multi-line text | — |
-| `richtext` | TipTap rich-text editor | — |
-| `number` | Numeric input | `min`, `max`, `step` |
-| `range` | Slider | `min`, `max`, `step` |
-| `select` | Dropdown | `options: [{value, label}]` |
-| `radio` | Radio group | `options: [{value, label}]` |
-| `checkbox` | Boolean toggle | — |
-| `color` | Color picker | — |
-| `image_picker` | Media library image | — |
-| `alignment` | Alignment picker | — |
-| `icon_picker` | Icon selector | — |
-| `url` | URL input | — |
+| type           | Description             | Extra fields                |
+| -------------- | ----------------------- | --------------------------- |
+| `text`         | Single-line text input  | —                           |
+| `textarea`     | Multi-line text         | —                           |
+| `richtext`     | TipTap rich-text editor | —                           |
+| `number`       | Numeric input           | `min`, `max`, `step`        |
+| `range`        | Slider                  | `min`, `max`, `step`        |
+| `select`       | Dropdown                | `options: [{value, label}]` |
+| `radio`        | Radio group             | `options: [{value, label}]` |
+| `checkbox`     | Boolean toggle          | —                           |
+| `color`        | Color picker            | —                           |
+| `image_picker` | Media library image     | —                           |
+| `alignment`    | Alignment picker        | —                           |
+| `icon_picker`  | Icon selector           | —                           |
+| `url`          | URL input               | —                           |
 
 ### Setting definition shape
 
@@ -211,7 +211,7 @@ Presets let users add a section pre-configured with settings and blocks:
 
 ```php
 // src/Schema/SectionSchema.php
-use Coderstm\PageBuilder\Schema\SectionSchema;
+use PageBuilder\Schema\SectionSchema;
 
 $schema = SectionSchema::fromArray([
     'name'     => 'Hero',
@@ -233,7 +233,7 @@ $schema->blockSchema('row');   // BlockSchema|null for local definition
 ## SectionRegistry
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;
+use PageBuilder\Facades\Section;
 
 // Get schema by type
 $schema = Section::get('hero');        // SectionSchema
@@ -298,15 +298,15 @@ $exists = Section::has('hero');        // bool
 
 The package ships with one built-in section at `resources/views/sections/section.blade.php`:
 
-| Setting | Type | Default | Notes |
-|---|---|---|---|
-| `anchor` | text | `''` | HTML `id` attribute |
-| `padding_top` | select | `md` | none/xs/sm/md/lg/xl/2xl |
-| `padding_bottom` | select | `md` | none/xs/sm/md/lg/xl/2xl |
-| `max_width` | select | `7xl` | full/sm/md/lg/xl/2xl/5xl/6xl/7xl |
-| `background_color` | color | `''` | CSS background color |
-| `background_image` | image_picker | `''` | Background image URL |
-| `background_overlay_opacity` | range | `0` | 0–100 |
-| `color_scheme` | select | `default` | default/light/dark/primary/accent |
+| Setting                      | Type         | Default   | Notes                             |
+| ---------------------------- | ------------ | --------- | --------------------------------- |
+| `anchor`                     | text         | `''`      | HTML `id` attribute               |
+| `padding_top`                | select       | `md`      | none/xs/sm/md/lg/xl/2xl           |
+| `padding_bottom`             | select       | `md`      | none/xs/sm/md/lg/xl/2xl           |
+| `max_width`                  | select       | `7xl`     | full/sm/md/lg/xl/2xl/5xl/6xl/7xl  |
+| `background_color`           | color        | `''`      | CSS background color              |
+| `background_image`           | image_picker | `''`      | Background image URL              |
+| `background_overlay_opacity` | range        | `0`       | 0–100                             |
+| `color_scheme`               | select       | `default` | default/light/dark/primary/accent |
 
 Accepted blocks: `row`, `@theme`

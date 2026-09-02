@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature;
+namespace PageBuilder\Tests\Feature;
 
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Facades\Page;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\View\View;

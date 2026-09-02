@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="art/intro.gif" alt="Intro" />
+  <img src="https://github.com/coders-tm/laravel-page-builder/blob/main/art/intro.gif?raw=true" alt="Intro" />
 </p>
 
 A modern page builder for Laravel that allows you to build dynamic pages using layouts, sections and JSON rendering.
@@ -544,7 +544,7 @@ themes/my-theme/views/templates/product.json      ← theme-specific product tem
 ### In Controllers
 
 ```php
-use Coderstm\PageBuilder\Facades\Page;
+use PageBuilder\Facades\Page;
 
 class PageController extends Controller
 {
@@ -558,7 +558,7 @@ class PageController extends Controller
 ### Programmatic Page Rendering
 
 ```php
-use Coderstm\PageBuilder\Facades\Page;
+use PageBuilder\Facades\Page;
 
 // Render from slug (loads JSON from disk)
 $html = Page::render('home');
@@ -574,8 +574,8 @@ $html = Page::render('home', ['title' => 'My Home Page']);
 You can register additional directories for section and block discovery:
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;
-use Coderstm\PageBuilder\Facades\Block;
+use PageBuilder\Facades\Section;
+use PageBuilder\Facades\Block;
 
 // In a service provider's boot() method
 Section::add(resource_path('views/custom-sections'));
@@ -587,8 +587,8 @@ Block::add(resource_path('views/custom-blocks'));
 Register a section or block programmatically without a Blade file:
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;
-use Coderstm\PageBuilder\Schema\SectionSchema;
+use PageBuilder\Facades\Section;
+use PageBuilder\Schema\SectionSchema;
 
 Section::register('custom-hero', new SectionSchema([
     'name' => 'Custom Hero',
@@ -657,7 +657,7 @@ When the callback returns `false`, the editor frame will not load, and the page 
 Register the callback in your `AppServiceProvider` or a dedicated service provider:
 
 ```php
-use Coderstm\PageBuilder\PageBuilder;
+use PageBuilder\PageBuilder;
 
 public function boot()
 {
@@ -837,7 +837,7 @@ For the full provider contract and additional examples, see the [Developer Docum
 | `@blocks($section)` | Renders all top-level blocks of a section                         |
 | `@blocks($block)`   | Renders child blocks inside a container block                     |
 | `@schema([...])`    | Declares schema (no-op at render time, extracted at registration) |
-| `@pbEditorClass`    | Renders the `<html>` class attribute with editor mode classes      |
+| `@pbEditorClass`    | Renders the `<html>` class attribute with editor mode classes     |
 
 ---
 
@@ -965,9 +965,9 @@ The package integrates with [qirolab/laravel-themer](https://github.com/qirolab/
 If you're using a theme system you can set the active theme and the package will automatically register theme `sections` and `blocks` when the expected view paths exist. This is convenient when using a theme package or `qirolab/laravel-themer`.
 
 ```php
-use Coderstm\PageBuilder\Facades\Theme;
-use Coderstm\PageBuilder\Facades\Section;
-use Coderstm\PageBuilder\Facades\Block;
+use PageBuilder\Facades\Theme;
+use PageBuilder\Facades\Section;
+use PageBuilder\Facades\Block;
 
 // Set the active theme (for example in a ThemeServiceProvider or middleware)
 Theme::set('my-theme');

@@ -38,8 +38,8 @@ Renders the full `<html>` class attribute. Any classes you pass are included fir
 
 Every section and block template has access to a specialized instance variable:
 
-- `$section`: Instance of `Coderstm\PageBuilder\Components\Section`.
-- `$block`: Instance of `Coderstm\PageBuilder\Components\Block`.
+- `$section`: Instance of `PageBuilder\Components\Section`.
+- `$block`: Instance of `PageBuilder\Components\Block`.
 
 These objects provide methods like `editorAttributes()` and properties like `settings` and `blocks` (for containers).
 
@@ -48,7 +48,7 @@ These objects provide methods like `editorAttributes()` and properties like `set
 You can also render sections manually from your own controllers or views using the `Renderer` service:
 
 ```php
-use Coderstm\PageBuilder\Rendering\Renderer;
+use PageBuilder\Rendering\Renderer;
 
 $html = app(Renderer::class)->renderRawSection('hero', [
     'settings' => ['title' => 'Custom Title'],

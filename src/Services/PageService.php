@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Services;
+namespace PageBuilder\Services;
 
-use Coderstm\PageBuilder\Http\Controllers\WebPageController;
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Registry\LayoutParser;
-use Coderstm\PageBuilder\Support\PageData;
-use Coderstm\PageBuilder\Support\TemplateVariableResolver;
+use PageBuilder\Http\Controllers\WebPageController;
+use PageBuilder\PageBuilder;
+use PageBuilder\Registry\LayoutParser;
+use PageBuilder\Support\PageData;
+use PageBuilder\Support\TemplateVariableResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;

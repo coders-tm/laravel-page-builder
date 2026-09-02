@@ -6,14 +6,14 @@ This directory contains structured guidelines for AI agents (Cursor, Claude Code
 
 ## Files
 
-| File | What It Covers |
-|---|---|
-| [core.md](core.md) | Package overview, five-layer architecture, DI rules, configuration, routes, code style |
-| [layouts.md](layouts.md) | Page JSON structure, section/block fields, layout zones (header/footer), settings resolution |
-| [sections.md](sections.md) | Section Blade files, `@schema()` directive, setting types, blocks array, SectionRegistry |
-| [blocks.md](blocks.md) | Block Blade files, nesting, `@blocks()` directive, theme vs local blocks, BlockRegistry |
-| [themes.md](themes.md) | Theme directory layout, master Blade layout, theme shadowing, assets, naming conventions |
-| [templates.md](templates.md) | JSON templates, wrapper property, variable interpolation, theme override, `TemplateStorage` |
+| File                         | What It Covers                                                                               |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| [core.md](core.md)           | Package overview, five-layer architecture, DI rules, configuration, routes, code style       |
+| [layouts.md](layouts.md)     | Page JSON structure, section/block fields, layout zones (header/footer), settings resolution |
+| [sections.md](sections.md)   | Section Blade files, `@schema()` directive, setting types, blocks array, SectionRegistry     |
+| [blocks.md](blocks.md)       | Block Blade files, nesting, `@blocks()` directive, theme vs local blocks, BlockRegistry      |
+| [themes.md](themes.md)       | Theme directory layout, master Blade layout, theme shadowing, assets, naming conventions     |
+| [templates.md](templates.md) | JSON templates, wrapper property, variable interpolation, theme override, `TemplateStorage`  |
 
 ---
 
@@ -39,15 +39,15 @@ This directory contains structured guidelines for AI agents (Cursor, Claude Code
 
 ```json
 {
-    "sections": {
-        "unique-id": {
-            "type": "section-type",
-            "settings": {},
-            "blocks": {},
-            "order": []
-        }
-    },
-    "order": ["unique-id"]
+  "sections": {
+    "unique-id": {
+      "type": "section-type",
+      "settings": {},
+      "blocks": {},
+      "order": []
+    }
+  },
+  "order": ["unique-id"]
 }
 ```
 
@@ -60,12 +60,12 @@ This directory contains structured guidelines for AI agents (Cursor, Claude Code
 
 ```json
 {
-    "layout":  "page",
-    "wrapper": "main#content",
-    "sections": {
-        "main": { "type": "page-content" }
-    },
-    "order": ["main"]
+  "layout": "page",
+  "wrapper": "main#content",
+  "sections": {
+    "main": { "type": "page-content" }
+  },
+  "order": ["main"]
 }
 ```
 
@@ -73,17 +73,17 @@ This directory contains structured guidelines for AI agents (Cursor, Claude Code
 
 ```json
 {
-    "layout": {
-        "type": "page",
-        "sections": {
-            "header": {
-                "type": "site-header",
-                "settings": {},
-                "blocks": {},
-                "order": []
-            }
-        }
+  "layout": {
+    "type": "page",
+    "sections": {
+      "header": {
+        "type": "site-header",
+        "settings": {},
+        "blocks": {},
+        "order": []
+      }
     }
+  }
 }
 ```
 
@@ -109,34 +109,34 @@ Lower layers never import from higher layers. All services are constructor-injec
 
 ## Key Classes
 
-| Class | Path | Purpose |
-|---|---|---|
-| `SectionSchema` | `src/Schema/SectionSchema.php` | Immutable section definition |
-| `BlockSchema` | `src/Schema/BlockSchema.php` | Immutable block definition |
-| `SettingSchema` | `src/Schema/SettingSchema.php` | Immutable setting definition |
-| `SectionRegistry` | `src/Registry/SectionRegistry.php` | Discovers and provides section schemas |
-| `BlockRegistry` | `src/Registry/BlockRegistry.php` | Discovers and provides block schemas |
-| `SchemaExtractor` | `src/Registry/SchemaExtractor.php` | Parses `@schema()` from Blade files |
-| `Renderer` | `src/Rendering/Renderer.php` | Core hydration and rendering engine |
-| `Section` | `src/Components/Section.php` | Runtime section instance |
-| `Block` | `src/Components/Block.php` | Runtime block instance |
-| `Settings` | `src/Components/Settings.php` | Schema-aware settings bag |
-| `PageData` | `src/Support/PageData.php` | Immutable page JSON value object (includes `wrapper`) |
-| `PageStorage` | `src/Services/PageStorage.php` | Page JSON file I/O |
-| `PageRenderer` | `src/Services/PageRenderer.php` | Full-page render orchestrator (applies wrapper) |
-| `TemplateStorage` | `src/Services/TemplateStorage.php` | Template JSON file I/O (theme-aware) |
-| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php` | Resolves `{{ $page->attr }}` in template data |
-| `WrapperParser` | `src/Support/WrapperParser.php` | Parses CSS-selector wrapper strings into HTML |
+| Class                      | Path                                       | Purpose                                               |
+| -------------------------- | ------------------------------------------ | ----------------------------------------------------- |
+| `SectionSchema`            | `src/Schema/SectionSchema.php`             | Immutable section definition                          |
+| `BlockSchema`              | `src/Schema/BlockSchema.php`               | Immutable block definition                            |
+| `SettingSchema`            | `src/Schema/SettingSchema.php`             | Immutable setting definition                          |
+| `SectionRegistry`          | `src/Registry/SectionRegistry.php`         | Discovers and provides section schemas                |
+| `BlockRegistry`            | `src/Registry/BlockRegistry.php`           | Discovers and provides block schemas                  |
+| `SchemaExtractor`          | `src/Registry/SchemaExtractor.php`         | Parses `@schema()` from Blade files                   |
+| `Renderer`                 | `src/Rendering/Renderer.php`               | Core hydration and rendering engine                   |
+| `Section`                  | `src/Components/Section.php`               | Runtime section instance                              |
+| `Block`                    | `src/Components/Block.php`                 | Runtime block instance                                |
+| `Settings`                 | `src/Components/Settings.php`              | Schema-aware settings bag                             |
+| `PageData`                 | `src/Support/PageData.php`                 | Immutable page JSON value object (includes `wrapper`) |
+| `PageStorage`              | `src/Services/PageStorage.php`             | Page JSON file I/O                                    |
+| `PageRenderer`             | `src/Services/PageRenderer.php`            | Full-page render orchestrator (applies wrapper)       |
+| `TemplateStorage`          | `src/Services/TemplateStorage.php`         | Template JSON file I/O (theme-aware)                  |
+| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php` | Resolves `{{ $page->attr }}` in template data         |
+| `WrapperParser`            | `src/Support/WrapperParser.php`            | Parses CSS-selector wrapper strings into HTML         |
 
 ---
 
 ## Facades
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;   // → SectionRegistry
-use Coderstm\PageBuilder\Facades\Block;     // → BlockRegistry
-use Coderstm\PageBuilder\Facades\Page;      // → PageService
-use Coderstm\PageBuilder\Facades\Theme;     // → Theme service
+use PageBuilder\Facades\Section;   // → SectionRegistry
+use PageBuilder\Facades\Block;     // → BlockRegistry
+use PageBuilder\Facades\Page;      // → PageService
+use PageBuilder\Facades\Theme;     // → Theme service
 ```
 
 ---

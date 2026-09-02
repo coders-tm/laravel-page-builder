@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Rendering;
+namespace PageBuilder\Tests\Feature\Rendering;
 
-use Coderstm\PageBuilder\Rendering\Renderer;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Rendering\Renderer;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\View;
 
 class ParentSettingsTest extends TestCase

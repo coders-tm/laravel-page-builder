@@ -1,6 +1,6 @@
 <?php
 
-namespace Coderstm\PageBuilder\Facades;
+namespace PageBuilder\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool useThemePublic()
  * @method static string active()
  *
- * @see \Coderstm\PageBuilder\Services\Theme
+ * @see \PageBuilder\Services\Theme
  */
 class Theme extends Facade
 {

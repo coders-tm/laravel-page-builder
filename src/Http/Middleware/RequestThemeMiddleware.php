@@ -1,9 +1,9 @@
 <?php
 
-namespace Coderstm\PageBuilder\Http\Middleware;
+namespace PageBuilder\Http\Middleware;
 
 use Closure;
-use Coderstm\PageBuilder\Services\Theme;
+use PageBuilder\Services\Theme;
 use Illuminate\Http\Request;
 
 class RequestThemeMiddleware

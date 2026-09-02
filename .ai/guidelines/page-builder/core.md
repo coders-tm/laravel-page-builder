@@ -124,10 +124,10 @@ public function __construct(
 ## Facades
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;
-use Coderstm\PageBuilder\Facades\Block;
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Facades\Theme;
+use PageBuilder\Facades\Section;
+use PageBuilder\Facades\Block;
+use PageBuilder\Facades\Page;
+use PageBuilder\Facades\Theme;
 
 Section::get('hero');       // → SectionSchema
 Block::get('row');          // → BlockSchema
@@ -207,7 +207,7 @@ $casts    = ['is_active' => 'boolean', 'metadata' => 'json'];
 ```php
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Schema;
+namespace PageBuilder\Schema;
 
 final class SectionSchema
 {

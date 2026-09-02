@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature;
+namespace PageBuilder\Tests\Feature;
 
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Services\PageRegistry;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Facades\Page;
+use PageBuilder\Services\PageRegistry;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\Route;
 
 class RouteRegistrationTest extends TestCase

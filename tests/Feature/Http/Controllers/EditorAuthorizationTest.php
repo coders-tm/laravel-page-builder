@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Http\Controllers;
+namespace PageBuilder\Tests\Feature\Http\Controllers;
 
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Facades\Page;
+use PageBuilder\PageBuilder;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Workbench\App\Models\Page as ModelsPage;

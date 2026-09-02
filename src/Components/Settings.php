@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Components;
+namespace PageBuilder\Components;
 
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;

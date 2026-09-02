@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Collections;
+namespace PageBuilder\Collections;
 
-use Coderstm\PageBuilder\Components\Section;
-use Coderstm\PageBuilder\Rendering\Renderer;
+use PageBuilder\Components\Section;
+use PageBuilder\Rendering\Renderer;
 
 /**
  * Ordered collection of Section instances for a page.

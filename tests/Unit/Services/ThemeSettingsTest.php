@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Services;
+namespace PageBuilder\Tests\Unit\Services;
 
-use Coderstm\PageBuilder\Services\PageStorage;
-use Coderstm\PageBuilder\Services\ThemeSettings;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Services\PageStorage;
+use PageBuilder\Services\ThemeSettings;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\File;
 
 class ThemeSettingsTest extends TestCase

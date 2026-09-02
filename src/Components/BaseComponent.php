@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Components;
+namespace PageBuilder\Components;
 
-use Coderstm\PageBuilder\Collections\BlockCollection;
+use PageBuilder\Collections\BlockCollection;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Services;
+namespace PageBuilder\Services;
 
 final class EditorPreviewShell
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Services;
+namespace PageBuilder\Tests\Feature\Services;
 
-use Coderstm\PageBuilder\Services\PageRenderer;
-use Coderstm\PageBuilder\Support\PageData;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Services\PageRenderer;
+use PageBuilder\Support\PageData;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PageRendererTest extends TestCase

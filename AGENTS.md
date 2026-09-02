@@ -22,13 +22,13 @@ Dependencies flow **downward only**. Never import from a higher layer.
 Schema → Registry → Components → Rendering → Services/Controllers
 ```
 
-| Layer | Directory | Purpose |
-|---|---|---|
-| Schema | `src/Schema/` | Immutable value objects (SectionSchema, BlockSchema, SettingSchema) |
-| Registry | `src/Registry/` | Discovers + stores schemas from Blade `@schema()` directives |
-| Components | `src/Components/`, `src/Collections/` | Runtime Section/Block instances hydrated from page JSON |
-| Rendering | `src/Rendering/` | Blade rendering engine (Renderer, EditorAttributes, BladeDirectives) |
-| Services | `src/Services/` | PageRenderer, PageStorage, PageRegistry, ThemeSettings |
+| Layer      | Directory                             | Purpose                                                              |
+| ---------- | ------------------------------------- | -------------------------------------------------------------------- |
+| Schema     | `src/Schema/`                         | Immutable value objects (SectionSchema, BlockSchema, SettingSchema)  |
+| Registry   | `src/Registry/`                       | Discovers + stores schemas from Blade `@schema()` directives         |
+| Components | `src/Components/`, `src/Collections/` | Runtime Section/Block instances hydrated from page JSON              |
+| Rendering  | `src/Rendering/`                      | Blade rendering engine (Renderer, EditorAttributes, BladeDirectives) |
+| Services   | `src/Services/`                       | PageRenderer, PageStorage, PageRegistry, ThemeSettings               |
 
 ---
 
@@ -38,22 +38,27 @@ Every page is a JSON document with sections and an order array:
 
 ```json
 {
-    "sections": {
-        "hero": {
-            "type": "hero",
-            "settings": { "title": "Hello" },
-            "blocks": {},
-            "order": [],
-            "disabled": false
-        }
-    },
-    "order": ["hero"],
-    "layout": {
-        "type": "page",
-        "sections": {
-            "header": { "type": "site-header", "settings": {}, "blocks": {}, "order": [] }
-        }
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": { "title": "Hello" },
+      "blocks": {},
+      "order": [],
+      "disabled": false
     }
+  },
+  "order": ["hero"],
+  "layout": {
+    "type": "page",
+    "sections": {
+      "header": {
+        "type": "site-header",
+        "settings": {},
+        "blocks": {},
+        "order": []
+      }
+    }
+  }
 }
 ```
 
@@ -136,10 +141,10 @@ See [themes.md](.ai/guidelines/page-builder/themes.md) for the full theme direct
 ## Facades
 
 ```php
-use Coderstm\PageBuilder\Facades\Section;
-use Coderstm\PageBuilder\Facades\Block;
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Facades\Theme;
+use PageBuilder\Facades\Section;
+use PageBuilder\Facades\Block;
+use PageBuilder\Facades\Page;
+use PageBuilder\Facades\Theme;
 ```
 
 ---
@@ -158,10 +163,10 @@ use Coderstm\PageBuilder\Facades\Theme;
 
 ## Full Guidelines
 
-| Topic | File |
-|---|---|
-| Architecture, config, routes | [core.md](.ai/guidelines/page-builder/core.md) |
-| Page JSON structure | [layouts.md](.ai/guidelines/page-builder/layouts.md) |
-| Sections, settings, schema | [sections.md](.ai/guidelines/page-builder/sections.md) |
-| Blocks, nesting, containers | [blocks.md](.ai/guidelines/page-builder/blocks.md) |
-| Themes, master layout, assets | [themes.md](.ai/guidelines/page-builder/themes.md) |
+| Topic                         | File                                                   |
+| ----------------------------- | ------------------------------------------------------ |
+| Architecture, config, routes  | [core.md](.ai/guidelines/page-builder/core.md)         |
+| Page JSON structure           | [layouts.md](.ai/guidelines/page-builder/layouts.md)   |
+| Sections, settings, schema    | [sections.md](.ai/guidelines/page-builder/sections.md) |
+| Blocks, nesting, containers   | [blocks.md](.ai/guidelines/page-builder/blocks.md)     |
+| Themes, master layout, assets | [themes.md](.ai/guidelines/page-builder/themes.md)     |

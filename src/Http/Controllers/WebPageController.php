@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Http\Controllers;
+namespace PageBuilder\Http\Controllers;
 
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\PageBuilder;
+use PageBuilder\Facades\Page;
+use PageBuilder\PageBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 

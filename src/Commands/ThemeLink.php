@@ -1,8 +1,8 @@
 <?php
 
-namespace Coderstm\PageBuilder\Commands;
+namespace PageBuilder\Commands;
 
-use Coderstm\PageBuilder\Services\Theme;
+use PageBuilder\Services\Theme;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 

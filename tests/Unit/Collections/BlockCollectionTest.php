@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Collections;
+namespace PageBuilder\Tests\Unit\Collections;
 
-use Coderstm\PageBuilder\Collections\BlockCollection;
-use Coderstm\PageBuilder\Components\Block;
-use Coderstm\PageBuilder\Components\Settings;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Collections\BlockCollection;
+use PageBuilder\Components\Block;
+use PageBuilder\Components\Settings;
+use PageBuilder\Tests\TestCase;
 
 class BlockCollectionTest extends TestCase
 {

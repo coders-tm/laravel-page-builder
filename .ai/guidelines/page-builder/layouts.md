@@ -10,15 +10,15 @@ Every page is backed by a JSON document stored in `config('pagebuilder.pages')/{
 
 ```json
 {
-    "sections": {
-        "hero": {
-            "type": "hero",
-            "settings": {},
-            "blocks": {},
-            "order": []
-        }
-    },
-    "order": ["hero"]
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {},
+      "blocks": {},
+      "order": []
+    }
+  },
+  "order": ["hero"]
 }
 ```
 
@@ -26,47 +26,47 @@ Every page is backed by a JSON document stored in `config('pagebuilder.pages')/{
 
 ```json
 {
-    "sections": {
-        "hero": {
-            "type": "section",
-            "settings": {
-                "padding_top": "lg",
-                "max_width": "7xl",
-                "background_color": "#f5f5f5"
+  "sections": {
+    "hero": {
+      "type": "section",
+      "settings": {
+        "padding_top": "lg",
+        "max_width": "7xl",
+        "background_color": "#f5f5f5"
+      },
+      "blocks": {
+        "row1": {
+          "type": "row",
+          "settings": { "columns": "2", "gap": "md" },
+          "blocks": {
+            "col-left": {
+              "type": "column",
+              "settings": { "padding": "md" },
+              "blocks": {},
+              "order": []
             },
-            "blocks": {
-                "row1": {
-                    "type": "row",
-                    "settings": { "columns": "2", "gap": "md" },
-                    "blocks": {
-                        "col-left": {
-                            "type": "column",
-                            "settings": { "padding": "md" },
-                            "blocks": {},
-                            "order": []
-                        },
-                        "col-right": {
-                            "type": "column",
-                            "settings": { "padding": "md" },
-                            "blocks": {},
-                            "order": []
-                        }
-                    },
-                    "order": ["col-left", "col-right"]
-                }
-            },
-            "order": ["row1"],
-            "disabled": false
-        },
-        "cta": {
-            "type": "cta",
-            "settings": { "title": "Get Started" },
-            "blocks": {},
-            "order": [],
-            "disabled": false
+            "col-right": {
+              "type": "column",
+              "settings": { "padding": "md" },
+              "blocks": {},
+              "order": []
+            }
+          },
+          "order": ["col-left", "col-right"]
         }
+      },
+      "order": ["row1"],
+      "disabled": false
     },
-    "order": ["hero", "cta"]
+    "cta": {
+      "type": "cta",
+      "settings": { "title": "Get Started" },
+      "blocks": {},
+      "order": [],
+      "disabled": false
+    }
+  },
+  "order": ["hero", "cta"]
 }
 ```
 
@@ -76,32 +76,32 @@ Every page is backed by a JSON document stored in `config('pagebuilder.pages')/{
 
 ### Top-level fields
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `sections` | object | yes | Map of section instances, keyed by unique ID |
-| `order` | string[] | yes | Render order of section IDs |
-| `layout` | object | no | Per-page layout slot overrides (header/footer) |
+| Field      | Type     | Required | Description                                    |
+| ---------- | -------- | -------- | ---------------------------------------------- |
+| `sections` | object   | yes      | Map of section instances, keyed by unique ID   |
+| `order`    | string[] | yes      | Render order of section IDs                    |
+| `layout`   | object   | no       | Per-page layout slot overrides (header/footer) |
 
 ### Section instance fields
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `type` | string | yes | Matches a registered `SectionSchema` key (Blade filename without `.blade.php`) |
-| `settings` | object | yes | Key→value setting overrides; missing keys fall back to schema defaults |
-| `blocks` | object | yes | Map of block instances, keyed by unique ID |
-| `order` | string[] | yes | Render order of block IDs within this section |
-| `disabled` | boolean | no | When `true`, section is hidden from the rendered output |
-| `_name` | string | no | Custom display label overriding the schema name in the editor |
+| Field      | Type     | Required | Description                                                                    |
+| ---------- | -------- | -------- | ------------------------------------------------------------------------------ |
+| `type`     | string   | yes      | Matches a registered `SectionSchema` key (Blade filename without `.blade.php`) |
+| `settings` | object   | yes      | Key→value setting overrides; missing keys fall back to schema defaults         |
+| `blocks`   | object   | yes      | Map of block instances, keyed by unique ID                                     |
+| `order`    | string[] | yes      | Render order of block IDs within this section                                  |
+| `disabled` | boolean  | no       | When `true`, section is hidden from the rendered output                        |
+| `_name`    | string   | no       | Custom display label overriding the schema name in the editor                  |
 
 ### Block instance fields
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `type` | string | yes | Matches a registered `BlockSchema` key or a local block definition |
-| `settings` | object | yes | Key→value setting overrides |
-| `blocks` | object | yes | Nested child block instances (for container blocks like `row`) |
-| `order` | string[] | yes | Render order of child block IDs |
-| `disabled` | boolean | no | When `true`, block is excluded from the rendered output |
+| Field      | Type     | Required | Description                                                        |
+| ---------- | -------- | -------- | ------------------------------------------------------------------ |
+| `type`     | string   | yes      | Matches a registered `BlockSchema` key or a local block definition |
+| `settings` | object   | yes      | Key→value setting overrides                                        |
+| `blocks`   | object   | yes      | Nested child block instances (for container blocks like `row`)     |
+| `order`    | string[] | yes      | Render order of child block IDs                                    |
+| `disabled` | boolean  | no       | When `true`, block is excluded from the rendered output            |
 
 ---
 
@@ -111,27 +111,27 @@ The `layout` key holds per-page overrides for structural slots rendered **outsid
 
 ```json
 {
-    "sections": { "...": "..." },
-    "order": ["hero", "cta"],
-    "layout": {
-        "type": "page",
-        "sections": {
-            "header": {
-                "type": "site-header",
-                "settings": { "sticky": true },
-                "blocks": {},
-                "order": [],
-                "disabled": false
-            },
-            "footer": {
-                "type": "site-footer",
-                "settings": { "show_social": true },
-                "blocks": {},
-                "order": [],
-                "disabled": false
-            }
-        }
+  "sections": { "...": "..." },
+  "order": ["hero", "cta"],
+  "layout": {
+    "type": "page",
+    "sections": {
+      "header": {
+        "type": "site-header",
+        "settings": { "sticky": true },
+        "blocks": {},
+        "order": [],
+        "disabled": false
+      },
+      "footer": {
+        "type": "site-footer",
+        "settings": { "show_social": true },
+        "blocks": {},
+        "order": [],
+        "disabled": false
+      }
     }
+  }
 }
 ```
 
@@ -203,7 +203,7 @@ Disabled sections are excluded by `SectionCollection::enabled()` before renderin
 ## Page JSON — PHP Access
 
 ```php
-use Coderstm\PageBuilder\Support\PageData;
+use PageBuilder\Support\PageData;
 
 $pageData = PageData::fromArray($rawJson);
 
@@ -218,7 +218,7 @@ $pageData->toArray();         // back to raw array for storage
 ## Creating / Saving a Page
 
 ```php
-use Coderstm\PageBuilder\Services\PageStorage;
+use PageBuilder\Services\PageStorage;
 
 $storage = app(PageStorage::class);
 
@@ -235,19 +235,19 @@ $storage->save('home', $pageData->toArray());
 
 ```json
 {
-    "sections": {
-        "main-hero": {
-            "type": "hero",
-            "settings": {
-                "title": "Welcome to Our Site",
-                "subtitle": "We build amazing things",
-                "background_image": "/storage/pagebuilder/hero-bg.jpg"
-            },
-            "blocks": {},
-            "order": []
-        }
-    },
-    "order": ["main-hero"]
+  "sections": {
+    "main-hero": {
+      "type": "hero",
+      "settings": {
+        "title": "Welcome to Our Site",
+        "subtitle": "We build amazing things",
+        "background_image": "/storage/pagebuilder/hero-bg.jpg"
+      },
+      "blocks": {},
+      "order": []
+    }
+  },
+  "order": ["main-hero"]
 }
 ```
 
@@ -255,33 +255,38 @@ $storage->save('home', $pageData->toArray());
 
 ```json
 {
-    "sections": {
-        "s1": {
-            "type": "section",
-            "settings": { "padding_top": "xl", "padding_bottom": "xl" },
-            "blocks": {
-                "b1": { "type": "row", "settings": { "columns": "2" }, "blocks": {}, "order": [] }
-            },
-            "order": ["b1"]
-        },
-        "s2": {
-            "type": "cta",
-            "settings": { "title": "Ready to Start?" },
-            "blocks": {},
-            "order": []
+  "sections": {
+    "s1": {
+      "type": "section",
+      "settings": { "padding_top": "xl", "padding_bottom": "xl" },
+      "blocks": {
+        "b1": {
+          "type": "row",
+          "settings": { "columns": "2" },
+          "blocks": {},
+          "order": []
         }
+      },
+      "order": ["b1"]
     },
-    "order": ["s1", "s2"],
-    "layout": {
-        "type": "page",
-        "sections": {
-            "header": {
-                "type": "site-header",
-                "settings": { "sticky": false },
-                "blocks": {},
-                "order": []
-            }
-        }
+    "s2": {
+      "type": "cta",
+      "settings": { "title": "Ready to Start?" },
+      "blocks": {},
+      "order": []
     }
+  },
+  "order": ["s1", "s2"],
+  "layout": {
+    "type": "page",
+    "sections": {
+      "header": {
+        "type": "site-header",
+        "settings": { "sticky": false },
+        "blocks": {},
+        "order": []
+      }
+    }
+  }
 }
 ```

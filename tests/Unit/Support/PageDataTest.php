@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Support;
+namespace PageBuilder\Tests\Unit\Support;
 
-use Coderstm\PageBuilder\Support\PageData;
+use PageBuilder\Support\PageData;
 use PHPUnit\Framework\TestCase;
 
 class PageDataTest extends TestCase

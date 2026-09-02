@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Support;
+namespace PageBuilder\Tests\Unit\Support;
 
-use Coderstm\PageBuilder\Support\TemplateVariableResolver;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Support\TemplateVariableResolver;
+use PageBuilder\Tests\TestCase;
 
 class TemplateVariableResolverTest extends TestCase
 {

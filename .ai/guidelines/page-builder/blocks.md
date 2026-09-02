@@ -85,10 +85,10 @@ A **block** is a reusable content element that lives inside a section (or inside
 
 `@blocks()` accepts either a `Section` or a `Block`:
 
-| Expression | Calls | Use case |
-|---|---|---|
-| `@blocks($section)` | `Renderer::renderBlocks(Section)` | Render all top-level blocks of a section |
-| `@blocks($block)` | `Renderer::renderBlockChildren(Block, ?Section)` | Render nested children of a container block |
+| Expression          | Calls                                            | Use case                                    |
+| ------------------- | ------------------------------------------------ | ------------------------------------------- |
+| `@blocks($section)` | `Renderer::renderBlocks(Section)`                | Render all top-level blocks of a section    |
+| `@blocks($block)`   | `Renderer::renderBlockChildren(Block, ?Section)` | Render nested children of a container block |
 
 **Rule:** Never call the renderer directly. Always use `@blocks()`.
 
@@ -122,7 +122,7 @@ $section->settings->title    {{-- access parent section settings --}}
 The schema is parsed from `@schema()` and stored as a `BlockSchema` value object:
 
 ```php
-use Coderstm\PageBuilder\Schema\BlockSchema;
+use PageBuilder\Schema\BlockSchema;
 
 $schema = BlockSchema::fromArray([
     'name'     => 'Row',
@@ -144,7 +144,7 @@ $schema->settingDefaults();    // ['columns' => '2', 'gap' => 'md', ...]
 ## BlockRegistry
 
 ```php
-use Coderstm\PageBuilder\Facades\Block;
+use PageBuilder\Facades\Block;
 
 // Get schema by type
 $schema = Block::get('row');       // BlockSchema
@@ -164,19 +164,29 @@ $exists = Block::has('row');       // bool
 
 ```json
 {
-    "blocks": {
-        "row1": {
-            "type": "row",
-            "settings": { "columns": "3" },
-            "blocks": {
-                "col-a": { "type": "column", "settings": {}, "blocks": {}, "order": [] },
-                "col-b": { "type": "column", "settings": {}, "blocks": {}, "order": [] },
-                "col-c": { "type": "column", "settings": {}, "blocks": {}, "order": [] }
-            },
-            "order": ["col-a", "col-b", "col-c"]
-        }
-    },
-    "order": ["row1"]
+  "blocks": {
+    "row1": {
+      "type": "row",
+      "settings": { "columns": "3" },
+      "blocks": {
+        "col-a": {
+          "type": "column",
+          "settings": {},
+          "blocks": {},
+          "order": []
+        },
+        "col-b": {
+          "type": "column",
+          "settings": {},
+          "blocks": {},
+          "order": []
+        },
+        "col-c": { "type": "column", "settings": {}, "blocks": {}, "order": [] }
+      },
+      "order": ["col-a", "col-b", "col-c"]
+    }
+  },
+  "order": ["row1"]
 }
 ```
 
@@ -223,28 +233,28 @@ $exists = Block::has('row');       // bool
 
 ### `row.blade.php` — Responsive Grid Row
 
-| Setting | Type | Default | Notes |
-|---|---|---|---|
-| `columns` | select | `2` | 1–6 columns |
-| `gap` | select | `md` | none/xs/sm/md/lg/xl |
-| `vertical_alignment` | select | `start` | start/center/end/stretch |
-| `reverse_on_mobile` | checkbox | `false` | Reverses column order on mobile |
-| `full_width` | checkbox | `false` | Future full-bleed override |
+| Setting              | Type     | Default | Notes                           |
+| -------------------- | -------- | ------- | ------------------------------- |
+| `columns`            | select   | `2`     | 1–6 columns                     |
+| `gap`                | select   | `md`    | none/xs/sm/md/lg/xl             |
+| `vertical_alignment` | select   | `start` | start/center/end/stretch        |
+| `reverse_on_mobile`  | checkbox | `false` | Reverses column order on mobile |
+| `full_width`         | checkbox | `false` | Future full-bleed override      |
 
 Accepted child blocks: `column`
 
 ### `column.blade.php` — Flex Column
 
-| Setting | Type | Default | Notes |
-|---|---|---|---|
-| `width` | select | `auto` | auto or col-span-1 to col-span-6 |
-| `horizontal_alignment` | select | `start` | start/center/end |
-| `vertical_alignment` | select | `start` | start/center/end/between |
-| `padding` | select | `none` | none/sm/md/lg/xl |
-| `background_color` | color | `''` | CSS background color |
-| `background_image` | image_picker | `''` | Background image |
-| `hide_on_mobile` | checkbox | `false` | Hidden below `sm` |
-| `hide_on_desktop` | checkbox | `false` | Hidden above `sm` |
+| Setting                | Type         | Default | Notes                            |
+| ---------------------- | ------------ | ------- | -------------------------------- |
+| `width`                | select       | `auto`  | auto or col-span-1 to col-span-6 |
+| `horizontal_alignment` | select       | `start` | start/center/end                 |
+| `vertical_alignment`   | select       | `start` | start/center/end/between         |
+| `padding`              | select       | `none`  | none/sm/md/lg/xl                 |
+| `background_color`     | color        | `''`    | CSS background color             |
+| `background_image`     | image_picker | `''`    | Background image                 |
+| `hide_on_mobile`       | checkbox     | `false` | Hidden below `sm`                |
+| `hide_on_desktop`      | checkbox     | `false` | Hidden above `sm`                |
 
 Accepted child blocks: `@theme` (any)
 

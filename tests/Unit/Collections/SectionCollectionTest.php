@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Collections;
+namespace PageBuilder\Tests\Unit\Collections;
 
-use Coderstm\PageBuilder\Collections\BlockCollection;
-use Coderstm\PageBuilder\Collections\SectionCollection;
-use Coderstm\PageBuilder\Components\Section;
-use Coderstm\PageBuilder\Components\Settings;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Collections\BlockCollection;
+use PageBuilder\Collections\SectionCollection;
+use PageBuilder\Components\Section;
+use PageBuilder\Components\Settings;
+use PageBuilder\Tests\TestCase;
 
 class SectionCollectionTest extends TestCase
 {

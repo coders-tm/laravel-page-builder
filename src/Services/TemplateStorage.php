@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Services;
+namespace PageBuilder\Services;
 
-use Coderstm\PageBuilder\Facades\Theme;
+use PageBuilder\Facades\Theme;
 use Illuminate\Support\Facades\File;
 
 /**

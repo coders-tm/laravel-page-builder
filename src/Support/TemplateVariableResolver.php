@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Support;
+namespace PageBuilder\Support;
 
 /**
  * Resolves `{{ $page->attribute }}` placeholders in template data.

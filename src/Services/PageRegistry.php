@@ -1,9 +1,9 @@
 <?php
 
-namespace Coderstm\PageBuilder\Services;
+namespace PageBuilder\Services;
 
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\PageBuilder;
+use PageBuilder\Facades\Page;
+use PageBuilder\PageBuilder;
 use Illuminate\Support\Facades\Cache;
 
 class PageRegistry

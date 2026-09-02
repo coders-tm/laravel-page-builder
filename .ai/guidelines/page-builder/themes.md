@@ -15,7 +15,7 @@ themes/
 └── my-theme/
     ├── views/
     │   ├── layouts/
-    │   │   └── page.blade.php          # Master layout (header, main, footer)
+    │   │   └── page.blade.php         # Master layout (header, main, footer)
     │   ├── sections/                  # Theme sections (override or extend built-ins)
     │   │   ├── hero.blade.php
     │   │   ├── features.blade.php

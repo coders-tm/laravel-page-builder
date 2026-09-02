@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Registry;
+namespace PageBuilder\Registry;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\File;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Support;
+namespace PageBuilder\Support;
 
 /**
  * Parses a CSS-selector-like wrapper string into an HTML element.

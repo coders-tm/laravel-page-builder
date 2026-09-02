@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Components;
+namespace PageBuilder\Components;
 
-use Coderstm\PageBuilder\Rendering\EditorAttributes;
+use PageBuilder\Rendering\EditorAttributes;
 
 /**
  * Runtime block instance hydrated from page JSON.

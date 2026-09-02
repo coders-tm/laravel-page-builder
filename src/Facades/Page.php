@@ -1,8 +1,8 @@
 <?php
 
-namespace Coderstm\PageBuilder\Facades;
+namespace PageBuilder\Facades;
 
-use Coderstm\PageBuilder\Services\PageService;
+use PageBuilder\Services\PageService;
 use Illuminate\Support\Facades\Facade;
 
 /**

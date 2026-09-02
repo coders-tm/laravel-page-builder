@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Services;
+namespace PageBuilder\Tests\Feature\Services;
 
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Facades\Page;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 
@@ -53,7 +53,7 @@ class PageEditorTemplateFallbackTest extends TestCase
     public function test_editor_mode_uses_template_content_when_json_is_missing(): void
     {
         // Create a DB page record specifying our template
-        \Coderstm\PageBuilder\Models\Page::create([
+        \PageBuilder\Models\Page::create([
             'title' => 'Test Page',
             'slug' => self::SLUG,
             'template' => self::TEMPLATE_NAME,
@@ -78,7 +78,7 @@ class PageEditorTemplateFallbackTest extends TestCase
     public function test_editor_json_response_includes_template_content_when_json_is_missing(): void
     {
         // Create a DB page record specifying our template
-        \Coderstm\PageBuilder\Models\Page::create([
+        \PageBuilder\Models\Page::create([
             'title' => 'Test Page',
             'slug' => self::SLUG,
             'template' => self::TEMPLATE_NAME,
@@ -100,7 +100,7 @@ class PageEditorTemplateFallbackTest extends TestCase
     public function test_normal_render_uses_template_fallback_when_json_is_missing(): void
     {
         // Create a DB page record specifying our template
-        \Coderstm\PageBuilder\Models\Page::create([
+        \PageBuilder\Models\Page::create([
             'title' => 'Test Page',
             'slug' => self::SLUG,
             'template' => self::TEMPLATE_NAME,

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Collections;
+namespace PageBuilder\Collections;
 
 use ArrayAccess;
 use ArrayIterator;

@@ -1,7 +1,7 @@
 <?php
 
-use Coderstm\PageBuilder\Http\Controllers\AssetController;
-use Coderstm\PageBuilder\Http\Controllers\PageBuilderController;
+use PageBuilder\Http\Controllers\AssetController;
+use PageBuilder\Http\Controllers\PageBuilderController;
 use Illuminate\Support\Facades\Route;
 
 /*

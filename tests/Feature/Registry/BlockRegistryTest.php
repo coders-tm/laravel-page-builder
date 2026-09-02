@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Registry;
+namespace PageBuilder\Tests\Feature\Registry;
 
-use Coderstm\PageBuilder\Registry\BlockRegistry;
-use Coderstm\PageBuilder\Schema\BlockSchema;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Registry\BlockRegistry;
+use PageBuilder\Schema\BlockSchema;
+use PageBuilder\Tests\TestCase;
 
 class BlockRegistryTest extends TestCase
 {

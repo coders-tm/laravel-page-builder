@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Rendering;
+namespace PageBuilder\Rendering;
 
-use Coderstm\PageBuilder\Components\Block;
-use Coderstm\PageBuilder\Components\Section;
-use Coderstm\PageBuilder\PageBuilder;
+use PageBuilder\Components\Block;
+use PageBuilder\Components\Section;
+use PageBuilder\PageBuilder;
 
 /**
  * Generates HTML data-attributes for the page builder editor.

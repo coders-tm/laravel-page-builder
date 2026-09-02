@@ -6,7 +6,7 @@
 *.md diff=markdown
 *.php diff=php
 
-/art/output.mp4 export-ignore
+/art export-ignore
 /.github export-ignore
 /scripts export-ignore
 /docs export-ignore
@@ -25,7 +25,7 @@ phpunit.xml.dist export-ignore
 RELEASE.md export-ignore
 testbench.yaml export-ignore
 UPGRADE.md export-ignore
-CLAUDE.md export-ignore
+AGENTS.md export-ignore
 components.json export-ignore
 vite.config.js export-ignore
 postcss.config.js export-ignore

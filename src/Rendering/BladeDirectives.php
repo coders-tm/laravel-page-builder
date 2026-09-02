@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Rendering;
+namespace PageBuilder\Rendering;
 
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Registry\LayoutParser;
-use Coderstm\PageBuilder\Services\ThemeSettings;
-use Coderstm\PageBuilder\Support\PageData;
+use PageBuilder\PageBuilder;
+use PageBuilder\Registry\LayoutParser;
+use PageBuilder\Services\ThemeSettings;
+use PageBuilder\Support\PageData;
 use Illuminate\Support\Facades\Blade;
 
 /**
@@ -30,7 +30,7 @@ class BladeDirectives
         Blade::directive('block', function (string $expression) {
             return <<<PHP
 <?php
-echo app(\Coderstm\PageBuilder\Rendering\Renderer::class)->renderBlock({$expression});
+echo app(\PageBuilder\Rendering\Renderer::class)->renderBlock({$expression});
 ?>
 PHP;
         });
@@ -41,11 +41,11 @@ PHP;
             return <<<PHP
 <?php
 \$__pb_ctx = {$expression};
-if (\$__pb_ctx instanceof \Coderstm\PageBuilder\Components\Block) {
-    echo app(\Coderstm\PageBuilder\Rendering\Renderer::class)
+if (\$__pb_ctx instanceof \PageBuilder\Components\Block) {
+    echo app(\PageBuilder\Rendering\Renderer::class)
         ->renderBlockChildren(\$__pb_ctx);
 } else {
-    echo app(\Coderstm\PageBuilder\Rendering\Renderer::class)
+    echo app(\PageBuilder\Rendering\Renderer::class)
         ->renderBlocks(\$__pb_ctx);
 }
 unset(\$__pb_ctx);
@@ -63,7 +63,7 @@ PHP;
         // Searches header zone then footer zone by key — no second argument needed.
         Blade::directive('sections', function (string $expression) {
             return sprintf(
-                '<?php echo \Coderstm\PageBuilder\Rendering\BladeDirectives::renderLayoutSection($__pb_layout ?? null, %s); ?>',
+                '<?php echo \PageBuilder\Rendering\BladeDirectives::renderLayoutSection($__pb_layout ?? null, %s); ?>',
                 trim($expression),
             );
         });
@@ -73,13 +73,13 @@ PHP;
             $expression = trim($expression);
 
             return $expression === ''
-                ? "<?php echo \Coderstm\PageBuilder\PageBuilder::classAttribute(); ?>"
-                : "<?php echo \Coderstm\PageBuilder\PageBuilder::classAttribute({$expression}); ?>";
+                ? "<?php echo \PageBuilder\PageBuilder::classAttribute(); ?>"
+                : "<?php echo \PageBuilder\PageBuilder::classAttribute({$expression}); ?>";
         });
 
         // @themeFont — emits Google Fonts <link> tags for any google_font settings
         Blade::directive('themeFont', function () {
-            return '<?php echo \Coderstm\PageBuilder\Rendering\BladeDirectives::renderThemeFont(); ?>';
+            return '<?php echo \PageBuilder\Rendering\BladeDirectives::renderThemeFont(); ?>';
         });
     }
 

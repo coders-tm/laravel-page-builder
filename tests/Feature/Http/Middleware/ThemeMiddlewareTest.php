@@ -1,10 +1,10 @@
 <?php
 
-namespace Coderstm\PageBuilder\Tests\Feature\Http\Middleware;
+namespace PageBuilder\Tests\Feature\Http\Middleware;
 
-use Coderstm\PageBuilder\Facades\Theme;
-use Coderstm\PageBuilder\Http\Middleware\RequestThemeMiddleware;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Facades\Theme;
+use PageBuilder\Http\Middleware\RequestThemeMiddleware;
+use PageBuilder\Tests\TestCase;
 
 class ThemeMiddlewareTest extends TestCase
 {

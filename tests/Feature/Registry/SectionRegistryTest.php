@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Registry;
+namespace PageBuilder\Tests\Feature\Registry;
 
-use Coderstm\PageBuilder\Registry\SectionRegistry;
-use Coderstm\PageBuilder\Schema\SectionSchema;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Registry\SectionRegistry;
+use PageBuilder\Schema\SectionSchema;
+use PageBuilder\Tests\TestCase;
 
 class SectionRegistryTest extends TestCase
 {

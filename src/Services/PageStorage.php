@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Services;
+namespace PageBuilder\Services;
 
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Support\PageData;
+use PageBuilder\PageBuilder;
+use PageBuilder\Support\PageData;
 use Illuminate\Support\Facades\File;
 
 /**

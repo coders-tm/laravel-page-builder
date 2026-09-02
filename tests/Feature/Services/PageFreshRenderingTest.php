@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature\Services;
+namespace PageBuilder\Tests\Feature\Services;
 
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Services\PageStorage;
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Facades\Page;
+use PageBuilder\Services\PageStorage;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;

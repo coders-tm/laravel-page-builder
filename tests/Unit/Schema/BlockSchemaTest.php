@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Unit\Schema;
+namespace PageBuilder\Tests\Unit\Schema;
 
-use Coderstm\PageBuilder\Schema\BlockSchema;
-use Coderstm\PageBuilder\Schema\SettingSchema;
+use PageBuilder\Schema\BlockSchema;
+use PageBuilder\Schema\SettingSchema;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

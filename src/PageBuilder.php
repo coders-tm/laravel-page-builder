@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder;
+namespace PageBuilder;
 
 use Closure;
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Observers\PageObserver;
-use Coderstm\PageBuilder\Registry\BlockRegistry;
-use Coderstm\PageBuilder\Registry\SectionRegistry;
-use Coderstm\PageBuilder\Services\PageRegistry;
-use Coderstm\PageBuilder\Services\TemplateStorage;
-use Coderstm\PageBuilder\Services\ThemeSettings;
+use PageBuilder\Facades\Page;
+use PageBuilder\Observers\PageObserver;
+use PageBuilder\Registry\BlockRegistry;
+use PageBuilder\Registry\SectionRegistry;
+use PageBuilder\Services\PageRegistry;
+use PageBuilder\Services\TemplateStorage;
+use PageBuilder\Services\ThemeSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;

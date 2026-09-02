@@ -1,8 +1,8 @@
 <?php
 
-namespace Coderstm\PageBuilder\Commands;
+namespace PageBuilder\Commands;
 
-use Coderstm\PageBuilder\Services\PageRegistry;
+use PageBuilder\Services\PageRegistry;
 use Illuminate\Console\Command;
 
 class RegeneratePages extends Command

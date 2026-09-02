@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Rendering;
+namespace PageBuilder\Rendering;
 
-use Coderstm\PageBuilder\Collections\BlockCollection;
-use Coderstm\PageBuilder\Components\BaseComponent;
-use Coderstm\PageBuilder\Components\Block;
-use Coderstm\PageBuilder\Components\Section;
-use Coderstm\PageBuilder\Components\Settings;
-use Coderstm\PageBuilder\PageBuilder;
-use Coderstm\PageBuilder\Registry\BlockRegistry;
-use Coderstm\PageBuilder\Registry\SectionRegistry;
-use Coderstm\PageBuilder\Schema\BlockSchema;
-use Coderstm\PageBuilder\Schema\SectionSchema;
+use PageBuilder\Collections\BlockCollection;
+use PageBuilder\Components\BaseComponent;
+use PageBuilder\Components\Block;
+use PageBuilder\Components\Section;
+use PageBuilder\Components\Settings;
+use PageBuilder\PageBuilder;
+use PageBuilder\Registry\BlockRegistry;
+use PageBuilder\Registry\SectionRegistry;
+use PageBuilder\Schema\BlockSchema;
+use PageBuilder\Schema\SectionSchema;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 

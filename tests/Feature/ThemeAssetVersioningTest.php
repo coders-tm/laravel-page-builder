@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Coderstm\PageBuilder\Tests\Feature;
+namespace PageBuilder\Tests\Feature;
 
-use Coderstm\PageBuilder\Tests\TestCase;
+use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\File;
 
 class ThemeAssetVersioningTest extends TestCase
