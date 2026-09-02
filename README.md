@@ -1128,6 +1128,6 @@ This package is released under a **Non-Commercial Open Source License**.
 
 - Free to use, modify, and distribute for **non-commercial purposes**.
 - **Commercial use is not permitted** without a separate license agreement.
-- Contact [hello@dipaksarkar.in](mailto:hello@dipaksarkar.in) for commercial licensing.
+- Contact [dipak@coderstm.com](mailto:dipak@coderstm.com) for commercial licensing.
 
 See [LICENSE.md](LICENSE.md) for the full license text.

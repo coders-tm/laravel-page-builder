@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "generate:icons": "node scripts/generate-icons.mjs"
+    "generate:icons": "node generate-icons.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
