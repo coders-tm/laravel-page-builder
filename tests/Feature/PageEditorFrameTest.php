@@ -2,27 +2,17 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature;
-
-use PageBuilder\Facades\Page;
-use PageBuilder\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use PageBuilder\Facades\Page;
 
-class PageEditorFrameTest extends TestCase
-{
-    use RefreshDatabase;
+test('renders editor frame when editor param present', function () {
+    $request = Request::create('/home', 'GET', ['editor' => 'true']);
+    $this->app->instance('request', $request);
 
-    public function test_renders_editor_frame_when_editor_param_present(): void
-    {
-        $request = Request::create('/home', 'GET', ['editor' => 'true']);
-        $this->app->instance('request', $request);
+    $response = Page::render('home', [], true);
 
-        $response = Page::render('home', [], true);
-
-        $this->assertInstanceOf(View::class, $response);
-        $this->assertEquals('pagebuilder::layout', $response->name());
-        $this->assertEquals('/', $response->getData()['config']['basePath']);
-    }
-}
+    expect($response)->toBeInstanceOf(View::class);
+    expect($response->name())->toEqual('pagebuilder::layout');
+    expect($response->getData()['config']['basePath'])->toEqual('/');
+});

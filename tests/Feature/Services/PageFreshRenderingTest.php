@@ -2,50 +2,33 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature\Services;
-
-use PageBuilder\Facades\Page;
-use PageBuilder\Services\PageStorage;
-use PageBuilder\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
+use PageBuilder\Facades\Page;
+use PageBuilder\Services\PageStorage;
 
-class PageFreshRenderingTest extends TestCase
-{
-    use RefreshDatabase;
+const PAGE_A = 'fresh-rendering-page-a';
+const PAGE_B = 'fresh-rendering-page-b';
+const SHARED_PAGE = 'shared-variable-rendering-test-page';
+const SHARED_SECTION = 'shared-variable-rendering-test';
+beforeEach(function () {
+    $this->storage = $this->app->make(PageStorage::class);
 
-    private PageStorage $storage;
+    $this->storage->save(PAGE_A, [
+        'sections' => [
+            'banner-1' => ['type' => 'banner', 'settings' => ['text' => 'Page A Content']],
+        ],
+        'order' => ['banner-1'],
+    ]);
 
-    private const PAGE_A = 'fresh-rendering-page-a';
+    $this->storage->save(PAGE_B, [
+        'sections' => [
+            'banner-1' => ['type' => 'banner', 'settings' => ['text' => 'Page B Content']],
+        ],
+        'order' => ['banner-1'],
+    ]);
 
-    private const PAGE_B = 'fresh-rendering-page-b';
-
-    private const SHARED_PAGE = 'shared-variable-rendering-test-page';
-
-    private const SHARED_SECTION = 'shared-variable-rendering-test';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->storage = $this->app->make(PageStorage::class);
-
-        $this->storage->save(self::PAGE_A, [
-            'sections' => [
-                'banner-1' => ['type' => 'banner', 'settings' => ['text' => 'Page A Content']],
-            ],
-            'order' => ['banner-1'],
-        ]);
-
-        $this->storage->save(self::PAGE_B, [
-            'sections' => [
-                'banner-1' => ['type' => 'banner', 'settings' => ['text' => 'Page B Content']],
-            ],
-            'order' => ['banner-1'],
-        ]);
-
-        File::put(config('pagebuilder.sections').'/'.self::SHARED_SECTION.'.blade.php', <<<'BLADE'
+    File::put(config('pagebuilder.sections').'/'.SHARED_SECTION.'.blade.php', <<<'BLADE'
 @schema([
     'name' => 'Shared Variable Rendering Test',
     'settings' => [],
@@ -53,70 +36,60 @@ class PageFreshRenderingTest extends TestCase
 
 <div class="shared-variable">{{ $sharedRenderingValue ?? 'missing' }}</div>
 BLADE);
-    }
+});
+afterEach(function () {
+    $pagesPath = config('pagebuilder.pages');
 
-    protected function tearDown(): void
-    {
-        $pagesPath = config('pagebuilder.pages');
+    @unlink($pagesPath.'/'.PAGE_A.'.json');
+    @unlink($pagesPath.'/'.PAGE_B.'.json');
+    @unlink($pagesPath.'/'.SHARED_PAGE.'.json');
+    @unlink($pagesPath.'/'.PAGE_A.'.blade.php');
+    @unlink($pagesPath.'/'.PAGE_B.'.blade.php');
+    @unlink(config('pagebuilder.sections').'/'.SHARED_SECTION.'.blade.php');
+    View::share('sharedRenderingValue', null);
 
-        @unlink($pagesPath.'/'.self::PAGE_A.'.json');
-        @unlink($pagesPath.'/'.self::PAGE_B.'.json');
-        @unlink($pagesPath.'/'.self::SHARED_PAGE.'.json');
-        @unlink($pagesPath.'/'.self::PAGE_A.'.blade.php');
-        @unlink($pagesPath.'/'.self::PAGE_B.'.blade.php');
-        @unlink(config('pagebuilder.sections').'/'.self::SHARED_SECTION.'.blade.php');
-        View::share('sharedRenderingValue', null);
+});
+test('render does not create generated blade view', function () {
+    $viewPath = config('pagebuilder.pages').'/'.PAGE_A.'.blade.php';
 
-        parent::tearDown();
-    }
+    $this->assertFileDoesNotExist($viewPath);
 
-    public function test_render_does_not_create_generated_blade_view(): void
-    {
-        $viewPath = config('pagebuilder.pages').'/'.self::PAGE_A.'.blade.php';
+    $html = Page::render(PAGE_A)->render();
 
-        $this->assertFileDoesNotExist($viewPath);
+    $this->assertFileDoesNotExist($viewPath);
+    $this->assertStringContainsString('Page A Content', $html);
+});
+test('render reads updated json between requests', function () {
+    $firstHtml = Page::render(PAGE_A)->render();
 
-        $html = Page::render(self::PAGE_A)->render();
+    File::put(config('pagebuilder.pages').'/'.PAGE_A.'.json', json_encode([
+        'sections' => [
+            'banner-1' => ['type' => 'banner', 'settings' => ['text' => 'Page A Updated']],
+        ],
+        'order' => ['banner-1'],
+    ]));
 
-        $this->assertFileDoesNotExist($viewPath);
-        $this->assertStringContainsString('Page A Content', $html);
-    }
+    $secondHtml = Page::render(PAGE_A)->render();
 
-    public function test_render_reads_updated_json_between_requests(): void
-    {
-        $firstHtml = Page::render(self::PAGE_A)->render();
+    $this->assertStringContainsString('Page A Content', $firstHtml);
+    $this->assertStringContainsString('Page A Updated', $secondHtml);
+    $this->assertStringNotContainsString('Page A Content', $secondHtml);
+});
+test('shared view data changes are reflected between renders', function () {
+    $this->storage->save(SHARED_PAGE, [
+        'sections' => [
+            'shared-1' => ['type' => SHARED_SECTION, 'settings' => []],
+        ],
+        'order' => ['shared-1'],
+    ]);
 
-        File::put(config('pagebuilder.pages').'/'.self::PAGE_A.'.json', json_encode([
-            'sections' => [
-                'banner-1' => ['type' => 'banner', 'settings' => ['text' => 'Page A Updated']],
-            ],
-            'order' => ['banner-1'],
-        ]));
+    View::share('sharedRenderingValue', 'First value');
+    $firstHtml = Page::render(SHARED_PAGE)->render();
 
-        $secondHtml = Page::render(self::PAGE_A)->render();
+    View::share('sharedRenderingValue', 'Second value');
+    $secondHtml = Page::render(SHARED_PAGE)->render();
 
-        $this->assertStringContainsString('Page A Content', $firstHtml);
-        $this->assertStringContainsString('Page A Updated', $secondHtml);
-        $this->assertStringNotContainsString('Page A Content', $secondHtml);
-    }
-
-    public function test_shared_view_data_changes_are_reflected_between_renders(): void
-    {
-        $this->storage->save(self::SHARED_PAGE, [
-            'sections' => [
-                'shared-1' => ['type' => self::SHARED_SECTION, 'settings' => []],
-            ],
-            'order' => ['shared-1'],
-        ]);
-
-        View::share('sharedRenderingValue', 'First value');
-        $firstHtml = Page::render(self::SHARED_PAGE)->render();
-
-        View::share('sharedRenderingValue', 'Second value');
-        $secondHtml = Page::render(self::SHARED_PAGE)->render();
-
-        $this->assertStringContainsString('First value', $firstHtml);
-        $this->assertStringContainsString('Second value', $secondHtml);
-        $this->assertStringNotContainsString('First value', $secondHtml);
-    }
-}
+    $this->assertStringContainsString('First value', $firstHtml);
+    $this->assertStringContainsString('Second value', $secondHtml);
+    $this->assertStringNotContainsString('First value', $secondHtml);
+});

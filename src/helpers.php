@@ -1,9 +1,9 @@
 <?php
 
+use Illuminate\Support\HtmlString;
 use PageBuilder\PageBuilder;
 use PageBuilder\Support\Mix;
 use PageBuilder\Support\Vite;
-use Illuminate\Support\HtmlString;
 
 if (! function_exists('pb_editor')) {
     /**

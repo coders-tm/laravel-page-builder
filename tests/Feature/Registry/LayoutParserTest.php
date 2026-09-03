@@ -2,46 +2,30 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature\Registry;
-
 use PageBuilder\Registry\LayoutParser;
-use PageBuilder\Tests\TestCase;
 
-class LayoutParserTest extends TestCase
-{
-    private LayoutParser $parser;
+beforeEach(function () {
+    $this->parser = $this->app->make(LayoutParser::class);
+});
+test('extract zoned keys', function () {
+    $keys = $this->parser->extractZonedKeys('page');
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->parser = $this->app->make(LayoutParser::class);
-    }
+    expect($keys['header'])->toBe(['header']);
+    expect($keys['footer'])->toBe(['footer']);
+});
+test('default layout structure', function () {
+    $layout = $this->parser->defaultLayout('simple');
 
-    public function test_extract_zoned_keys(): void
-    {
-        $keys = $this->parser->extractZonedKeys('page');
+    expect($layout['type'])->toBe('simple');
+    expect($layout['header']['order'])->toBe(['announcement', 'header']);
+    expect($layout['footer']['order'])->toBe(['footer']);
 
-        $this->assertSame(['header'], $keys['header']);
-        $this->assertSame(['footer'], $keys['footer']);
-    }
+    expect($layout['header']['sections'])->toHaveKey('header');
+    expect($layout['header']['sections']['header']['type'])->toBe('header');
+});
+test('extract zoned keys returns empty for missing layout', function () {
+    $keys = $this->parser->extractZonedKeys('nonexistent');
 
-    public function test_default_layout_structure(): void
-    {
-        $layout = $this->parser->defaultLayout('simple');
-
-        $this->assertSame('simple', $layout['type']);
-        $this->assertSame(['announcement', 'header'], $layout['header']['order']);
-        $this->assertSame(['footer'], $layout['footer']['order']);
-
-        $this->assertArrayHasKey('header', $layout['header']['sections']);
-        $this->assertSame('header', $layout['header']['sections']['header']['type']);
-    }
-
-    public function test_extract_zoned_keys_returns_empty_for_missing_layout(): void
-    {
-        $keys = $this->parser->extractZonedKeys('nonexistent');
-
-        $this->assertSame([], $keys['header']);
-        $this->assertSame([], $keys['footer']);
-    }
-}
+    expect($keys['header'])->toBe([]);
+    expect($keys['footer'])->toBe([]);
+});

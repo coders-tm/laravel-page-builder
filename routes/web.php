@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use PageBuilder\Http\Controllers\AssetController;
 use PageBuilder\Http\Controllers\PageBuilderController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------

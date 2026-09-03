@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace PageBuilder\Rendering;
 
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 use PageBuilder\Collections\BlockCollection;
 use PageBuilder\Components\BaseComponent;
 use PageBuilder\Components\Block;
@@ -14,8 +16,6 @@ use PageBuilder\Registry\BlockRegistry;
 use PageBuilder\Registry\SectionRegistry;
 use PageBuilder\Schema\BlockSchema;
 use PageBuilder\Schema\SectionSchema;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\View;
 
 /**
  * Renders sections and blocks into HTML strings.

@@ -2,126 +2,104 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Unit\Components;
-
 use PageBuilder\Collections\BlockCollection;
 use PageBuilder\Components\Block;
 use PageBuilder\Components\Settings;
 use PageBuilder\PageBuilder;
-use PageBuilder\Tests\TestCase;
 
-class BlockTest extends TestCase
-{
-    public function test_construction_with_full_data(): void
-    {
-        $block = new Block([
-            'id' => 'block-1',
-            'type' => 'row',
-            'name' => 'Row Block',
-            'disabled' => false,
-            'settings' => new Settings(['columns' => '2'], []),
-            'blocks' => new BlockCollection,
-        ]);
+test('construction with full data', function () {
+    $block = new Block([
+        'id' => 'block-1',
+        'type' => 'row',
+        'name' => 'Row Block',
+        'disabled' => false,
+        'settings' => new Settings(['columns' => '2'], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $this->assertSame('block-1', $block->id);
-        $this->assertSame('row', $block->type);
-        $this->assertSame('Row Block', $block->name);
-        $this->assertFalse($block->disabled);
-        $this->assertSame('2', $block->settings->columns);
-    }
+    expect($block->id)->toBe('block-1');
+    expect($block->type)->toBe('row');
+    expect($block->name)->toBe('Row Block');
+    expect($block->disabled)->toBeFalse();
+    expect($block->settings->columns)->toBe('2');
+});
+test('default type is block', function () {
+    $block = new Block([
+        'id' => 'block-1',
+    ]);
 
-    public function test_default_type_is_block(): void
-    {
-        $block = new Block([
-            'id' => 'block-1',
-        ]);
+    expect($block->type)->toBe('block');
+});
+test('disabled block', function () {
+    $block = new Block([
+        'id' => 'block-1',
+        'type' => 'row',
+        'disabled' => true,
+    ]);
 
-        $this->assertSame('block', $block->type);
-    }
+    expect($block->disabled)->toBeTrue();
+});
+test('editor attributes empty when editor disabled', function () {
+    PageBuilder::disableEditor();
 
-    public function test_disabled_block(): void
-    {
-        $block = new Block([
-            'id' => 'block-1',
-            'type' => 'row',
-            'disabled' => true,
-        ]);
+    $block = new Block([
+        'id' => 'block-1',
+        'type' => 'row',
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $this->assertTrue($block->disabled);
-    }
+    expect($block->editorAttributes())->toBe('');
+});
+test('nested blocks', function () {
+    $childBlock = new Block([
+        'id' => 'col-1',
+        'type' => 'column',
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-    public function test_editor_attributes_empty_when_editor_disabled(): void
-    {
-        PageBuilder::disableEditor();
+    $parentBlock = new Block([
+        'id' => 'row-1',
+        'type' => 'row',
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection([$childBlock]),
+    ]);
 
-        $block = new Block([
-            'id' => 'block-1',
-            'type' => 'row',
-            'settings' => new Settings([], []),
-            'blocks' => new BlockCollection,
-        ]);
+    expect($parentBlock->blocks)->toHaveCount(1);
+    expect($parentBlock->blocks->first()->id)->toBe('col-1');
+});
+test('to array', function () {
+    $block = new Block([
+        'id' => 'block-1',
+        'type' => 'row',
+        'name' => 'Row',
+        'settings' => new Settings(['columns' => '3'], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $this->assertSame('', $block->editorAttributes());
-    }
+    $array = $block->toArray();
 
-    public function test_nested_blocks(): void
-    {
-        $childBlock = new Block([
-            'id' => 'col-1',
-            'type' => 'column',
-            'settings' => new Settings([], []),
-            'blocks' => new BlockCollection,
-        ]);
+    expect($array['id'])->toBe('block-1');
+    expect($array['type'])->toBe('row');
+    expect($array['name'])->toBe('Row');
+    expect($array['settings']['columns'])->toBe('3');
+});
+test('json serialization', function () {
+    $block = new Block([
+        'id' => 'block-1',
+        'type' => 'column',
+        'name' => 'Column',
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $parentBlock = new Block([
-            'id' => 'row-1',
-            'type' => 'row',
-            'settings' => new Settings([], []),
-            'blocks' => new BlockCollection([$childBlock]),
-        ]);
+    $json = json_encode($block);
+    $decoded = json_decode($json, true);
 
-        $this->assertCount(1, $parentBlock->blocks);
-        $this->assertSame('col-1', $parentBlock->blocks->first()->id);
-    }
-
-    public function test_to_array(): void
-    {
-        $block = new Block([
-            'id' => 'block-1',
-            'type' => 'row',
-            'name' => 'Row',
-            'settings' => new Settings(['columns' => '3'], []),
-            'blocks' => new BlockCollection,
-        ]);
-
-        $array = $block->toArray();
-
-        $this->assertSame('block-1', $array['id']);
-        $this->assertSame('row', $array['type']);
-        $this->assertSame('Row', $array['name']);
-        $this->assertSame('3', $array['settings']['columns']);
-    }
-
-    public function test_json_serialization(): void
-    {
-        $block = new Block([
-            'id' => 'block-1',
-            'type' => 'column',
-            'name' => 'Column',
-            'settings' => new Settings([], []),
-            'blocks' => new BlockCollection,
-        ]);
-
-        $json = json_encode($block);
-        $decoded = json_decode($json, true);
-
-        $this->assertSame('block-1', $decoded['id']);
-        $this->assertSame('column', $decoded['type']);
-    }
-
-    protected function tearDown(): void
-    {
-        PageBuilder::disableEditor();
-        parent::tearDown();
-    }
-}
+    expect($decoded['id'])->toBe('block-1');
+    expect($decoded['type'])->toBe('column');
+});
+afterEach(function () {
+    PageBuilder::disableEditor();
+});

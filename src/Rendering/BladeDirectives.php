@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace PageBuilder\Rendering;
 
+use Illuminate\Support\Facades\Blade;
 use PageBuilder\PageBuilder;
 use PageBuilder\Registry\LayoutParser;
 use PageBuilder\Services\ThemeSettings;
 use PageBuilder\Support\PageData;
-use Illuminate\Support\Facades\Blade;
 
 /**
  * Registers Blade directives for the page builder.

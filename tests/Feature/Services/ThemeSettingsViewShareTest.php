@@ -2,105 +2,71 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature\Services;
-
-use PageBuilder\Services\ThemeSettings;
-use PageBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
+use PageBuilder\Services\ThemeSettings;
 
-class ThemeSettingsViewShareTest extends TestCase
+beforeEach(function () {
+    $this->valuesPath = sys_get_temp_dir().'/pb-theme-view-test.json';
+    $this->app['config']->set('pagebuilder.theme_settings_path', $this->valuesPath);
+});
+afterEach(function () {
+    if (File::exists($this->valuesPath)) {
+        File::delete($this->valuesPath);
+    }
+
+});
+test('theme is shared with all views', function () {
+    $shared = View::shared('theme');
+
+    expect($shared)->not->toBeNull();
+    expect($shared)->toBeInstanceOf(ThemeSettings::class);
+});
+test('theme shared instance is same singleton', function () {
+    $shared = View::shared('theme');
+    $singleton = $this->app->make(ThemeSettings::class);
+
+    expect($shared)->toBe($singleton);
+});
+test('theme property access in blade view', function () {
+    // Write values that Blade will read via $theme->primary_color
+    $themeSettings = $this->app->make(ThemeSettings::class);
+    $themeSettings->save(['primary_color' => '#FACADE']);
+
+    $html = renderInlineBladeView('{{ $theme->primary_color }}');
+
+    expect(trim($html))->toBe('#FACADE');
+});
+test('theme get with default in blade view', function () {
+    $html = renderInlineBladeView('{{ $theme->get(\'missing_key\', \'default-value\') }}');
+
+    expect(trim($html))->toBe('default-value');
+});
+test('theme null coalescing in blade view', function () {
+    $html = renderInlineBladeView('{{ $theme->undefined_key ?? \'fallback\' }}');
+
+    expect(trim($html))->toBe('fallback');
+});
+test('theme reflects updated values after save', function () {
+    $themeSettings = $this->app->make(ThemeSettings::class);
+    $themeSettings->save(['primary_color' => '#BEFORE']);
+
+    $themeSettings->save(['primary_color' => '#AFTER']);
+
+    $html = renderInlineBladeView('{{ $theme->primary_color }}');
+
+    expect(trim($html))->toBe('#AFTER');
+});
+// ─── Helper ──────────────────────────────────────────────────────────────
+function renderInlineBladeView(string $bladeString): string
 {
-    private string $valuesPath;
+    $tmpFile = sys_get_temp_dir().'/pb-blade-test-'.uniqid().'.blade.php';
+    File::put($tmpFile, $bladeString);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    app('view')->addLocation(sys_get_temp_dir());
 
-        $this->valuesPath = sys_get_temp_dir().'/pb-theme-view-test.json';
-        $this->app['config']->set('pagebuilder.theme_settings_path', $this->valuesPath);
-    }
+    ob_start();
+    echo view()->file($tmpFile)->render();
 
-    protected function tearDown(): void
-    {
-        if (File::exists($this->valuesPath)) {
-            File::delete($this->valuesPath);
-        }
-
-        parent::tearDown();
-    }
-
-    public function test_theme_is_shared_with_all_views(): void
-    {
-        $shared = View::shared('theme');
-
-        $this->assertNotNull($shared);
-        $this->assertInstanceOf(ThemeSettings::class, $shared);
-    }
-
-    public function test_theme_shared_instance_is_same_singleton(): void
-    {
-        $shared = View::shared('theme');
-        $singleton = $this->app->make(ThemeSettings::class);
-
-        $this->assertSame($singleton, $shared);
-    }
-
-    public function test_theme_property_access_in_blade_view(): void
-    {
-        // Write values that Blade will read via $theme->primary_color
-        $themeSettings = $this->app->make(ThemeSettings::class);
-        $themeSettings->save(['primary_color' => '#FACADE']);
-
-        $html = $this->renderInlineBladeView('{{ $theme->primary_color }}');
-
-        $this->assertSame('#FACADE', trim($html));
-    }
-
-    public function test_theme_get_with_default_in_blade_view(): void
-    {
-        $html = $this->renderInlineBladeView(
-            '{{ $theme->get(\'missing_key\', \'default-value\') }}'
-        );
-
-        $this->assertSame('default-value', trim($html));
-    }
-
-    public function test_theme_null_coalescing_in_blade_view(): void
-    {
-        $html = $this->renderInlineBladeView(
-            '{{ $theme->undefined_key ?? \'fallback\' }}'
-        );
-
-        $this->assertSame('fallback', trim($html));
-    }
-
-    public function test_theme_reflects_updated_values_after_save(): void
-    {
-        $themeSettings = $this->app->make(ThemeSettings::class);
-        $themeSettings->save(['primary_color' => '#BEFORE']);
-
-        $themeSettings->save(['primary_color' => '#AFTER']);
-
-        $html = $this->renderInlineBladeView('{{ $theme->primary_color }}');
-
-        $this->assertSame('#AFTER', trim($html));
-    }
-
-    // ─── Helper ──────────────────────────────────────────────────────────────
-
-    private function renderInlineBladeView(string $bladeString): string
-    {
-        $tmpFile = sys_get_temp_dir().'/pb-blade-test-'.uniqid().'.blade.php';
-        File::put($tmpFile, $bladeString);
-
-        // Register a one-off view path so Blade can find the temp file
-        $viewName = 'pb-test-'.md5($tmpFile);
-        $this->app['view']->addLocation(sys_get_temp_dir());
-
-        ob_start();
-        echo view()->file($tmpFile)->render();
-
-        return ob_get_clean();
-    }
+    return ob_get_clean();
 }

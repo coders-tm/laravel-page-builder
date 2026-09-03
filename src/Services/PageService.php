@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace PageBuilder\Services;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use PageBuilder\Http\Controllers\WebPageController;
 use PageBuilder\PageBuilder;
 use PageBuilder\Registry\LayoutParser;
 use PageBuilder\Support\PageData;
 use PageBuilder\Support\TemplateVariableResolver;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
 
 class PageService
 {

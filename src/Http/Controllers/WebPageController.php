@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace PageBuilder\Http\Controllers;
 
-use PageBuilder\Facades\Page;
-use PageBuilder\PageBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use PageBuilder\Facades\Page;
+use PageBuilder\PageBuilder;
 
 class WebPageController extends Controller
 {

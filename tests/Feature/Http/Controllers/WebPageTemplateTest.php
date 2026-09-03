@@ -2,229 +2,178 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature\Http\Controllers;
-
 use PageBuilder\Facades\Page;
-use PageBuilder\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Workbench\App\Models\Page as ModelsPage;
 
-/**
- * Tests template-based page rendering.
- *
- * Resolution order:
- *   1. Custom Blade view (pages/{slug}.blade.php)
- *   2. Page JSON (pages/{slug}.json)
- *   3. Template JSON (templates/{template}.json or templates/page.json)
- *   4. 404
- */
-class WebPageTemplateTest extends TestCase
-{
-    use RefreshDatabase;
+test('renders page using default template when no json exists', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'template-no-json',
+        'title' => 'Template Page',
+        'content' => '<p>Hello from template</p>',
+    ]);
 
-    // ── Default template (templates/page.json) ────────────────────────────────
+    Page::routes();
 
-    public function test_renders_page_using_default_template_when_no_json_exists(): void
-    {
-        ModelsPage::factory()->create([
-            'slug' => 'template-no-json',
-            'title' => 'Template Page',
-            'content' => '<p>Hello from template</p>',
-        ]);
+    $response = $this->get(route('pages.template-no-json'));
 
-        Page::routes();
+    $response->assertOk();
 
-        $response = $this->get(route('pages.template-no-json'));
+    // Default template uses the page-content section which renders $page->content
+    $response->assertSee('<p>Hello from template</p>', escape: false);
+});
+test('default template renders page content section', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'default-tpl-page',
+        'title' => 'Default Template',
+        'content' => '<p>Default template content</p>',
+    ]);
 
-        $response->assertOk();
-        // Default template uses the page-content section which renders $page->content
-        $response->assertSee('<p>Hello from template</p>', escape: false);
-    }
+    Page::routes();
 
-    public function test_default_template_renders_page_content_section(): void
-    {
-        ModelsPage::factory()->create([
-            'slug' => 'default-tpl-page',
-            'title' => 'Default Template',
-            'content' => '<p>Default template content</p>',
-        ]);
+    $response = $this->get(route('pages.default-tpl-page'));
 
-        Page::routes();
+    $response->assertOk();
 
-        $response = $this->get(route('pages.default-tpl-page'));
+    $html = $response->getContent();
 
-        $response->assertOk();
+    // page-content section renders with prose class
+    $this->assertStringContainsString('prose', $html);
+    $this->assertStringContainsString('<p>Default template content</p>', $html);
+});
+test('renders page using selected template', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'alternate-tpl-page',
+        'title' => 'Alternate Template Page',
+        'template' => 'page.alternate',
+        'content' => '<p>Alternate content</p>',
+    ]);
 
-        $html = $response->getContent();
-        // page-content section renders with prose class
-        $this->assertStringContainsString('prose', $html);
-        $this->assertStringContainsString('<p>Default template content</p>', $html);
-    }
+    Page::routes();
 
-    // ── Selected template ────────────────────────────────────────────────────
+    $response = $this->get(route('pages.alternate-tpl-page'));
 
-    public function test_renders_page_using_selected_template(): void
-    {
-        ModelsPage::factory()->create([
-            'slug' => 'alternate-tpl-page',
-            'title' => 'Alternate Template Page',
-            'template' => 'page.alternate',
-            'content' => '<p>Alternate content</p>',
-        ]);
+    $response->assertOk();
+    $response->assertSee('<p>Alternate content</p>', escape: false);
+});
+test('renders wrapper element around sections', function () {
+    // page.alternate.json has: "wrapper": "main#page-alternate.page-wrapper"
+    ModelsPage::factory()->create([
+        'slug' => 'wrapper-page',
+        'title' => 'Wrapper Page',
+        'template' => 'page.alternate',
+        'content' => '<p>Wrapped</p>',
+    ]);
 
-        Page::routes();
+    Page::routes();
 
-        $response = $this->get(route('pages.alternate-tpl-page'));
+    $html = $this->get(route('pages.wrapper-page'))->getContent();
 
-        $response->assertOk();
-        $response->assertSee('<p>Alternate content</p>', escape: false);
-    }
+    $this->assertStringContainsString('<main id="page-alternate" class="page-wrapper">', $html);
+    $this->assertStringContainsString('</main>', $html);
+    $this->assertStringContainsString('<p>Wrapped</p>', $html);
+});
+test('default template has no wrapper', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'no-wrapper-page',
+        'title' => 'No Wrapper',
+        'content' => '<p>Content</p>',
+    ]);
 
-    // ── Wrapper property ─────────────────────────────────────────────────────
+    Page::routes();
 
-    public function test_renders_wrapper_element_around_sections(): void
-    {
-        // page.alternate.json has: "wrapper": "main#page-alternate.page-wrapper"
-        ModelsPage::factory()->create([
-            'slug' => 'wrapper-page',
-            'title' => 'Wrapper Page',
-            'template' => 'page.alternate',
-            'content' => '<p>Wrapped</p>',
-        ]);
+    $html = $this->get(route('pages.no-wrapper-page'))->getContent();
 
-        Page::routes();
+    // Default template has no wrapper — sections rendered directly
+    $this->assertStringNotContainsString('<main id="page-alternate"', $html);
+});
+test('template settings resolve page title variable', function () {
+    // page.var.json has "text": "{{ $page->title }}" in the banner section
+    ModelsPage::factory()->create([
+        'slug' => 'var-page',
+        'title' => 'My Interpolated Title',
+        'template' => 'page.var',
+    ]);
 
-        $html = $this->get(route('pages.wrapper-page'))->getContent();
+    Page::routes();
 
-        $this->assertStringContainsString('<main id="page-alternate" class="page-wrapper">', $html);
-        $this->assertStringContainsString('</main>', $html);
-        $this->assertStringContainsString('<p>Wrapped</p>', $html);
-    }
+    $html = $this->get(route('pages.var-page'))->getContent();
 
-    public function test_default_template_has_no_wrapper(): void
-    {
-        ModelsPage::factory()->create([
-            'slug' => 'no-wrapper-page',
-            'title' => 'No Wrapper',
-            'content' => '<p>Content</p>',
-        ]);
+    // banner.blade.php renders $section->settings->text inside <h3>
+    $this->assertStringContainsString('My Interpolated Title', $html);
+});
+test('template variable resolves to empty when attribute missing', function () {
+    // meta_keywords is null by default in the factory
+    ModelsPage::factory()->create([
+        'slug' => 'missing-attr-page',
+        'title' => 'Title OK',
+        'template' => 'page.var',
+    ]);
 
-        Page::routes();
+    Page::routes();
 
-        $html = $this->get(route('pages.no-wrapper-page'))->getContent();
+    $response = $this->get(route('pages.missing-attr-page'));
+    $response->assertOk();
+});
+test('json file takes priority over template', function () {
+    // layout-default.json exists in workbench pages dir and renders a banner section
+    ModelsPage::factory()->create([
+        'slug' => 'layout-default',
+        'title' => 'JSON Priority Page',
+        'content' => '<p>Should not appear from template</p>',
+    ]);
 
-        // Default template has no wrapper — sections rendered directly
-        $this->assertStringNotContainsString('<main id="page-alternate"', $html);
-    }
+    Page::routes();
 
-    // ── Variable interpolation ───────────────────────────────────────────────
+    $html = $this->get(route('pages.layout-default'))->getContent();
 
-    public function test_template_settings_resolve_page_title_variable(): void
-    {
-        // page.var.json has "text": "{{ $page->title }}" in the banner section
-        ModelsPage::factory()->create([
-            'slug' => 'var-page',
-            'title' => 'My Interpolated Title',
-            'template' => 'page.var',
-        ]);
+    // layout-default.json renders a banner with text="Content"
+    // The default template would render page-content (prose class)
+    $this->assertStringContainsString('Content', $html);
 
-        Page::routes();
+    // The JSON file's banner section is what gets rendered, not the template
+    $this->assertStringContainsString('class="banner', $html);
+});
+test('falls back to default template when selected not found', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'fallback-tpl-page',
+        'title' => 'Fallback Template',
+        'template' => 'nonexistent-template',
+        'content' => '<p>Fallback content</p>',
+    ]);
 
-        $html = $this->get(route('pages.var-page'))->getContent();
+    Page::routes();
 
-        // banner.blade.php renders $section->settings->text inside <h3>
-        $this->assertStringContainsString('My Interpolated Title', $html);
-    }
+    $response = $this->get(route('pages.fallback-tpl-page'));
 
-    public function test_template_variable_resolves_to_empty_when_attribute_missing(): void
-    {
-        // meta_keywords is null by default in the factory
-        ModelsPage::factory()->create([
-            'slug' => 'missing-attr-page',
-            'title' => 'Title OK',
-            'template' => 'page.var',
-        ]);
+    $response->assertOk();
 
-        Page::routes();
+    // Falls back to page.json template which renders page-content
+    $response->assertSee('<p>Fallback content</p>', escape: false);
+});
+test('returns 404 when no page record exists', function () {
+    // No DB record — template can't be resolved because we need a DB page
+    // for the template system to look up its `template` field
+    Page::routes();
 
-        $response = $this->get(route('pages.missing-attr-page'));
-        $response->assertOk();
-    }
+    $response = $this->get('/totally-nonexistent-slug-xyz');
+    $response->assertNotFound();
+});
+test('template page renders meta tags from db', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'meta-template-page',
+        'title' => 'Meta Template Page',
+        'meta_title' => 'SEO Title',
+        'meta_description' => 'SEO Description',
+        'meta_keywords' => 'seo, template',
+        'content' => '<p>Meta page content</p>',
+    ]);
 
-    // ── Priority: Blade > JSON > Template ────────────────────────────────────
+    Page::routes();
 
-    public function test_json_file_takes_priority_over_template(): void
-    {
-        // layout-default.json exists in workbench pages dir and renders a banner section
-        ModelsPage::factory()->create([
-            'slug' => 'layout-default',
-            'title' => 'JSON Priority Page',
-            'content' => '<p>Should not appear from template</p>',
-        ]);
+    $html = $this->get(route('pages.meta-template-page'))->getContent();
 
-        Page::routes();
-
-        $html = $this->get(route('pages.layout-default'))->getContent();
-
-        // layout-default.json renders a banner with text="Content"
-        // The default template would render page-content (prose class)
-        $this->assertStringContainsString('Content', $html);
-        // The JSON file's banner section is what gets rendered, not the template
-        $this->assertStringContainsString('class="banner', $html);
-    }
-
-    // ── Fallback: unknown template → default page.json template ──────────────
-
-    public function test_falls_back_to_default_template_when_selected_not_found(): void
-    {
-        ModelsPage::factory()->create([
-            'slug' => 'fallback-tpl-page',
-            'title' => 'Fallback Template',
-            'template' => 'nonexistent-template',
-            'content' => '<p>Fallback content</p>',
-        ]);
-
-        Page::routes();
-
-        $response = $this->get(route('pages.fallback-tpl-page'));
-
-        $response->assertOk();
-        // Falls back to page.json template which renders page-content
-        $response->assertSee('<p>Fallback content</p>', escape: false);
-    }
-
-    // ── 404 when no template exists ──────────────────────────────────────────
-
-    public function test_returns_404_when_no_page_record_exists(): void
-    {
-        // No DB record — template can't be resolved because we need a DB page
-        // for the template system to look up its `template` field
-        Page::routes();
-
-        $response = $this->get('/totally-nonexistent-slug-xyz');
-        $response->assertNotFound();
-    }
-
-    // ── Meta tags from DB page ───────────────────────────────────────────────
-
-    public function test_template_page_renders_meta_tags_from_db(): void
-    {
-        ModelsPage::factory()->create([
-            'slug' => 'meta-template-page',
-            'title' => 'Meta Template Page',
-            'meta_title' => 'SEO Title',
-            'meta_description' => 'SEO Description',
-            'meta_keywords' => 'seo, template',
-            'content' => '<p>Meta page content</p>',
-        ]);
-
-        Page::routes();
-
-        $html = $this->get(route('pages.meta-template-page'))->getContent();
-
-        // $meta_title overrides the title|app.name format when present
-        $this->assertStringContainsString('SEO Title', $html);
-        $this->assertStringContainsString('content="SEO Description"', $html);
-        $this->assertStringContainsString('content="seo, template"', $html);
-    }
-}
+    // $meta_title overrides the title|app.name format when present
+    $this->assertStringContainsString('SEO Title', $html);
+    $this->assertStringContainsString('content="SEO Description"', $html);
+    $this->assertStringContainsString('content="seo, template"', $html);
+});

@@ -26,76 +26,74 @@ const LICENSE = "Source-Available Non-Commercial"
 export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="mx-[15px] max-w-md gap-0 p-0 sm:mx-auto">
-        <DialogHeader className="px-6 pt-6 pb-0">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl">
-              <svg
-                width="178"
-                height="178"
-                viewBox="0 0 178 178"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect width="178" height="178" fill="#282E40" />
-                <rect
-                  x="32"
-                  y="30"
-                  width="84"
-                  height="45"
-                  rx="4"
-                  stroke="#5C58E2"
-                  stroke-width="4"
-                  stroke-dasharray="15 7"
-                />
-                <rect
-                  x="32"
-                  y="88"
-                  width="49"
-                  height="50"
-                  rx="4"
-                  stroke="#C4C4C4"
-                  stroke-width="4"
-                  stroke-dasharray="15 7"
-                />
-                <path
-                  d="M143 86C146.314 86 149 88.6863 149 92V126.964C148.614 126.805 148.212 126.641 147.793 126.47L132.061 120.038C130.34 119.335 128.929 118.756 127.796 118.409C126.687 118.07 125.504 117.836 124.349 118.158C122.737 118.607 121.41 119.752 120.729 121.28H120.728C120.239 122.376 120.297 123.58 120.47 124.727C120.647 125.899 121.012 127.38 121.455 129.187L124.602 142H99C95.6863 142 93 139.314 93 136V92C93 88.6863 95.6863 86 99 86H143Z"
-                  fill="url(#paint0_linear_2001_156)"
-                />
-                <path
-                  d="M147.173 139.249C151.308 137.481 153.375 136.597 153.989 135.365C154.521 134.296 154.511 133.037 153.962 131.976C153.329 130.754 151.247 129.903 147.085 128.202L131.353 121.77C127.841 120.334 126.085 119.616 124.85 119.96C123.776 120.26 122.891 121.023 122.437 122.042C121.915 123.213 122.368 125.055 123.272 128.74L127.28 145.061C128.393 149.594 128.949 151.86 130.088 152.667C131.076 153.366 132.341 153.544 133.483 153.146C134.801 152.686 135.963 150.662 138.287 146.615L140.004 143.625C140.374 142.981 140.559 142.659 140.797 142.384C141.009 142.141 141.251 141.926 141.517 141.744C141.818 141.539 142.159 141.393 142.842 141.101L147.173 139.249Z"
-                  fill="#5752D8"
-                  stroke="white"
-                  stroke-width="3.74215"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <defs>
-                  <linearGradient
-                    id="paint0_linear_2001_156"
-                    x1="121"
-                    y1="86"
-                    x2="121"
-                    y2="142"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#7571F3" />
-                    <stop offset="1" stop-color="#5656DC" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div>
-              <DialogTitle className="text-lg font-semibold">Laravel Page Builder</DialogTitle>
-              <DialogDescription className="mt-0.5 text-xs text-gray-500">
-                Version {VERSION}
-              </DialogDescription>
-            </div>
+      <DialogContent className="w-[calc(100%-2rem)] max-w-md gap-0 rounded-xl p-0">
+        <DialogHeader className="flex flex-col items-center px-6 pt-6 pb-0 text-center sm:text-center">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl">
+            <svg
+              width="178"
+              height="178"
+              viewBox="0 0 178 178"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="178" height="178" fill="#282E40" />
+              <rect
+                x="32.5"
+                y="30.5"
+                width="114"
+                height="44"
+                rx="3.5"
+                stroke="#78C355"
+                strokeWidth="5"
+                strokeDasharray="15 9"
+              />
+              <rect
+                x="32.5"
+                y="88.5"
+                width="48"
+                height="49"
+                rx="3.5"
+                stroke="#C4C4C4"
+                strokeWidth="5"
+                strokeDasharray="15 9"
+              />
+              <path
+                d="M143 86C146.314 86 149 88.6863 149 92V126.964C148.614 126.805 148.212 126.641 147.793 126.47L132.061 120.038C130.34 119.335 128.929 118.756 127.796 118.409C126.687 118.07 125.504 117.836 124.349 118.158C122.737 118.607 121.41 119.752 120.729 121.28H120.728C120.239 122.376 120.297 123.58 120.47 124.727C120.647 125.899 121.012 127.38 121.455 129.187L124.602 142H99C95.6863 142 93 139.314 93 136V92C93 88.6863 95.6863 86 99 86H143Z"
+                fill="url(#paint0_linear_2001_156)"
+              />
+              <path
+                d="M147.173 139.249C151.308 137.481 153.375 136.597 153.989 135.365C154.521 134.296 154.511 133.037 153.962 131.976C153.329 130.754 151.247 129.903 147.085 128.202L131.353 121.77C127.841 120.334 126.085 119.616 124.85 119.96C123.776 120.26 122.891 121.023 122.437 122.042C121.915 123.213 122.368 125.055 123.272 128.74L127.28 145.061C128.393 149.594 128.949 151.86 130.088 152.667C131.076 153.366 132.341 153.544 133.483 153.146C134.801 152.686 135.963 150.662 138.287 146.615L140.004 143.625C140.374 142.981 140.559 142.659 140.797 142.384C141.009 142.141 141.251 141.926 141.517 141.744C141.818 141.539 142.159 141.393 142.842 141.101L147.173 139.249Z"
+                fill="#5752D8"
+                stroke="white"
+                strokeWidth="3.74215"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <defs>
+                <linearGradient
+                  id="paint0_linear_2001_156"
+                  x1="121"
+                  y1="86"
+                  x2="121"
+                  y2="142"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stopColor="#7571F3" />
+                  <stop offset="1" stopColor="#5656DC" />
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
+          <DialogTitle className="mt-3 text-center text-lg font-semibold">
+            Laravel Page Builder
+          </DialogTitle>
+          <DialogDescription className="mt-0.5 text-center text-xs text-gray-500">
+            Version {VERSION}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 py-5">
-          <p className="text-sm leading-relaxed text-gray-600">{DESCRIPTION}</p>
+          <p className="text-center text-sm leading-relaxed text-gray-600">{DESCRIPTION}</p>
 
           <div className="mt-5 space-y-3">
             <InfoRow label="Author" value={AUTHOR} />
@@ -105,8 +103,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3.5">
-          <span className="text-[11px] text-gray-400">Built with Laravel &amp; React</span>
+        <div className="flex items-center justify-center border-t border-gray-100 px-6 py-3.5">
           <a
             href={REPO_URL}
             target="_blank"

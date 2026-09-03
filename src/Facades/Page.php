@@ -2,8 +2,8 @@
 
 namespace PageBuilder\Facades;
 
-use PageBuilder\Services\PageService;
 use Illuminate\Support\Facades\Facade;
+use PageBuilder\Services\PageService;
 
 /**
  * @method static array resolve(string $slug, ?\Illuminate\Database\Eloquent\Model $dbPage = null)

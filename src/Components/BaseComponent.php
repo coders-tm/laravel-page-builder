@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace PageBuilder\Components;
 
-use PageBuilder\Collections\BlockCollection;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use PageBuilder\Collections\BlockCollection;
 
 /**
  * Abstract base for runtime components (Section, Block) hydrated from page JSON.

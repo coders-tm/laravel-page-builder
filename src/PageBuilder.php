@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace PageBuilder;
 
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\HtmlString;
 use PageBuilder\Facades\Page;
 use PageBuilder\Observers\PageObserver;
 use PageBuilder\Registry\BlockRegistry;
@@ -12,9 +15,6 @@ use PageBuilder\Registry\SectionRegistry;
 use PageBuilder\Services\PageRegistry;
 use PageBuilder\Services\TemplateStorage;
 use PageBuilder\Services\ThemeSettings;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\HtmlString;
 use RuntimeException;
 
 class PageBuilder

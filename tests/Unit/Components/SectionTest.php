@@ -2,109 +2,89 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Unit\Components;
-
 use PageBuilder\Collections\BlockCollection;
 use PageBuilder\Components\Section;
 use PageBuilder\Components\Settings;
 use PageBuilder\PageBuilder;
-use PageBuilder\Tests\TestCase;
 
-class SectionTest extends TestCase
-{
-    public function test_construction_with_full_data(): void
-    {
-        $section = new Section([
-            'id' => 'hero-1',
-            'type' => 'hero',
-            'name' => 'Hero Section',
-            'disabled' => false,
-            'settings' => new Settings(['title' => 'Welcome'], []),
-            'blocks' => new BlockCollection,
-        ]);
+test('construction with full data', function () {
+    $section = new Section([
+        'id' => 'hero-1',
+        'type' => 'hero',
+        'name' => 'Hero Section',
+        'disabled' => false,
+        'settings' => new Settings(['title' => 'Welcome'], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $this->assertSame('hero-1', $section->id);
-        $this->assertSame('hero', $section->type);
-        $this->assertSame('Hero Section', $section->name);
-        $this->assertFalse($section->disabled);
-        $this->assertSame('Welcome', $section->settings->title);
-        $this->assertCount(0, $section->blocks);
-    }
+    expect($section->id)->toBe('hero-1');
+    expect($section->type)->toBe('hero');
+    expect($section->name)->toBe('Hero Section');
+    expect($section->disabled)->toBeFalse();
+    expect($section->settings->title)->toBe('Welcome');
+    expect($section->blocks)->toHaveCount(0);
+});
+test('construction with minimal data', function () {
+    $section = new Section([]);
 
-    public function test_construction_with_minimal_data(): void
-    {
-        $section = new Section([]);
+    expect($section->id)->toBe('');
+    expect($section->type)->toBe('');
+    expect($section->name)->toBe('');
+    expect($section->disabled)->toBeFalse();
+});
+test('disabled section', function () {
+    $section = new Section([
+        'id' => 'hero-1',
+        'type' => 'hero',
+        'disabled' => true,
+    ]);
 
-        $this->assertSame('', $section->id);
-        $this->assertSame('', $section->type);
-        $this->assertSame('', $section->name);
-        $this->assertFalse($section->disabled);
-    }
+    expect($section->disabled)->toBeTrue();
+});
+test('editor attributes empty when editor disabled', function () {
+    PageBuilder::disableEditor();
 
-    public function test_disabled_section(): void
-    {
-        $section = new Section([
-            'id' => 'hero-1',
-            'type' => 'hero',
-            'disabled' => true,
-        ]);
+    $section = new Section([
+        'id' => 'hero-1',
+        'type' => 'hero',
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $this->assertTrue($section->disabled);
-    }
+    expect($section->editorAttributes())->toBe('');
+});
+test('to array', function () {
+    $section = new Section([
+        'id' => 'hero-1',
+        'type' => 'hero',
+        'name' => 'Hero',
+        'settings' => new Settings(['title' => 'Hello'], ['title' => 'Default']),
+        'blocks' => new BlockCollection,
+    ]);
 
-    public function test_editor_attributes_empty_when_editor_disabled(): void
-    {
-        PageBuilder::disableEditor();
+    $array = $section->toArray();
 
-        $section = new Section([
-            'id' => 'hero-1',
-            'type' => 'hero',
-            'settings' => new Settings([], []),
-            'blocks' => new BlockCollection,
-        ]);
+    expect($array['id'])->toBe('hero-1');
+    expect($array['type'])->toBe('hero');
+    expect($array['name'])->toBe('Hero');
+    expect($array['disabled'])->toBeFalse();
+    expect($array['settings']['title'])->toBe('Hello');
+});
+test('json serialization', function () {
+    $section = new Section([
+        'id' => 'hero-1',
+        'type' => 'hero',
+        'name' => 'Hero',
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $this->assertSame('', $section->editorAttributes());
-    }
+    $json = json_encode($section);
+    $decoded = json_decode($json, true);
 
-    public function test_to_array(): void
-    {
-        $section = new Section([
-            'id' => 'hero-1',
-            'type' => 'hero',
-            'name' => 'Hero',
-            'settings' => new Settings(['title' => 'Hello'], ['title' => 'Default']),
-            'blocks' => new BlockCollection,
-        ]);
-
-        $array = $section->toArray();
-
-        $this->assertSame('hero-1', $array['id']);
-        $this->assertSame('hero', $array['type']);
-        $this->assertSame('Hero', $array['name']);
-        $this->assertFalse($array['disabled']);
-        $this->assertSame('Hello', $array['settings']['title']);
-    }
-
-    public function test_json_serialization(): void
-    {
-        $section = new Section([
-            'id' => 'hero-1',
-            'type' => 'hero',
-            'name' => 'Hero',
-            'settings' => new Settings([], []),
-            'blocks' => new BlockCollection,
-        ]);
-
-        $json = json_encode($section);
-        $decoded = json_decode($json, true);
-
-        $this->assertSame('hero-1', $decoded['id']);
-        $this->assertSame('hero', $decoded['type']);
-    }
-
-    protected function tearDown(): void
-    {
-        PageBuilder::disableEditor();
-        parent::tearDown();
-    }
-}
+    expect($decoded['id'])->toBe('hero-1');
+    expect($decoded['type'])->toBe('hero');
+});
+afterEach(function () {
+    PageBuilder::disableEditor();
+});

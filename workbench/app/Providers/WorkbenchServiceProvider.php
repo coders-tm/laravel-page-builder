@@ -2,9 +2,9 @@
 
 namespace Workbench\App\Providers;
 
+use Illuminate\Support\ServiceProvider;
 use PageBuilder\Facades\Theme;
 use PageBuilder\PageBuilder;
-use Illuminate\Support\ServiceProvider;
 use Workbench\App\Models\Page;
 
 class WorkbenchServiceProvider extends ServiceProvider

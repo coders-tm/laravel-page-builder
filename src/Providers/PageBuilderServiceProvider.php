@@ -2,6 +2,9 @@
 
 namespace PageBuilder\Providers;
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 use PageBuilder\Commands;
 use PageBuilder\Facades;
 use PageBuilder\Http\Middleware;
@@ -17,9 +20,6 @@ use PageBuilder\Services\ThemeSettings;
 use PageBuilder\Support;
 use PageBuilder\Support\TemplateVariableResolver;
 use PageBuilder\Support\WrapperParser;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
 
 class PageBuilderServiceProvider extends ServiceProvider
 {

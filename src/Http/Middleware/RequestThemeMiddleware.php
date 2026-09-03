@@ -3,8 +3,8 @@
 namespace PageBuilder\Http\Middleware;
 
 use Closure;
-use PageBuilder\Services\Theme;
 use Illuminate\Http\Request;
+use PageBuilder\Services\Theme;
 
 class RequestThemeMiddleware
 {

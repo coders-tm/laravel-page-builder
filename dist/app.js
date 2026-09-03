@@ -23643,8 +23643,8 @@ function gLe() {
 }
 const XT = h.memo(gLe), vLe = "1.4.0", hLe = "laravel-page-builder", bLe = vLe, yLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", _Le = "Dipak Sarkar", Px = "dipak@coderstm.com", wLe = "https://github.com/coders-tm/laravel-page-builder", SLe = "Source-Available Non-Commercial";
 function ZT({ isOpen: a, onClose: e }) {
-  return /* @__PURE__ */ y.jsx(Vf, { open: a, onOpenChange: (l) => !l && e(), children: /* @__PURE__ */ y.jsxs(Hc, { className: "mx-[15px] max-w-md gap-0 p-0 sm:mx-auto", children: [
-    /* @__PURE__ */ y.jsx(jc, { className: "px-6 pt-6 pb-0", children: /* @__PURE__ */ y.jsxs("div", { className: "flex items-center gap-3", children: [
+  return /* @__PURE__ */ y.jsx(Vf, { open: a, onOpenChange: (l) => !l && e(), children: /* @__PURE__ */ y.jsxs(Hc, { className: "w-[calc(100%-2rem)] max-w-md gap-0 rounded-xl p-0", children: [
+    /* @__PURE__ */ y.jsxs(jc, { className: "flex flex-col items-center px-6 pt-6 pb-0 text-center sm:text-center", children: [
       /* @__PURE__ */ y.jsx("div", { className: "flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl", children: /* @__PURE__ */ y.jsxs(
         "svg",
         {
@@ -23658,27 +23658,27 @@ function ZT({ isOpen: a, onClose: e }) {
             /* @__PURE__ */ y.jsx(
               "rect",
               {
-                x: "32",
-                y: "30",
-                width: "84",
-                height: "45",
-                rx: "4",
-                stroke: "#5C58E2",
-                "stroke-width": "4",
-                "stroke-dasharray": "15 7"
+                x: "32.5",
+                y: "30.5",
+                width: "114",
+                height: "44",
+                rx: "3.5",
+                stroke: "#78C355",
+                strokeWidth: "5",
+                strokeDasharray: "15 9"
               }
             ),
             /* @__PURE__ */ y.jsx(
               "rect",
               {
-                x: "32",
-                y: "88",
-                width: "49",
-                height: "50",
-                rx: "4",
+                x: "32.5",
+                y: "88.5",
+                width: "48",
+                height: "49",
+                rx: "3.5",
                 stroke: "#C4C4C4",
-                "stroke-width": "4",
-                "stroke-dasharray": "15 7"
+                strokeWidth: "5",
+                strokeDasharray: "15 9"
               }
             ),
             /* @__PURE__ */ y.jsx(
@@ -23694,9 +23694,9 @@ function ZT({ isOpen: a, onClose: e }) {
                 d: "M147.173 139.249C151.308 137.481 153.375 136.597 153.989 135.365C154.521 134.296 154.511 133.037 153.962 131.976C153.329 130.754 151.247 129.903 147.085 128.202L131.353 121.77C127.841 120.334 126.085 119.616 124.85 119.96C123.776 120.26 122.891 121.023 122.437 122.042C121.915 123.213 122.368 125.055 123.272 128.74L127.28 145.061C128.393 149.594 128.949 151.86 130.088 152.667C131.076 153.366 132.341 153.544 133.483 153.146C134.801 152.686 135.963 150.662 138.287 146.615L140.004 143.625C140.374 142.981 140.559 142.659 140.797 142.384C141.009 142.141 141.251 141.926 141.517 141.744C141.818 141.539 142.159 141.393 142.842 141.101L147.173 139.249Z",
                 fill: "#5752D8",
                 stroke: "white",
-                "stroke-width": "3.74215",
-                "stroke-linecap": "round",
-                "stroke-linejoin": "round"
+                strokeWidth: "3.74215",
+                strokeLinecap: "round",
+                strokeLinejoin: "round"
               }
             ),
             /* @__PURE__ */ y.jsx("defs", { children: /* @__PURE__ */ y.jsxs(
@@ -23709,24 +23709,22 @@ function ZT({ isOpen: a, onClose: e }) {
                 y2: "142",
                 gradientUnits: "userSpaceOnUse",
                 children: [
-                  /* @__PURE__ */ y.jsx("stop", { "stop-color": "#7571F3" }),
-                  /* @__PURE__ */ y.jsx("stop", { offset: "1", "stop-color": "#5656DC" })
+                  /* @__PURE__ */ y.jsx("stop", { stopColor: "#7571F3" }),
+                  /* @__PURE__ */ y.jsx("stop", { offset: "1", stopColor: "#5656DC" })
                 ]
               }
             ) })
           ]
         }
       ) }),
-      /* @__PURE__ */ y.jsxs("div", { children: [
-        /* @__PURE__ */ y.jsx(Wc, { className: "text-lg font-semibold", children: "Laravel Page Builder" }),
-        /* @__PURE__ */ y.jsxs(BT, { className: "mt-0.5 text-xs text-gray-500", children: [
-          "Version ",
-          bLe
-        ] })
+      /* @__PURE__ */ y.jsx(Wc, { className: "mt-3 text-center text-lg font-semibold", children: "Laravel Page Builder" }),
+      /* @__PURE__ */ y.jsxs(BT, { className: "mt-0.5 text-center text-xs text-gray-500", children: [
+        "Version ",
+        bLe
       ] })
-    ] }) }),
+    ] }),
     /* @__PURE__ */ y.jsxs("div", { className: "px-6 py-5", children: [
-      /* @__PURE__ */ y.jsx("p", { className: "text-sm leading-relaxed text-gray-600", children: yLe }),
+      /* @__PURE__ */ y.jsx("p", { className: "text-center text-sm leading-relaxed text-gray-600", children: yLe }),
       /* @__PURE__ */ y.jsxs("div", { className: "mt-5 space-y-3", children: [
         /* @__PURE__ */ y.jsx(c0, { label: "Author", value: _Le }),
         /* @__PURE__ */ y.jsx(c0, { label: "Email", value: Px, href: `mailto:${Px}` }),
@@ -23734,23 +23732,20 @@ function ZT({ isOpen: a, onClose: e }) {
         /* @__PURE__ */ y.jsx(c0, { label: "Package", value: hLe })
       ] })
     ] }),
-    /* @__PURE__ */ y.jsxs("div", { className: "flex items-center justify-between border-t border-gray-100 px-6 py-3.5", children: [
-      /* @__PURE__ */ y.jsx("span", { className: "text-[11px] text-gray-400", children: "Built with Laravel & React" }),
-      /* @__PURE__ */ y.jsxs(
-        "a",
-        {
-          href: wLe,
-          target: "_blank",
-          rel: "noopener noreferrer",
-          className: "inline-flex items-center gap-1.5 rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-gray-800",
-          children: [
-            /* @__PURE__ */ y.jsx("svg", { width: "14", height: "14", viewBox: "0 0 24 24", fill: "currentColor", children: /* @__PURE__ */ y.jsx("path", { d: "M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" }) }),
-            "GitHub",
-            /* @__PURE__ */ y.jsx(rA, { className: "h-3 w-3 opacity-60" })
-          ]
-        }
-      )
-    ] })
+    /* @__PURE__ */ y.jsx("div", { className: "flex items-center justify-center border-t border-gray-100 px-6 py-3.5", children: /* @__PURE__ */ y.jsxs(
+      "a",
+      {
+        href: wLe,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        className: "inline-flex items-center gap-1.5 rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-gray-800",
+        children: [
+          /* @__PURE__ */ y.jsx("svg", { width: "14", height: "14", viewBox: "0 0 24 24", fill: "currentColor", children: /* @__PURE__ */ y.jsx("path", { d: "M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" }) }),
+          "GitHub",
+          /* @__PURE__ */ y.jsx(rA, { className: "h-3 w-3 opacity-60" })
+        ]
+      }
+    ) })
   ] }) });
 }
 function c0({ label: a, value: e, href: l }) {

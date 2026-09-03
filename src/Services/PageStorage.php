@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace PageBuilder\Services;
 
+use Illuminate\Support\Facades\File;
 use PageBuilder\PageBuilder;
 use PageBuilder\Support\PageData;
-use Illuminate\Support\Facades\File;
 
 /**
  * Handles loading and persisting page JSON data to disk.

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace PageBuilder\Services;
 
-use PageBuilder\Facades\Theme;
 use Illuminate\Support\Facades\File;
+use PageBuilder\Facades\Theme;
 
 /**
  * Loads JSON template files from the templates directory.

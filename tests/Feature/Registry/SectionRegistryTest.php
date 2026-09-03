@@ -2,92 +2,66 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature\Registry;
-
 use PageBuilder\Registry\SectionRegistry;
 use PageBuilder\Schema\SectionSchema;
-use PageBuilder\Tests\TestCase;
 
-class SectionRegistryTest extends TestCase
-{
-    private SectionRegistry $registry;
+beforeEach(function () {
+    $this->registry = $this->app->make(SectionRegistry::class);
+});
+test('auto discovers sections from path', function () {
+    // The sections path is already added via config in TestCase::defineEnvironment
+    expect($this->registry->has('hero'))->toBeTrue();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->registry = $this->app->make(SectionRegistry::class);
-    }
+    $entry = $this->registry->get('hero');
+    expect($entry)->toBeArray();
+    expect($entry)->toHaveKey('schema');
+    expect($entry['schema'])->toBeInstanceOf(SectionSchema::class);
+    expect($entry['schema']->name)->toBe('Hero');
+});
+test('types returns all registered types', function () {
+    $types = $this->registry->types();
+    expect($types)->toContain('hero');
+    expect($types)->toContain('footer');
+});
+test('has returns false for unregistered', function () {
+    expect($this->registry->has('nonexistent'))->toBeFalse();
+});
+test('get returns null for unregistered', function () {
+    expect($this->registry->get('nonexistent'))->toBeNull();
+});
+test('register manual schema', function () {
+    $schema = new SectionSchema([
+        'name' => 'Custom Section',
+        'settings' => [],
+    ]);
 
-    public function test_auto_discovers_sections_from_path(): void
-    {
-        // The sections path is already added via config in TestCase::defineEnvironment
+    $this->registry->register('custom', $schema);
 
-        $this->assertTrue($this->registry->has('hero'));
+    expect($this->registry->has('custom'))->toBeTrue();
+    $entry = $this->registry->get('custom');
+    expect($entry['schema']->name)->toBe('Custom Section');
+    expect($entry['view'])->toBe('sections.custom');
+});
+test('get all returns all entries', function () {
+    $all = $this->registry->get();
+    expect($all)->toBeArray();
+    expect($all)->toHaveKey('hero');
+    expect($all['hero']['schema'])->toBeInstanceOf(SectionSchema::class);
+});
+test('has returns false for invalid schema', function () {
+    expect($this->registry->has('non-schema-file-name'))->toBeFalse();
+});
+test('section with blocks and presets', function () {
+    $entry = $this->registry->get('content');
+    $schema = $entry['schema'];
 
-        $entry = $this->registry->get('hero');
-        $this->assertIsArray($entry);
-        $this->assertArrayHasKey('schema', $entry);
-        $this->assertInstanceOf(SectionSchema::class, $entry['schema']);
-        $this->assertSame('Hero', $entry['schema']->name);
-    }
+    expect($schema->name)->toBe('Content');
+    expect($schema->settings)->toHaveCount(0);
 
-    public function test_types_returns_all_registered_types(): void
-    {
-        $types = $this->registry->types();
-        $this->assertContains('hero', $types);
-        $this->assertContains('footer', $types);
-    }
-
-    public function test_has_returns_false_for_unregistered(): void
-    {
-        $this->assertFalse($this->registry->has('nonexistent'));
-    }
-
-    public function test_get_returns_null_for_unregistered(): void
-    {
-        $this->assertNull($this->registry->get('nonexistent'));
-    }
-
-    public function test_register_manual_schema(): void
-    {
-        $schema = new SectionSchema([
-            'name' => 'Custom Section',
-            'settings' => [],
-        ]);
-
-        $this->registry->register('custom', $schema);
-
-        $this->assertTrue($this->registry->has('custom'));
-        $entry = $this->registry->get('custom');
-        $this->assertSame('Custom Section', $entry['schema']->name);
-        $this->assertSame('sections.custom', $entry['view']);
-    }
-
-    public function test_get_all_returns_all_entries(): void
-    {
-        $all = $this->registry->get();
-        $this->assertIsArray($all);
-        $this->assertArrayHasKey('hero', $all);
-        $this->assertInstanceOf(SectionSchema::class, $all['hero']['schema']);
-    }
-
-    public function test_has_returns_false_for_invalid_schema(): void
-    {
-        $this->assertFalse($this->registry->has('non-schema-file-name'));
-    }
-
-    public function test_section_with_blocks_and_presets(): void
-    {
-        $entry = $this->registry->get('content');
-        $schema = $entry['schema'];
-
-        $this->assertSame('Content', $schema->name);
-        $this->assertCount(0, $schema->settings);
-        // Only entries with both 'type' and 'name' become BlockSchema objects in $blocks.
-        // The bare ['type' => '@theme'] entry goes into $allowedBlockTypes, not $blocks.
-        $this->assertCount(1, $schema->blocks);
-        $this->assertCount(1, $schema->allowedBlockTypes);
-        $this->assertCount(1, $schema->presets);
-        $this->assertFalse($schema->acceptsThemeBlocks());
-    }
-}
+    // Only entries with both 'type' and 'name' become BlockSchema objects in $blocks.
+    // The bare ['type' => '@theme'] entry goes into $allowedBlockTypes, not $blocks.
+    expect($schema->blocks)->toHaveCount(1);
+    expect($schema->allowedBlockTypes)->toHaveCount(1);
+    expect($schema->presets)->toHaveCount(1);
+    expect($schema->acceptsThemeBlocks())->toBeFalse();
+});

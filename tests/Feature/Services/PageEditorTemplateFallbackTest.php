@@ -2,119 +2,97 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature\Services;
-
-use PageBuilder\Facades\Page;
-use PageBuilder\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use PageBuilder\Facades\Page;
 
-class PageEditorTemplateFallbackTest extends TestCase
-{
-    use RefreshDatabase;
+const SLUG = 'editor-fallback-test';
+const TEMPLATE_NAME = 'fallback-test-template';
 
-    private const SLUG = 'editor-fallback-test';
+beforeEach(function () {
+    $templatesPath = config('pagebuilder.templates');
 
-    private const TEMPLATE_NAME = 'fallback-test-template';
+    // Create a template file
+    if (! File::isDirectory($templatesPath)) {
+        File::makeDirectory($templatesPath, 0755, true);
+    }
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $templatesPath = config('pagebuilder.templates');
-
-        // Create a template file
-        if (! File::isDirectory($templatesPath)) {
-            File::makeDirectory($templatesPath, 0755, true);
-        }
-
-        File::put($templatesPath.'/'.self::TEMPLATE_NAME.'.json', json_encode([
-            'sections' => [
-                'template-section' => [
-                    'type' => 'banner',
-                    'settings' => ['text' => 'Content from Template'],
-                ],
+    File::put($templatesPath.'/'.TEMPLATE_NAME.'.json', json_encode([
+        'sections' => [
+            'template-section' => [
+                'type' => 'banner',
+                'settings' => ['text' => 'Content from Template'],
             ],
-            'order' => ['template-section'],
-        ]));
-    }
+        ],
+        'order' => ['template-section'],
+    ]));
+});
+afterEach(function () {
+    $templatesPath = config('pagebuilder.templates');
+    $pagesPath = config('pagebuilder.pages');
 
-    protected function tearDown(): void
-    {
-        $templatesPath = config('pagebuilder.templates');
-        $pagesPath = config('pagebuilder.pages');
+    @unlink($templatesPath.'/'.TEMPLATE_NAME.'.json');
+    @unlink($pagesPath.'/'.SLUG.'.json');
 
-        @unlink($templatesPath.'/'.self::TEMPLATE_NAME.'.json');
-        @unlink($pagesPath.'/'.self::SLUG.'.json');
+});
+test('editor mode uses template content when json is missing', function () {
+    // Create a DB page record specifying our template
+    PageBuilder\Models\Page::create([
+        'title' => 'Test Page',
+        'slug' => SLUG,
+        'template' => TEMPLATE_NAME,
+        'is_active' => true,
+    ]);
 
-        parent::tearDown();
-    }
+    // Ensure no page JSON exists
+    $this->assertFileDoesNotExist(config('pagebuilder.pages').'/'.SLUG.'.json');
 
-    public function test_editor_mode_uses_template_content_when_json_is_missing(): void
-    {
-        // Create a DB page record specifying our template
-        \PageBuilder\Models\Page::create([
-            'title' => 'Test Page',
-            'slug' => self::SLUG,
-            'template' => self::TEMPLATE_NAME,
-            'is_active' => true,
-        ]);
+    // Render in editor mode via query param
+    $view = Page::render(SLUG, ['pb-editor' => '1']);
+    $data = $view->getData();
 
-        // Ensure no page JSON exists
-        $this->assertFileDoesNotExist(config('pagebuilder.pages').'/'.self::SLUG.'.json');
+    // Verify that __pb_content contains the template content
+    $this->assertStringContainsString('Content from Template', (string) $data['__pb_content']);
 
-        // Render in editor mode via query param
-        $view = Page::render(self::SLUG, ['pb-editor' => '1']);
-        $data = $view->getData();
+    // Verify that __pb_layout contains the template data
+    expect($data['__pb_layout']->isNotEmpty())->toBeTrue();
+    expect($data['__pb_layout']->sections())->toHaveKey('template-section');
+});
+test('editor json response includes template content when json is missing', function () {
+    // Create a DB page record specifying our template
+    PageBuilder\Models\Page::create([
+        'title' => 'Test Page',
+        'slug' => SLUG,
+        'template' => TEMPLATE_NAME,
+        'is_active' => true,
+    ]);
 
-        // Verify that __pb_content contains the template content
-        $this->assertStringContainsString('Content from Template', (string) $data['__pb_content']);
+    // Ensure no page JSON exists
+    $this->assertFileDoesNotExist(config('pagebuilder.pages').'/'.SLUG.'.json');
 
-        // Verify that __pb_layout contains the template data
-        $this->assertTrue($data['__pb_layout']->isNotEmpty());
-        $this->assertArrayHasKey('template-section', $data['__pb_layout']->sections());
-    }
+    // Request the page JSON
+    $response = $this->getJson('/pagebuilder/'.SLUG.'.json');
 
-    public function test_editor_json_response_includes_template_content_when_json_is_missing(): void
-    {
-        // Create a DB page record specifying our template
-        \PageBuilder\Models\Page::create([
-            'title' => 'Test Page',
-            'slug' => self::SLUG,
-            'template' => self::TEMPLATE_NAME,
-            'is_active' => true,
-        ]);
+    $response->assertStatus(200);
+    $response->assertJsonPath('sections.template-section.type', 'banner');
+    $response->assertJsonPath('sections.template-section.settings.text', 'Content from Template');
+    $response->assertJsonPath('order.0', 'template-section');
+});
+test('normal render uses template fallback when json is missing', function () {
+    // Create a DB page record specifying our template
+    PageBuilder\Models\Page::create([
+        'title' => 'Test Page',
+        'slug' => SLUG,
+        'template' => TEMPLATE_NAME,
+        'is_active' => true,
+    ]);
 
-        // Ensure no page JSON exists
-        $this->assertFileDoesNotExist(config('pagebuilder.pages').'/'.self::SLUG.'.json');
+    // Ensure no page JSON exists
+    $this->assertFileDoesNotExist(config('pagebuilder.pages').'/'.SLUG.'.json');
 
-        // Request the page JSON
-        $response = $this->getJson('/pagebuilder/'.self::SLUG.'.json');
+    // Render in normal mode
+    $view = Page::render(SLUG, []);
+    $data = $view->getData();
 
-        $response->assertStatus(200);
-        $response->assertJsonPath('sections.template-section.type', 'banner');
-        $response->assertJsonPath('sections.template-section.settings.text', 'Content from Template');
-        $response->assertJsonPath('order.0', 'template-section');
-    }
-
-    public function test_normal_render_uses_template_fallback_when_json_is_missing(): void
-    {
-        // Create a DB page record specifying our template
-        \PageBuilder\Models\Page::create([
-            'title' => 'Test Page',
-            'slug' => self::SLUG,
-            'template' => self::TEMPLATE_NAME,
-            'is_active' => true,
-        ]);
-
-        // Ensure no page JSON exists
-        $this->assertFileDoesNotExist(config('pagebuilder.pages').'/'.self::SLUG.'.json');
-
-        // Render in normal mode
-        $view = Page::render(self::SLUG, []);
-        $data = $view->getData();
-
-        // Verify that __pb_content contains the template content
-        $this->assertStringContainsString('Content from Template', (string) $data['__pb_content']);
-    }
-}
+    // Verify that __pb_content contains the template content
+    $this->assertStringContainsString('Content from Template', (string) $data['__pb_content']);
+});

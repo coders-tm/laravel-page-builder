@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace PageBuilder\Registry;
 
-use PageBuilder\Schema\SectionSchema;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
+use PageBuilder\Schema\SectionSchema;
 
 /**
  * Parses a layout Blade file for @sections('key') directives and builds a

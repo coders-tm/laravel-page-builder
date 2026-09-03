@@ -2,6 +2,11 @@
 
 namespace PageBuilder\Http\Controllers;
 
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\View as FacadesView;
 use PageBuilder\Facades\Page;
 use PageBuilder\PageBuilder;
 use PageBuilder\Registry\BlockRegistry;
@@ -11,11 +16,6 @@ use PageBuilder\Rendering\Renderer;
 use PageBuilder\Services\PageRenderer;
 use PageBuilder\Services\PageStorage;
 use PageBuilder\Services\ThemeSettings;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\View as FacadesView;
 
 class PageBuilderController extends Controller
 {

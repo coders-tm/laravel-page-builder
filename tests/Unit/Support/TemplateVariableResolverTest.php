@@ -2,173 +2,129 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Unit\Support;
-
 use PageBuilder\Support\TemplateVariableResolver;
-use PageBuilder\Tests\TestCase;
 
-class TemplateVariableResolverTest extends TestCase
-{
-    private TemplateVariableResolver $resolver;
+beforeEach(function () {
+    $this->resolver = new TemplateVariableResolver;
+});
+test('resolves page title', function () {
+    $page = makePage(['title' => 'My Page Title']);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->resolver = new TemplateVariableResolver;
-    }
+    $data = $this->resolver->resolve(['heading' => '{{ $page->title }}'], $page);
 
-    // ── Basic resolution ─────────────────────────────────────────────────────
+    expect($data['heading'])->toBe('My Page Title');
+});
+test('resolves without spaces', function () {
+    $page = makePage(['title' => 'Compact']);
 
-    public function test_resolves_page_title(): void
-    {
-        $page = $this->makePage(['title' => 'My Page Title']);
+    $data = $this->resolver->resolve(['heading' => '{{$page->title}}'], $page);
 
-        $data = $this->resolver->resolve(['heading' => '{{ $page->title }}'], $page);
+    expect($data['heading'])->toBe('Compact');
+});
+test('resolves multiple placeholders in one string', function () {
+    $page = makePage(['title' => 'Hello', 'meta_title' => 'World']);
 
-        $this->assertSame('My Page Title', $data['heading']);
-    }
+    $data = $this->resolver->resolve(
+        ['text' => '{{ $page->title }} – {{ $page->meta_title }}'],
+        $page,
+    );
 
-    public function test_resolves_without_spaces(): void
-    {
-        $page = $this->makePage(['title' => 'Compact']);
+    expect($data['text'])->toBe('Hello – World');
+});
+test('resolves multiple fields', function () {
+    $page = makePage([
+        'title' => 'My Title',
+        'meta_description' => 'My Description',
+    ]);
 
-        $data = $this->resolver->resolve(['heading' => '{{$page->title}}'], $page);
+    $data = $this->resolver->resolve([
+        'title' => '{{ $page->title }}',
+        'desc' => '{{ $page->meta_description }}',
+    ], $page);
 
-        $this->assertSame('Compact', $data['heading']);
-    }
+    expect($data['title'])->toBe('My Title');
+    expect($data['desc'])->toBe('My Description');
+});
+test('resolves in nested arrays', function () {
+    $page = makePage(['title' => 'Nested Title']);
 
-    public function test_resolves_multiple_placeholders_in_one_string(): void
-    {
-        $page = $this->makePage(['title' => 'Hello', 'meta_title' => 'World']);
-
-        $data = $this->resolver->resolve(
-            ['text' => '{{ $page->title }} – {{ $page->meta_title }}'],
-            $page,
-        );
-
-        $this->assertSame('Hello – World', $data['text']);
-    }
-
-    public function test_resolves_multiple_fields(): void
-    {
-        $page = $this->makePage([
-            'title' => 'My Title',
-            'meta_description' => 'My Description',
-        ]);
-
-        $data = $this->resolver->resolve([
-            'title' => '{{ $page->title }}',
-            'desc' => '{{ $page->meta_description }}',
-        ], $page);
-
-        $this->assertSame('My Title', $data['title']);
-        $this->assertSame('My Description', $data['desc']);
-    }
-
-    // ── Nested array resolution ───────────────────────────────────────────────
-
-    public function test_resolves_in_nested_arrays(): void
-    {
-        $page = $this->makePage(['title' => 'Nested Title']);
-
-        $data = $this->resolver->resolve([
-            'sections' => [
-                'hero' => [
-                    'settings' => [
-                        'heading' => '{{ $page->title }}',
-                    ],
+    $data = $this->resolver->resolve([
+        'sections' => [
+            'hero' => [
+                'settings' => [
+                    'heading' => '{{ $page->title }}',
                 ],
             ],
-        ], $page);
+        ],
+    ], $page);
 
-        $this->assertSame('Nested Title', $data['sections']['hero']['settings']['heading']);
-    }
+    expect($data['sections']['hero']['settings']['heading'])->toBe('Nested Title');
+});
+test('null page removes placeholders', function () {
+    $data = $this->resolver->resolve(['heading' => '{{ $page->title }}'], null);
 
-    // ── Null page ────────────────────────────────────────────────────────────
+    expect($data['heading'])->toBe('');
+});
+test('null page with surrounding text', function () {
+    $data = $this->resolver->resolve(['heading' => 'Hello {{ $page->title }}!'], null);
 
-    public function test_null_page_removes_placeholders(): void
+    expect($data['heading'])->toBe('Hello !');
+});
+test('ignores strings without placeholder', function () {
+    $page = makePage(['title' => 'Test']);
+
+    $data = $this->resolver->resolve(['heading' => 'Static value'], $page);
+
+    expect($data['heading'])->toBe('Static value');
+});
+test('ignores non page placeholders', function () {
+    $page = makePage(['title' => 'Test']);
+
+    $data = $this->resolver->resolve(['heading' => '{{ $other->title }}'], $page);
+
+    // Non-page placeholder is left as-is (not matched by the pattern)
+    expect($data['heading'])->toBe('{{ $other->title }}');
+});
+test('non string values are preserved', function () {
+    $page = makePage(['title' => 'Test']);
+
+    $data = $this->resolver->resolve([
+        'count' => 42,
+        'active' => true,
+        'items' => null,
+    ], $page);
+
+    expect($data['count'])->toBe(42);
+    expect($data['active'])->toBeTrue();
+    expect($data['items'])->toBeNull();
+});
+test('resolves to empty string for missing attribute', function () {
+    $page = makePage([]);
+
+    $data = $this->resolver->resolve(['heading' => '{{ $page->nonexistent_attr }}'], $page);
+
+    expect($data['heading'])->toBe('');
+});
+// ── Helpers ──────────────────────────────────────────────────────────────
+/**
+ * Build a simple object whose properties are accessible via $obj->key.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function makePage(array $attributes): object
+{
+    return new class($attributes)
     {
-        $data = $this->resolver->resolve(['heading' => '{{ $page->title }}'], null);
+        public function __construct(private array $attributes) {}
 
-        $this->assertSame('', $data['heading']);
-    }
-
-    public function test_null_page_with_surrounding_text(): void
-    {
-        $data = $this->resolver->resolve(['heading' => 'Hello {{ $page->title }}!'], null);
-
-        $this->assertSame('Hello !', $data['heading']);
-    }
-
-    // ── Non-matching strings ─────────────────────────────────────────────────
-
-    public function test_ignores_strings_without_placeholder(): void
-    {
-        $page = $this->makePage(['title' => 'Test']);
-
-        $data = $this->resolver->resolve(['heading' => 'Static value'], $page);
-
-        $this->assertSame('Static value', $data['heading']);
-    }
-
-    public function test_ignores_non_page_placeholders(): void
-    {
-        $page = $this->makePage(['title' => 'Test']);
-
-        $data = $this->resolver->resolve(['heading' => '{{ $other->title }}'], $page);
-
-        // Non-page placeholder is left as-is (not matched by the pattern)
-        $this->assertSame('{{ $other->title }}', $data['heading']);
-    }
-
-    public function test_non_string_values_are_preserved(): void
-    {
-        $page = $this->makePage(['title' => 'Test']);
-
-        $data = $this->resolver->resolve([
-            'count' => 42,
-            'active' => true,
-            'items' => null,
-        ], $page);
-
-        $this->assertSame(42, $data['count']);
-        $this->assertTrue($data['active']);
-        $this->assertNull($data['items']);
-    }
-
-    // ── Missing attribute ────────────────────────────────────────────────────
-
-    public function test_resolves_to_empty_string_for_missing_attribute(): void
-    {
-        $page = $this->makePage([]);
-
-        $data = $this->resolver->resolve(['heading' => '{{ $page->nonexistent_attr }}'], $page);
-
-        $this->assertSame('', $data['heading']);
-    }
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
-    /**
-     * Build a simple object whose properties are accessible via $obj->key.
-     *
-     * @param  array<string, mixed>  $attributes
-     */
-    private function makePage(array $attributes): object
-    {
-        return new class($attributes)
+        public function __get(string $name): mixed
         {
-            public function __construct(private array $attributes) {}
+            return $this->attributes[$name] ?? null;
+        }
 
-            public function __get(string $name): mixed
-            {
-                return $this->attributes[$name] ?? null;
-            }
-
-            public function __isset(string $name): bool
-            {
-                return isset($this->attributes[$name]);
-            }
-        };
-    }
+        public function __isset(string $name): bool
+        {
+            return isset($this->attributes[$name]);
+        }
+    };
 }

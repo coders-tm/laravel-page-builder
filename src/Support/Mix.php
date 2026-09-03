@@ -2,8 +2,8 @@
 
 namespace PageBuilder\Support;
 
-use PageBuilder\Services\Theme;
 use Illuminate\Support\HtmlString;
+use PageBuilder\Services\Theme;
 
 class Mix
 {

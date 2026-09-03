@@ -2,161 +2,108 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Unit\Support;
-
 use PageBuilder\Support\WrapperParser;
-use PageBuilder\Tests\TestCase;
 
-class WrapperParserTest extends TestCase
-{
-    private WrapperParser $parser;
+beforeEach(function () {
+    $this->parser = new WrapperParser;
+});
+test('parses tag only', function () {
+    $result = $this->parser->parse('div');
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->parser = new WrapperParser;
-    }
+    expect($result['tag'])->toBe('div');
+    expect($result['attributes'])->toBe([]);
+});
+test('parses main tag', function () {
+    $result = $this->parser->parse('main');
 
-    // ── parse() ──────────────────────────────────────────────────────────────
+    expect($result['tag'])->toBe('main');
+});
+test('parses section tag', function () {
+    $result = $this->parser->parse('section');
 
-    public function test_parses_tag_only(): void
-    {
-        $result = $this->parser->parse('div');
+    expect($result['tag'])->toBe('section');
+});
+test('falls back to div for disallowed tag', function () {
+    $result = $this->parser->parse('article#some-id');
 
-        $this->assertSame('div', $result['tag']);
-        $this->assertSame([], $result['attributes']);
-    }
+    expect($result['tag'])->toBe('div');
+    expect($result['attributes']['id'])->toBe('some-id');
+});
+test('parses id', function () {
+    $result = $this->parser->parse('div#main-content');
 
-    public function test_parses_main_tag(): void
-    {
-        $result = $this->parser->parse('main');
+    expect($result['tag'])->toBe('div');
+    expect($result['attributes']['id'])->toBe('main-content');
+});
+test('parses single class', function () {
+    $result = $this->parser->parse('div.container');
 
-        $this->assertSame('main', $result['tag']);
-    }
+    expect($result['attributes']['class'])->toBe('container');
+});
+test('parses multiple classes', function () {
+    $result = $this->parser->parse('div.container.fluid.mx-auto');
 
-    public function test_parses_section_tag(): void
-    {
-        $result = $this->parser->parse('section');
+    expect($result['attributes']['class'])->toBe('container fluid mx-auto');
+});
+test('parses id and class', function () {
+    $result = $this->parser->parse('div#div_id.div_class');
 
-        $this->assertSame('section', $result['tag']);
-    }
+    expect($result['attributes']['id'])->toBe('div_id');
+    expect($result['attributes']['class'])->toBe('div_class');
+});
+test('parses custom attribute', function () {
+    $result = $this->parser->parse('div[data-page=1]');
 
-    public function test_falls_back_to_div_for_disallowed_tag(): void
-    {
-        $result = $this->parser->parse('article#some-id');
+    expect($result['attributes']['data-page'])->toBe('1');
+});
+test('parses multiple attributes', function () {
+    $result = $this->parser->parse('div[attr-one=value1][attr-two=value2]');
 
-        $this->assertSame('div', $result['tag']);
-        $this->assertSame('some-id', $result['attributes']['id']);
-    }
+    expect($result['attributes']['attr-one'])->toBe('value1');
+    expect($result['attributes']['attr-two'])->toBe('value2');
+});
+test('parses full selector from spec example', function () {
+    // Example from the spec: div#div_id.div_class[attribute-one=value]
+    $result = $this->parser->parse('div#div_id.div_class[attribute-one=value]');
 
-    public function test_parses_id(): void
-    {
-        $result = $this->parser->parse('div#main-content');
+    expect($result['tag'])->toBe('div');
+    expect($result['attributes']['id'])->toBe('div_id');
+    expect($result['attributes']['class'])->toBe('div_class');
+    expect($result['attributes']['attribute-one'])->toBe('value');
+});
+test('parses main with id', function () {
+    $result = $this->parser->parse('main#page-content');
 
-        $this->assertSame('div', $result['tag']);
-        $this->assertSame('main-content', $result['attributes']['id']);
-    }
+    expect($result['tag'])->toBe('main');
+    expect($result['attributes']['id'])->toBe('page-content');
+});
+test('render wraps content in div', function () {
+    $html = $this->parser->render('div', '<p>Hello</p>');
 
-    public function test_parses_single_class(): void
-    {
-        $result = $this->parser->parse('div.container');
+    expect($html)->toBe('<div><p>Hello</p></div>');
+});
+test('render with id and class', function () {
+    $html = $this->parser->render('div#div_id.div_class', 'content');
 
-        $this->assertSame('container', $result['attributes']['class']);
-    }
+    expect($html)->toBe('<div id="div_id" class="div_class">content</div>');
+});
+test('render with custom attribute', function () {
+    $html = $this->parser->render('div[attribute-one=value]', 'content');
 
-    public function test_parses_multiple_classes(): void
-    {
-        $result = $this->parser->parse('div.container.fluid.mx-auto');
+    expect($html)->toBe('<div attribute-one="value">content</div>');
+});
+test('render full spec example', function () {
+    $html = $this->parser->render('div#div_id.div_class[attribute-one=value]', '<!-- sections -->');
 
-        $this->assertSame('container fluid mx-auto', $result['attributes']['class']);
-    }
+    expect($html)->toBe('<div id="div_id" class="div_class" attribute-one="value"><!-- sections --></div>');
+});
+test('render main wrapper', function () {
+    $html = $this->parser->render('main#page-content.wrapper', '<section>x</section>');
 
-    public function test_parses_id_and_class(): void
-    {
-        $result = $this->parser->parse('div#div_id.div_class');
+    expect($html)->toBe('<main id="page-content" class="wrapper"><section>x</section></main>');
+});
+test('render escapes attribute values', function () {
+    $html = $this->parser->render('div#id<script>', 'content');
 
-        $this->assertSame('div_id', $result['attributes']['id']);
-        $this->assertSame('div_class', $result['attributes']['class']);
-    }
-
-    public function test_parses_custom_attribute(): void
-    {
-        $result = $this->parser->parse('div[data-page=1]');
-
-        $this->assertSame('1', $result['attributes']['data-page']);
-    }
-
-    public function test_parses_multiple_attributes(): void
-    {
-        $result = $this->parser->parse('div[attr-one=value1][attr-two=value2]');
-
-        $this->assertSame('value1', $result['attributes']['attr-one']);
-        $this->assertSame('value2', $result['attributes']['attr-two']);
-    }
-
-    public function test_parses_full_selector_from_spec_example(): void
-    {
-        // Example from the spec: div#div_id.div_class[attribute-one=value]
-        $result = $this->parser->parse('div#div_id.div_class[attribute-one=value]');
-
-        $this->assertSame('div', $result['tag']);
-        $this->assertSame('div_id', $result['attributes']['id']);
-        $this->assertSame('div_class', $result['attributes']['class']);
-        $this->assertSame('value', $result['attributes']['attribute-one']);
-    }
-
-    public function test_parses_main_with_id(): void
-    {
-        $result = $this->parser->parse('main#page-content');
-
-        $this->assertSame('main', $result['tag']);
-        $this->assertSame('page-content', $result['attributes']['id']);
-    }
-
-    // ── render() ─────────────────────────────────────────────────────────────
-
-    public function test_render_wraps_content_in_div(): void
-    {
-        $html = $this->parser->render('div', '<p>Hello</p>');
-
-        $this->assertSame('<div><p>Hello</p></div>', $html);
-    }
-
-    public function test_render_with_id_and_class(): void
-    {
-        $html = $this->parser->render('div#div_id.div_class', 'content');
-
-        $this->assertSame('<div id="div_id" class="div_class">content</div>', $html);
-    }
-
-    public function test_render_with_custom_attribute(): void
-    {
-        $html = $this->parser->render('div[attribute-one=value]', 'content');
-
-        $this->assertSame('<div attribute-one="value">content</div>', $html);
-    }
-
-    public function test_render_full_spec_example(): void
-    {
-        $html = $this->parser->render('div#div_id.div_class[attribute-one=value]', '<!-- sections -->');
-
-        $this->assertSame(
-            '<div id="div_id" class="div_class" attribute-one="value"><!-- sections --></div>',
-            $html,
-        );
-    }
-
-    public function test_render_main_wrapper(): void
-    {
-        $html = $this->parser->render('main#page-content.wrapper', '<section>x</section>');
-
-        $this->assertSame('<main id="page-content" class="wrapper"><section>x</section></main>', $html);
-    }
-
-    public function test_render_escapes_attribute_values(): void
-    {
-        $html = $this->parser->render('div#id<script>', 'content');
-
-        $this->assertStringNotContainsString('<script>', $html);
-    }
-}
+    $this->assertStringNotContainsString('<script>', $html);
+});

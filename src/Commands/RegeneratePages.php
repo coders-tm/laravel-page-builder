@@ -2,8 +2,8 @@
 
 namespace PageBuilder\Commands;
 
-use PageBuilder\Services\PageRegistry;
 use Illuminate\Console\Command;
+use PageBuilder\Services\PageRegistry;
 
 class RegeneratePages extends Command
 {

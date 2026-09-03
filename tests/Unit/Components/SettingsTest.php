@@ -1,182 +1,142 @@
 <?php
 
 declare(strict_types=1);
-
-namespace PageBuilder\Tests\Unit\Components;
-
 use PageBuilder\Components\Settings;
 use PageBuilder\Schema\SettingSchema;
-use PHPUnit\Framework\TestCase;
 
-class SettingsTest extends TestCase
-{
-    public function test_get_returns_value(): void
-    {
-        $settings = new Settings(
-            ['title' => 'Hello', 'color' => '#fff'],
-            []
-        );
+test('get returns value', function () {
+    $settings = new Settings(
+        ['title' => 'Hello', 'color' => '#fff'],
+        []
+    );
 
-        $this->assertSame('Hello', $settings->get('title'));
-        $this->assertSame('#fff', $settings->get('color'));
-    }
+    expect($settings->get('title'))->toBe('Hello');
+    expect($settings->get('color'))->toBe('#fff');
+});
+test('get falls back to default', function () {
+    $settings = new Settings(
+        [],
+        ['title' => 'Default Title']
+    );
 
-    public function test_get_falls_back_to_default(): void
-    {
-        $settings = new Settings(
-            [],
-            ['title' => 'Default Title']
-        );
+    expect($settings->get('title'))->toBe('Default Title');
+});
+test('get returns explicit fallback', function () {
+    $settings = new Settings([], []);
 
-        $this->assertSame('Default Title', $settings->get('title'));
-    }
+    expect($settings->get('missing', 'fallback'))->toBe('fallback');
+});
+test('has checks values and defaults', function () {
+    $settings = new Settings(
+        ['title' => 'Hello'],
+        ['subtitle' => 'Default']
+    );
 
-    public function test_get_returns_explicit_fallback(): void
-    {
-        $settings = new Settings([], []);
+    expect($settings->has('title'))->toBeTrue();
+    expect($settings->has('subtitle'))->toBeTrue();
+    expect($settings->has('nonexistent'))->toBeFalse();
+});
+test('all merges defaults with values', function () {
+    $settings = new Settings(
+        ['title' => 'Custom'],
+        ['title' => 'Default', 'subtitle' => 'Default Sub']
+    );
 
-        $this->assertSame('fallback', $settings->get('missing', 'fallback'));
-    }
+    $all = $settings->all();
+    expect($all['title'])->toBe('Custom');
+    expect($all['subtitle'])->toBe('Default Sub');
+});
+test('raw returns only explicit values', function () {
+    $settings = new Settings(
+        ['title' => 'Hello'],
+        ['title' => 'Default', 'subtitle' => 'Sub']
+    );
 
-    public function test_has_checks_values_and_defaults(): void
-    {
-        $settings = new Settings(
-            ['title' => 'Hello'],
-            ['subtitle' => 'Default']
-        );
+    $raw = $settings->raw();
+    expect($raw)->toBe(['title' => 'Hello']);
+});
+test('defaults returns only defaults', function () {
+    $settings = new Settings(
+        ['title' => 'Hello'],
+        ['title' => 'Default', 'subtitle' => 'Sub']
+    );
 
-        $this->assertTrue($settings->has('title'));
-        $this->assertTrue($settings->has('subtitle'));
-        $this->assertFalse($settings->has('nonexistent'));
-    }
+    $defaults = $settings->defaults();
+    expect($defaults)->toBe(['title' => 'Default', 'subtitle' => 'Sub']);
+});
+test('magic get', function () {
+    $settings = new Settings(['title' => 'Hello'], []);
 
-    public function test_all_merges_defaults_with_values(): void
-    {
-        $settings = new Settings(
-            ['title' => 'Custom'],
-            ['title' => 'Default', 'subtitle' => 'Default Sub']
-        );
+    expect($settings->title)->toBe('Hello');
+});
+test('magic isset', function () {
+    $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
 
-        $all = $settings->all();
-        $this->assertSame('Custom', $all['title']);
-        $this->assertSame('Default Sub', $all['subtitle']);
-    }
+    expect(isset($settings->title))->toBeTrue();
+    expect(isset($settings->color))->toBeTrue();
+    expect(isset($settings->missing))->toBeFalse();
+});
+test('invokable', function () {
+    $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
 
-    public function test_raw_returns_only_explicit_values(): void
-    {
-        $settings = new Settings(
-            ['title' => 'Hello'],
-            ['title' => 'Default', 'subtitle' => 'Sub']
-        );
+    expect($settings('title'))->toBe('Hello');
+    expect($settings('color'))->toBe('#000');
+    expect($settings('missing', 'fallback'))->toBe('fallback');
+});
+test('to string', function () {
+    $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
 
-        $raw = $settings->raw();
-        $this->assertSame(['title' => 'Hello'], $raw);
-    }
+    // Settings __toString returns empty string (not JSON — use toArray/jsonSerialize for that)
+    expect((string) $settings)->toBe('');
+});
+test('array access', function () {
+    $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
 
-    public function test_defaults_returns_only_defaults(): void
-    {
-        $settings = new Settings(
-            ['title' => 'Hello'],
-            ['title' => 'Default', 'subtitle' => 'Sub']
-        );
+    expect(isset($settings['title']))->toBeTrue();
+    expect($settings['title'])->toBe('Hello');
+    expect($settings['color'])->toBe('#000');
+});
+test('array access set mutates', function () {
+    $settings = new Settings([], []);
 
-        $defaults = $settings->defaults();
-        $this->assertSame(['title' => 'Default', 'subtitle' => 'Sub'], $defaults);
-    }
+    // Settings allows writes via ArrayAccess
+    $settings['title'] = 'value';
+    expect($settings['title'])->toBe('value');
+});
+test('array access unset removes value', function () {
+    $settings = new Settings(['title' => 'Hello'], []);
 
-    public function test_magic_get(): void
-    {
-        $settings = new Settings(['title' => 'Hello'], []);
+    // Settings allows unset via ArrayAccess
+    unset($settings['title']);
+    expect($settings->get('title'))->toBeNull();
+});
+test('to array', function () {
+    $settings = new Settings(
+        ['title' => 'Custom'],
+        ['title' => 'Default', 'subtitle' => 'Sub']
+    );
 
-        $this->assertSame('Hello', $settings->title);
-    }
+    $array = $settings->toArray();
+    expect($array['title'])->toBe('Custom');
+    expect($array['subtitle'])->toBe('Sub');
+});
+test('json serializable', function () {
+    $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
+    $json = json_encode($settings);
+    $decoded = json_decode($json, true);
 
-    public function test_magic_isset(): void
-    {
-        $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
+    expect($decoded['title'])->toBe('Hello');
+    expect($decoded['color'])->toBe('#000');
+});
+test('from schema', function () {
+    $schemas = [
+        new SettingSchema(['id' => 'title', 'type' => 'text', 'default' => 'Hello']),
+        new SettingSchema(['id' => 'color', 'type' => 'color', 'default' => '#000']),
+    ];
 
-        $this->assertTrue(isset($settings->title));
-        $this->assertTrue(isset($settings->color));
-        $this->assertFalse(isset($settings->missing));
-    }
+    $settings = Settings::fromSchema(['title' => 'Custom'], $schemas);
 
-    public function test_invokable(): void
-    {
-        $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
-
-        $this->assertSame('Hello', $settings('title'));
-        $this->assertSame('#000', $settings('color'));
-        $this->assertSame('fallback', $settings('missing', 'fallback'));
-    }
-
-    public function test_to_string(): void
-    {
-        $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
-
-        // Settings __toString returns empty string (not JSON — use toArray/jsonSerialize for that)
-        $this->assertSame('', (string) $settings);
-    }
-
-    public function test_array_access(): void
-    {
-        $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
-
-        $this->assertTrue(isset($settings['title']));
-        $this->assertSame('Hello', $settings['title']);
-        $this->assertSame('#000', $settings['color']);
-    }
-
-    public function test_array_access_set_mutates(): void
-    {
-        $settings = new Settings([], []);
-
-        // Settings allows writes via ArrayAccess
-        $settings['title'] = 'value';
-        $this->assertSame('value', $settings['title']);
-    }
-
-    public function test_array_access_unset_removes_value(): void
-    {
-        $settings = new Settings(['title' => 'Hello'], []);
-
-        // Settings allows unset via ArrayAccess
-        unset($settings['title']);
-        $this->assertNull($settings->get('title'));
-    }
-
-    public function test_to_array(): void
-    {
-        $settings = new Settings(
-            ['title' => 'Custom'],
-            ['title' => 'Default', 'subtitle' => 'Sub']
-        );
-
-        $array = $settings->toArray();
-        $this->assertSame('Custom', $array['title']);
-        $this->assertSame('Sub', $array['subtitle']);
-    }
-
-    public function test_json_serializable(): void
-    {
-        $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
-        $json = json_encode($settings);
-        $decoded = json_decode($json, true);
-
-        $this->assertSame('Hello', $decoded['title']);
-        $this->assertSame('#000', $decoded['color']);
-    }
-
-    public function test_from_schema(): void
-    {
-        $schemas = [
-            new SettingSchema(['id' => 'title', 'type' => 'text', 'default' => 'Hello']),
-            new SettingSchema(['id' => 'color', 'type' => 'color', 'default' => '#000']),
-        ];
-
-        $settings = Settings::fromSchema(['title' => 'Custom'], $schemas);
-
-        $this->assertSame('Custom', $settings->get('title'));
-        $this->assertSame('#000', $settings->get('color'));
-        $this->assertSame(['title' => 'Hello', 'color' => '#000'], $settings->defaults());
-    }
-}
+    expect($settings->get('title'))->toBe('Custom');
+    expect($settings->get('color'))->toBe('#000');
+    expect($settings->defaults())->toBe(['title' => 'Hello', 'color' => '#000']);
+});

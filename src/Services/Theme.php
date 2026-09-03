@@ -2,11 +2,11 @@
 
 namespace PageBuilder\Services;
 
-use PageBuilder\Facades\Block;
-use PageBuilder\Facades\Section;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
+use PageBuilder\Facades\Block;
+use PageBuilder\Facades\Section;
 use Qirolab\Theme\Theme as Base;
 
 class Theme extends Base

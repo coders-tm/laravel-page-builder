@@ -2,149 +2,121 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature\Rendering;
-
 use PageBuilder\Collections\BlockCollection;
 use PageBuilder\Components\Block;
 use PageBuilder\Components\Section;
 use PageBuilder\Components\Settings;
 use PageBuilder\PageBuilder;
 use PageBuilder\Rendering\Renderer;
-use PageBuilder\Tests\TestCase;
 
-class RendererTest extends TestCase
-{
-    private Renderer $renderer;
+beforeEach(function () {
+    $this->renderer = $this->app->make(Renderer::class);
+});
+afterEach(function () {
+    PageBuilder::disableEditor();
+});
+test('hydrate section', function () {
+    $section = $this->renderer->hydrateSection('hero-1', [
+        'type' => 'hero',
+        'settings' => ['title' => 'Custom Title'],
+        'blocks' => [],
+    ]);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->renderer = $this->app->make(Renderer::class);
-    }
+    expect($section)->toBeInstanceOf(Section::class);
+    expect($section->id)->toBe('hero-1');
+    expect($section->type)->toBe('hero');
+    expect($section->name)->toBe('Hero');
+    expect($section->settings->title)->toBe('Custom Title');
 
-    protected function tearDown(): void
-    {
-        PageBuilder::disableEditor();
-        parent::tearDown();
-    }
-
-    public function test_hydrate_section(): void
-    {
-        $section = $this->renderer->hydrateSection('hero-1', [
-            'type' => 'hero',
-            'settings' => ['title' => 'Custom Title'],
-            'blocks' => [],
-        ]);
-
-        $this->assertInstanceOf(Section::class, $section);
-        $this->assertSame('hero-1', $section->id);
-        $this->assertSame('hero', $section->type);
-        $this->assertSame('Hero', $section->name);
-        $this->assertSame('Custom Title', $section->settings->title);
-        // Default should apply for non-provided settings
-        $this->assertSame('Hello World', $section->settings->subtitle);
-    }
-
-    public function test_hydrate_section_with_nested_blocks(): void
-    {
-        $section = $this->renderer->hydrateSection('content-1', [
-            'type' => 'content',
-            'settings' => [],
-            'blocks' => [
-                'row-1' => [
-                    'type' => 'row',
-                    'settings' => ['columns' => '3'],
-                    'blocks' => [],
-                ],
+    // Default should apply for non-provided settings
+    expect($section->settings->subtitle)->toBe('Hello World');
+});
+test('hydrate section with nested blocks', function () {
+    $section = $this->renderer->hydrateSection('content-1', [
+        'type' => 'content',
+        'settings' => [],
+        'blocks' => [
+            'row-1' => [
+                'type' => 'row',
+                'settings' => ['columns' => '3'],
+                'blocks' => [],
             ],
-            'order' => ['row-1'],
-        ]);
+        ],
+        'order' => ['row-1'],
+    ]);
 
-        $this->assertSame(1, $section->blocks->count());
-        $this->assertSame('row-1', $section->blocks->first()->id);
-        $this->assertSame('row', $section->blocks->first()->type);
-        $this->assertSame('3', $section->blocks->first()->settings->columns);
-    }
+    expect($section->blocks->count())->toBe(1);
+    expect($section->blocks->first()->id)->toBe('row-1');
+    expect($section->blocks->first()->type)->toBe('row');
+    expect($section->blocks->first()->settings->columns)->toBe('3');
+});
+test('hydrate section skips disabled blocks', function () {
+    $section = $this->renderer->hydrateSection('test-1', [
+        'type' => 'test',
+        'settings' => [],
+        'blocks' => [
+            'b1' => ['type' => 'text', 'settings' => [], 'disabled' => false],
+            'b2' => ['type' => 'text', 'settings' => [], 'disabled' => true],
+        ],
+        'order' => ['b1', 'b2'],
+    ]);
 
-    public function test_hydrate_section_skips_disabled_blocks(): void
-    {
-        $section = $this->renderer->hydrateSection('test-1', [
-            'type' => 'test',
-            'settings' => [],
-            'blocks' => [
-                'b1' => ['type' => 'text', 'settings' => [], 'disabled' => false],
-                'b2' => ['type' => 'text', 'settings' => [], 'disabled' => true],
-            ],
-            'order' => ['b1', 'b2'],
-        ]);
+    expect($section->blocks->count())->toBe(1);
+    expect($section->blocks->first()->id)->toBe('b1');
+});
+test('render section', function () {
+    $section = $this->renderer->hydrateSection('s1', [
+        'type' => 'simple',
+        'settings' => ['heading' => 'Test Heading'],
+    ]);
 
-        $this->assertSame(1, $section->blocks->count());
-        $this->assertSame('b1', $section->blocks->first()->id);
-    }
+    $html = $this->renderer->renderSection($section);
 
-    public function test_render_section(): void
-    {
-        $section = $this->renderer->hydrateSection('s1', [
-            'type' => 'simple',
-            'settings' => ['heading' => 'Test Heading'],
-        ]);
+    $this->assertStringContainsString('<h1>Test Heading</h1>', $html);
+    $this->assertStringContainsString('<section >', $html);
+});
+test('render section returns comment for unknown type', function () {
+    $section = new Section([
+        'id' => 's1',
+        'type' => 'unknown',
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $html = $this->renderer->renderSection($section);
+    $html = $this->renderer->renderSection($section);
 
-        $this->assertStringContainsString('<h1>Test Heading</h1>', $html);
-        $this->assertStringContainsString('<section >', $html);
-    }
+    $this->assertStringContainsString('not found', $html);
+});
+test('render block', function () {
+    $block = new Block([
+        'id' => 'b1',
+        'type' => 'text',
+        'settings' => new Settings(['content' => 'Hello World'], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-    public function test_render_section_returns_comment_for_unknown_type(): void
-    {
-        $section = new Section([
-            'id' => 's1',
-            'type' => 'unknown',
-            'settings' => new Settings([], []),
-            'blocks' => new BlockCollection,
-        ]);
+    $html = $this->renderer->renderBlock($block);
 
-        $html = $this->renderer->renderSection($section);
+    $this->assertStringContainsString('Hello World', $html);
+    $this->assertStringContainsString('text-block', $html);
+});
+test('render block returns comment for unknown view', function () {
+    $block = new Block([
+        'id' => 'b1',
+        'type' => 'nonexistent-block-type',
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
+    ]);
 
-        $this->assertStringContainsString('not found', $html);
-    }
+    $html = $this->renderer->renderBlock($block);
 
-    public function test_render_block(): void
-    {
-        $block = new Block([
-            'id' => 'b1',
-            'type' => 'text',
-            'settings' => new Settings(['content' => 'Hello World'], []),
-            'blocks' => new BlockCollection,
-        ]);
+    $this->assertStringContainsString('not found', $html);
+});
+test('render raw section', function () {
+    $html = $this->renderer->renderRawSection('raw-1', [
+        'type' => 'raw',
+        'settings' => ['text' => 'Preview Text'],
+    ]);
 
-        $html = $this->renderer->renderBlock($block);
-
-        $this->assertStringContainsString('Hello World', $html);
-        $this->assertStringContainsString('text-block', $html);
-    }
-
-    public function test_render_block_returns_comment_for_unknown_view(): void
-    {
-        $block = new Block([
-            'id' => 'b1',
-            'type' => 'nonexistent-block-type',
-            'settings' => new Settings([], []),
-            'blocks' => new BlockCollection,
-        ]);
-
-        $html = $this->renderer->renderBlock($block);
-
-        $this->assertStringContainsString('not found', $html);
-    }
-
-    public function test_render_raw_section(): void
-    {
-        $html = $this->renderer->renderRawSection('raw-1', [
-            'type' => 'raw',
-            'settings' => ['text' => 'Preview Text'],
-        ]);
-
-        $this->assertStringContainsString('Preview Text', $html);
-    }
-}
+    $this->assertStringContainsString('Preview Text', $html);
+});

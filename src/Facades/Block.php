@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace PageBuilder\Facades;
 
-use PageBuilder\Registry\BlockRegistry;
 use Illuminate\Support\Facades\Facade;
+use PageBuilder\Registry\BlockRegistry;
 
 /**
  * @method static void add(string|array $paths)

@@ -2,112 +2,90 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Feature\Services;
-
+use Illuminate\Support\Facades\Cache;
 use PageBuilder\PageBuilder;
 use PageBuilder\Services\PageRegistry;
-use PageBuilder\Tests\TestCase;
-use Illuminate\Support\Facades\Cache;
 
-class PageRegistryTest extends TestCase
-{
-    protected function tearDown(): void
-    {
-        // Reset static key so other tests are not affected.
-        PageBuilder::$pageCacheKey = 'pagebuilder.pages';
+afterEach(function () {
+    // Reset static key so other tests are not affected.
+    PageBuilder::$pageCacheKey = 'pagebuilder.pages';
 
-        parent::tearDown();
-    }
+});
+test('pages returns empty when no cache', function () {
+    $registry = $this->app->make(PageRegistry::class);
 
-    public function test_pages_returns_empty_when_no_cache(): void
-    {
-        $registry = $this->app->make(PageRegistry::class);
+    expect($registry->pages())->toBe([]);
+});
+test('pages loads from cache file', function () {
+    $registry = $this->app->make(PageRegistry::class);
+    $registry->put([
+        'about' => ['title' => 'About', 'slug' => 'about', 'path' => '/pages/about.json'],
+    ]);
 
-        $this->assertSame([], $registry->pages());
-    }
+    $pages = $registry->pages();
 
-    public function test_pages_loads_from_cache_file(): void
-    {
-        $registry = $this->app->make(PageRegistry::class);
-        $registry->put([
-            'about' => ['title' => 'About', 'slug' => 'about', 'path' => '/pages/about.json'],
-        ]);
+    expect($pages)->toHaveCount(1);
+    expect($pages)->toHaveKey('about');
+});
+test('page returns specific page', function () {
+    $registry = $this->app->make(PageRegistry::class);
+    $registry->put([
+        'about' => ['title' => 'About', 'slug' => 'about'],
+    ]);
 
-        $pages = $registry->pages();
+    $page = $registry->page('about');
+    expect($page)->toBeArray();
+    expect($page['title'])->toBe('About');
+});
+test('page returns null for missing slug', function () {
+    $registry = $this->app->make(PageRegistry::class);
 
-        $this->assertCount(1, $pages);
-        $this->assertArrayHasKey('about', $pages);
-    }
+    expect($registry->page('nonexistent'))->toBeNull();
+});
+test('load pages is cached', function () {
+    Cache::put(PageBuilder::$pageCacheKey, ['about' => ['title' => 'About']]);
 
-    public function test_page_returns_specific_page(): void
-    {
-        $registry = $this->app->make(PageRegistry::class);
-        $registry->put([
-            'about' => ['title' => 'About', 'slug' => 'about'],
-        ]);
+    $registry = $this->app->make(PageRegistry::class);
 
-        $page = $registry->page('about');
-        $this->assertIsArray($page);
-        $this->assertSame('About', $page['title']);
-    }
+    // Both calls return the same in-memory array
+    expect($registry->pages())->toBe($registry->pages());
+});
+test('custom cache key isolates registry from default', function () {
+    // Populate under the default key.
+    $default = $this->app->make(PageRegistry::class);
+    $default->put(['home' => ['title' => 'Default Home']]);
 
-    public function test_page_returns_null_for_missing_slug(): void
-    {
-        $registry = $this->app->make(PageRegistry::class);
+    // Switch to a tenant-specific key.
+    PageBuilder::$pageCacheKey = 'pagebuilder.pages.tenant-99';
 
-        $this->assertNull($registry->page('nonexistent'));
-    }
+    // New instance reads from the new key — must be empty.
+    $tenant = new PageRegistry;
 
-    public function test_load_pages_is_cached(): void
-    {
-        Cache::put(PageBuilder::$pageCacheKey, ['about' => ['title' => 'About']]);
+    expect($tenant->pages())->toBe([]);
 
-        $registry = $this->app->make(PageRegistry::class);
+    // Populate under the tenant key.
+    $tenant->put(['shop' => ['title' => 'Tenant Shop']]);
 
-        // Both calls return the same in-memory array
-        $this->assertSame($registry->pages(), $registry->pages());
-    }
+    // Switch back to the default key and verify it is unchanged.
+    PageBuilder::$pageCacheKey = 'pagebuilder.pages';
+    $reloaded = new PageRegistry;
 
-    public function test_custom_cache_key_isolates_registry_from_default(): void
-    {
-        // Populate under the default key.
-        $default = $this->app->make(PageRegistry::class);
-        $default->put(['home' => ['title' => 'Default Home']]);
+    expect($reloaded->pages())->toHaveKey('home');
+    $this->assertArrayNotHasKey('shop', $reloaded->pages());
+});
+test('flush only clears current key', function () {
+    // Populate default.
+    $default = $this->app->make(PageRegistry::class);
+    $default->put(['home' => ['title' => 'Home']]);
 
-        // Switch to a tenant-specific key.
-        PageBuilder::$pageCacheKey = 'pagebuilder.pages.tenant-99';
+    // Populate tenant.
+    PageBuilder::$pageCacheKey = 'pagebuilder.pages.tenant-99';
+    $tenant = new PageRegistry;
+    $tenant->put(['shop' => ['title' => 'Shop']]);
 
-        // New instance reads from the new key — must be empty.
-        $tenant = new PageRegistry;
+    // Flush only the tenant key.
+    $tenant->flush();
 
-        $this->assertSame([], $tenant->pages());
-
-        // Populate under the tenant key.
-        $tenant->put(['shop' => ['title' => 'Tenant Shop']]);
-
-        // Switch back to the default key and verify it is unchanged.
-        PageBuilder::$pageCacheKey = 'pagebuilder.pages';
-        $reloaded = new PageRegistry;
-
-        $this->assertArrayHasKey('home', $reloaded->pages());
-        $this->assertArrayNotHasKey('shop', $reloaded->pages());
-    }
-
-    public function test_flush_only_clears_current_key(): void
-    {
-        // Populate default.
-        $default = $this->app->make(PageRegistry::class);
-        $default->put(['home' => ['title' => 'Home']]);
-
-        // Populate tenant.
-        PageBuilder::$pageCacheKey = 'pagebuilder.pages.tenant-99';
-        $tenant = new PageRegistry;
-        $tenant->put(['shop' => ['title' => 'Shop']]);
-
-        // Flush only the tenant key.
-        $tenant->flush();
-
-        $this->assertSame([], $tenant->pages());
-        $this->assertNotNull(Cache::get('pagebuilder.pages'));
-    }
-}
+    expect($tenant->pages())->toBe([]);
+    expect(Cache::get('pagebuilder.pages'))->not->toBeNull();
+});

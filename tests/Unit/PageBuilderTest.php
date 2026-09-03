@@ -2,137 +2,97 @@
 
 declare(strict_types=1);
 
-namespace PageBuilder\Tests\Unit;
-
-use PageBuilder\PageBuilder;
-use PageBuilder\Tests\TestCase;
 use Illuminate\Support\HtmlString;
+use PageBuilder\PageBuilder;
 
-class PageBuilderTest extends TestCase
-{
-    protected function tearDown(): void
-    {
-        PageBuilder::disableEditor();
-        parent::tearDown();
-    }
+afterEach(function () {
+    PageBuilder::disableEditor();
+});
+test('editor is disabled by default', function () {
+    expect(PageBuilder::editor())->toBeFalse();
+});
+test('enable editor', function () {
+    PageBuilder::enableEditor();
 
-    public function test_editor_is_disabled_by_default(): void
-    {
-        $this->assertFalse(PageBuilder::editor());
-    }
+    expect(PageBuilder::editor())->toBeTrue();
+});
+test('disable editor', function () {
+    PageBuilder::enableEditor();
+    PageBuilder::disableEditor();
 
-    public function test_enable_editor(): void
-    {
-        PageBuilder::enableEditor();
+    expect(PageBuilder::editor())->toBeFalse();
+});
+test('class returns string when editor enabled', function () {
+    PageBuilder::enableEditor();
 
-        $this->assertTrue(PageBuilder::editor());
-    }
+    $class = PageBuilder::class();
 
-    public function test_disable_editor(): void
-    {
-        PageBuilder::enableEditor();
-        PageBuilder::disableEditor();
+    expect($class)->toBeString();
+    expect($class)->not->toBeEmpty();
 
-        $this->assertFalse(PageBuilder::editor());
-    }
+    // Actual value is 'js pb-design-mode'
+    $this->assertStringContainsString('pb-design-mode', $class);
+});
+test('class returns empty when editor disabled', function () {
+    PageBuilder::disableEditor();
 
-    public function test_class_returns_string_when_editor_enabled(): void
-    {
-        PageBuilder::enableEditor();
+    expect(PageBuilder::class())->toBe('');
+});
+test('class attribute returns empty without classes when editor disabled', function () {
+    PageBuilder::disableEditor();
 
-        $class = PageBuilder::class();
+    expect(PageBuilder::classAttribute())->toBe('');
+});
+test('class attribute returns custom classes when editor disabled', function () {
+    PageBuilder::disableEditor();
 
-        $this->assertIsString($class);
-        $this->assertNotEmpty($class);
-        // Actual value is 'js pb-design-mode'
-        $this->assertStringContainsString('pb-design-mode', $class);
-    }
+    expect(PageBuilder::classAttribute('dark'))->toBe('class="dark"');
+});
+test('class attribute merges custom classes with editor classes', function () {
+    PageBuilder::enableEditor();
 
-    public function test_class_returns_empty_when_editor_disabled(): void
-    {
-        PageBuilder::disableEditor();
+    expect(PageBuilder::classAttribute('foo', 'bar'))->toBe('class="foo bar js pb-design-mode"');
+});
+test('css returns html string when editor enabled', function () {
+    PageBuilder::enableEditor();
 
-        $this->assertSame('', PageBuilder::class());
-    }
+    $css = PageBuilder::css();
 
-    public function test_class_attribute_returns_empty_without_classes_when_editor_disabled(): void
-    {
-        PageBuilder::disableEditor();
+    // css() returns HtmlString, not a plain string
+    expect($css)->toBeInstanceOf(HtmlString::class);
+});
+test('js returns html string when editor enabled', function () {
+    PageBuilder::enableEditor();
 
-        $this->assertSame('', PageBuilder::classAttribute());
-    }
+    $js = PageBuilder::js();
 
-    public function test_class_attribute_returns_custom_classes_when_editor_disabled(): void
-    {
-        PageBuilder::disableEditor();
+    // js() returns HtmlString, not a plain string
+    expect($js)->toBeInstanceOf(HtmlString::class);
+});
+test('css returns empty html string when editor disabled', function () {
+    PageBuilder::disableEditor();
 
-        $this->assertSame('class="dark"', PageBuilder::classAttribute('dark'));
-    }
+    $css = PageBuilder::css();
+    expect($css)->toBeInstanceOf(HtmlString::class);
+});
+test('js returns html string when editor disabled', function () {
+    PageBuilder::disableEditor();
 
-    public function test_class_attribute_merges_custom_classes_with_editor_classes(): void
-    {
-        PageBuilder::enableEditor();
+    // js() still returns HtmlString (possibly with Vite dev script in dev mode)
+    $js = PageBuilder::js();
+    expect($js)->toBeInstanceOf(HtmlString::class);
+});
+test('script variables returns array', function () {
+    $vars = PageBuilder::scriptVariables();
 
-        $this->assertSame(
-            'class="foo bar js pb-design-mode"',
-            PageBuilder::classAttribute('foo', 'bar'),
-        );
-    }
-
-    public function test_css_returns_html_string_when_editor_enabled(): void
-    {
-        PageBuilder::enableEditor();
-
-        $css = PageBuilder::css();
-
-        // css() returns HtmlString, not a plain string
-        $this->assertInstanceOf(HtmlString::class, $css);
-    }
-
-    public function test_js_returns_html_string_when_editor_enabled(): void
-    {
-        PageBuilder::enableEditor();
-
-        $js = PageBuilder::js();
-
-        // js() returns HtmlString, not a plain string
-        $this->assertInstanceOf(HtmlString::class, $js);
-    }
-
-    public function test_css_returns_empty_html_string_when_editor_disabled(): void
-    {
-        PageBuilder::disableEditor();
-
-        $css = PageBuilder::css();
-        $this->assertInstanceOf(HtmlString::class, $css);
-    }
-
-    public function test_js_returns_html_string_when_editor_disabled(): void
-    {
-        PageBuilder::disableEditor();
-
-        // js() still returns HtmlString (possibly with Vite dev script in dev mode)
-        $js = PageBuilder::js();
-        $this->assertInstanceOf(HtmlString::class, $js);
-    }
-
-    public function test_script_variables_returns_array(): void
-    {
-        $vars = PageBuilder::scriptVariables();
-
-        $this->assertIsArray($vars);
-    }
-
-    public function test_is_preserved_page(): void
-    {
-        $this->assertTrue(PageBuilder::isPreservedPage('home'));
-        $this->assertFalse(PageBuilder::isPreservedPage('custom-page'));
-        $this->assertFalse(PageBuilder::isPreservedPage(null));
-    }
-
-    public function test_is_preserved_page_case_insensitive(): void
-    {
-        $this->assertTrue(PageBuilder::isPreservedPage('HOME'));
-        $this->assertTrue(PageBuilder::isPreservedPage('Home'));
-    }
-}
+    expect($vars)->toBeArray();
+});
+test('is preserved page', function () {
+    expect(PageBuilder::isPreservedPage('home'))->toBeTrue();
+    expect(PageBuilder::isPreservedPage('custom-page'))->toBeFalse();
+    expect(PageBuilder::isPreservedPage(null))->toBeFalse();
+});
+test('is preserved page case insensitive', function () {
+    expect(PageBuilder::isPreservedPage('HOME'))->toBeTrue();
+    expect(PageBuilder::isPreservedPage('Home'))->toBeTrue();
+});

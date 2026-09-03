@@ -2,9 +2,9 @@
 
 namespace PageBuilder\Services;
 
+use Illuminate\Support\Facades\Cache;
 use PageBuilder\Facades\Page;
 use PageBuilder\PageBuilder;
-use Illuminate\Support\Facades\Cache;
 
 class PageRegistry
 {

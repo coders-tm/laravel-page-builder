@@ -2,9 +2,9 @@
 
 namespace PageBuilder\Commands;
 
-use PageBuilder\Services\Theme;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use PageBuilder\Services\Theme;
 
 class ThemeLink extends Command
 {

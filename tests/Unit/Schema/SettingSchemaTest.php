@@ -1,120 +1,100 @@
 <?php
 
 declare(strict_types=1);
-
-namespace PageBuilder\Tests\Unit\Schema;
-
 use PageBuilder\Schema\SettingSchema;
-use PHPUnit\Framework\TestCase;
 
-class SettingSchemaTest extends TestCase
-{
-    public function test_it_creates_from_array(): void
-    {
-        $schema = new SettingSchema([
-            'id' => 'title',
-            'type' => 'text',
-            'label' => 'Title',
-            'default' => 'Hello',
-        ]);
+test('it creates from array', function () {
+    $schema = new SettingSchema([
+        'id' => 'title',
+        'type' => 'text',
+        'label' => 'Title',
+        'default' => 'Hello',
+    ]);
 
-        $this->assertSame('title', $schema->id);
-        $this->assertSame('text', $schema->type);
-        $this->assertSame('Title', $schema->label);
-        $this->assertSame('Hello', $schema->default);
-    }
+    expect($schema->id)->toBe('title');
+    expect($schema->type)->toBe('text');
+    expect($schema->label)->toBe('Title');
+    expect($schema->default)->toBe('Hello');
+});
+test('it defaults type to text', function () {
+    $schema = new SettingSchema(['id' => 'name']);
 
-    public function test_it_defaults_type_to_text(): void
-    {
-        $schema = new SettingSchema(['id' => 'name']);
+    expect($schema->type)->toBe('text');
+});
+test('it handles missing optional fields', function () {
+    $schema = new SettingSchema([]);
 
-        $this->assertSame('text', $schema->type);
-    }
+    expect($schema->id)->toBeNull();
+    expect($schema->type)->toBe('text');
+    expect($schema->label)->toBeNull();
+    expect($schema->default)->toBeNull();
+    expect($schema->info)->toBeNull();
+    expect($schema->placeholder)->toBeNull();
+    expect($schema->content)->toBeNull();
+    expect($schema->options)->toBeNull();
+    expect($schema->min)->toBeNull();
+    expect($schema->max)->toBeNull();
+    expect($schema->step)->toBeNull();
+    expect($schema->unit)->toBeNull();
+});
+test('it parses range fields', function () {
+    $schema = new SettingSchema([
+        'id' => 'opacity',
+        'type' => 'range',
+        'min' => '0',
+        'max' => '100',
+        'step' => '5',
+        'unit' => '%',
+    ]);
 
-    public function test_it_handles_missing_optional_fields(): void
-    {
-        $schema = new SettingSchema([]);
+    expect($schema->min)->toBe(0);
+    expect($schema->max)->toBe(100);
+    expect($schema->step)->toBe(5);
+    expect($schema->unit)->toBe('%');
+});
+test('it parses select options', function () {
+    $options = [
+        ['label' => 'Small', 'value' => 'sm'],
+        ['label' => 'Large', 'value' => 'lg'],
+    ];
 
-        $this->assertNull($schema->id);
-        $this->assertSame('text', $schema->type);
-        $this->assertNull($schema->label);
-        $this->assertNull($schema->default);
-        $this->assertNull($schema->info);
-        $this->assertNull($schema->placeholder);
-        $this->assertNull($schema->content);
-        $this->assertNull($schema->options);
-        $this->assertNull($schema->min);
-        $this->assertNull($schema->max);
-        $this->assertNull($schema->step);
-        $this->assertNull($schema->unit);
-    }
+    $schema = new SettingSchema([
+        'id' => 'size',
+        'type' => 'select',
+        'options' => $options,
+    ]);
 
-    public function test_it_parses_range_fields(): void
-    {
-        $schema = new SettingSchema([
-            'id' => 'opacity',
-            'type' => 'range',
-            'min' => '0',
-            'max' => '100',
-            'step' => '5',
-            'unit' => '%',
-        ]);
+    expect($schema->options)->toBe($options);
+});
+test('to array excludes nulls', function () {
+    $schema = new SettingSchema([
+        'id' => 'title',
+        'type' => 'text',
+        'label' => 'Title',
+        'default' => 'Hello',
+    ]);
 
-        $this->assertSame(0, $schema->min);
-        $this->assertSame(100, $schema->max);
-        $this->assertSame(5, $schema->step);
-        $this->assertSame('%', $schema->unit);
-    }
+    $array = $schema->toArray();
 
-    public function test_it_parses_select_options(): void
-    {
-        $options = [
-            ['label' => 'Small', 'value' => 'sm'],
-            ['label' => 'Large', 'value' => 'lg'],
-        ];
+    expect($array)->toHaveKey('id');
+    expect($array)->toHaveKey('type');
+    expect($array)->toHaveKey('label');
+    expect($array)->toHaveKey('default');
+    $this->assertArrayNotHasKey('info', $array);
+    $this->assertArrayNotHasKey('placeholder', $array);
+    $this->assertArrayNotHasKey('min', $array);
+});
+test('json serialization', function () {
+    $schema = new SettingSchema([
+        'id' => 'bg',
+        'type' => 'color',
+        'default' => '#fff',
+    ]);
 
-        $schema = new SettingSchema([
-            'id' => 'size',
-            'type' => 'select',
-            'options' => $options,
-        ]);
+    $json = json_encode($schema);
+    $decoded = json_decode($json, true);
 
-        $this->assertSame($options, $schema->options);
-    }
-
-    public function test_to_array_excludes_nulls(): void
-    {
-        $schema = new SettingSchema([
-            'id' => 'title',
-            'type' => 'text',
-            'label' => 'Title',
-            'default' => 'Hello',
-        ]);
-
-        $array = $schema->toArray();
-
-        $this->assertArrayHasKey('id', $array);
-        $this->assertArrayHasKey('type', $array);
-        $this->assertArrayHasKey('label', $array);
-        $this->assertArrayHasKey('default', $array);
-        $this->assertArrayNotHasKey('info', $array);
-        $this->assertArrayNotHasKey('placeholder', $array);
-        $this->assertArrayNotHasKey('min', $array);
-    }
-
-    public function test_json_serialization(): void
-    {
-        $schema = new SettingSchema([
-            'id' => 'bg',
-            'type' => 'color',
-            'default' => '#fff',
-        ]);
-
-        $json = json_encode($schema);
-        $decoded = json_decode($json, true);
-
-        $this->assertSame('bg', $decoded['id']);
-        $this->assertSame('color', $decoded['type']);
-        $this->assertSame('#fff', $decoded['default']);
-    }
-}
+    expect($decoded['id'])->toBe('bg');
+    expect($decoded['type'])->toBe('color');
+    expect($decoded['default'])->toBe('#fff');
+});
