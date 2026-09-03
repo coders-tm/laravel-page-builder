@@ -13,7 +13,7 @@
     "blade",
     "json"
   ],
-  "homepage": "https://github.com/coderstm/laravel-page-builder",
+  "homepage": "https://github.com/coders-tm/laravel-page-builder",
   "license": "MIT",
   "authors": [
     {
@@ -24,8 +24,8 @@
     }
   ],
   "support": {
-    "issues": "https://github.com/coderstm/laravel-page-builder/issues",
-    "source": "https://github.com/coderstm/laravel-page-builder"
+    "issues": "https://github.com/coders-tm/laravel-page-builder/issues",
+    "source": "https://github.com/coders-tm/laravel-page-builder"
   },
   "require": {
     "php": "^8.2",

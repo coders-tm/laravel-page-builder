@@ -51,7 +51,7 @@
           "type": "hero-action",
           "settings": {
             "label": "View GitHub Repository",
-            "url": "https://github.com/coderstm/laravel-page-builder",
+            "url": "https://github.com/coders-tm/laravel-page-builder",
             "style": "secondary"
           },
           "blocks": {},
@@ -302,7 +302,7 @@
             "description": "Perfect for individual developers and open-source Laravel applications.",
             "is_popular": false,
             "button_label": "Install via Composer",
-            "button_url": "https://github.com/coderstm/laravel-page-builder",
+            "button_url": "https://github.com/coders-tm/laravel-page-builder",
             "features_list": "Full Blade @schema Engine\nMulti-Theme Shadowing\nJSON Page Storage\n13+ Schema Field Types\nZero Database Lock-in\nCommunity Discord Support"
           },
           "blocks": {},
@@ -412,9 +412,9 @@
         "description": "Install the package with Composer and enjoy pure Blade section composition.",
         "command_text": "composer require coderstm/laravel-page-builder",
         "button_label": "Read Documentation",
-        "button_url": "https://github.com/coderstm/laravel-page-builder",
+        "button_url": "https://github.com/coders-tm/laravel-page-builder",
         "secondary_label": "Star on GitHub ⭐",
-        "secondary_url": "https://github.com/coderstm/laravel-page-builder"
+        "secondary_url": "https://github.com/coders-tm/laravel-page-builder"
       },
       "blocks": {},
       "order": []
@@ -440,7 +440,7 @@
           "logo_text": "PageBuilder",
           "logo_badge": "v1.0",
           "sticky": true,
-          "github_url": "https://github.com/coderstm/laravel-page-builder",
+          "github_url": "https://github.com/coders-tm/laravel-page-builder",
           "cta_label": "Get Started",
           "cta_url": "#pricing"
         },
@@ -499,7 +499,7 @@
           "logo_image": "/statics/logo-dark.svg",
           "brand_name": "Laravel Page Builder",
           "brand_tagline": "A multi-theme, schema-driven page composition engine built specifically for Laravel.",
-          "github_url": "https://github.com/coderstm/laravel-page-builder"
+          "github_url": "https://github.com/coders-tm/laravel-page-builder"
         },
         "blocks": {
           "col_1": {
@@ -578,7 +578,7 @@
                 "type": "footer-link",
                 "settings": {
                   "label": "GitHub Repository",
-                  "url": "https://github.com/coderstm/laravel-page-builder",
+                  "url": "https://github.com/coders-tm/laravel-page-builder",
                   "target_blank": true
                 },
                 "blocks": {},
@@ -621,7 +621,7 @@
                 "type": "footer-link",
                 "settings": {
                   "label": "Community Discussions",
-                  "url": "https://github.com/coderstm/laravel-page-builder/discussions",
+                  "url": "https://github.com/coders-tm/laravel-page-builder/discussions",
                   "target_blank": true
                 },
                 "blocks": {},
@@ -631,7 +631,7 @@
                 "type": "footer-link",
                 "settings": {
                   "label": "Report an Issue",
-                  "url": "https://github.com/coderstm/laravel-page-builder/issues",
+                  "url": "https://github.com/coders-tm/laravel-page-builder/issues",
                   "target_blank": true
                 },
                 "blocks": {},

@@ -23,7 +23,7 @@
                 'title_highlight' => 'Laravel & Blade',
                 'subtitle' => 'A multi-theme, JSON-driven page builder. Define block schemas directly in your Blade views with zero extra database queries or Javascript bloat.',
             ],
-            'blocks' => [['type' => 'hero-badge-pill', 'settings' => ['text' => 'Blade Native', 'icon' => '🔥']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'JSON Driven', 'icon' => '📦']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'Zero Dependencies', 'icon' => '⚡']], ['type' => 'hero-action', 'settings' => ['label' => 'Explore Documentation', 'url' => '#features', 'style' => 'primary']], ['type' => 'hero-action', 'settings' => ['label' => 'View Github', 'url' => 'https://github.com/coderstm/laravel-page-builder', 'style' => 'secondary']]],
+            'blocks' => [['type' => 'hero-badge-pill', 'settings' => ['text' => 'Blade Native', 'icon' => '🔥']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'JSON Driven', 'icon' => '📦']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'Zero Dependencies', 'icon' => '⚡']], ['type' => 'hero-action', 'settings' => ['label' => 'Explore Documentation', 'url' => '#features', 'style' => 'primary']], ['type' => 'hero-action', 'settings' => ['label' => 'View Github', 'url' => 'https://github.com/coders-tm/laravel-page-builder', 'style' => 'secondary']]],
         ],
     ],
 ])

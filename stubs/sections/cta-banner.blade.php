@@ -6,9 +6,9 @@
         ['id' => 'description', 'type' => 'textarea', 'label' => 'Description', 'default' => 'Install via Composer and publish your first schema-driven section in less than 5 minutes.'],
         ['id' => 'command_text', 'type' => 'text', 'label' => 'Composer Command', 'default' => 'composer require coderstm/laravel-page-builder'],
         ['id' => 'button_label', 'type' => 'text', 'label' => 'Primary Button', 'default' => 'Read Documentation'],
-        ['id' => 'button_url', 'type' => 'url', 'label' => 'Primary URL', 'default' => 'https://github.com/coderstm/laravel-page-builder'],
+        ['id' => 'button_url', 'type' => 'url', 'label' => 'Primary URL', 'default' => 'https://github.com/coders-tm/laravel-page-builder'],
         ['id' => 'secondary_label', 'type' => 'text', 'label' => 'Secondary Button', 'default' => 'View Source on GitHub'],
-        ['id' => 'secondary_url', 'type' => 'url', 'label' => 'Secondary URL', 'default' => 'https://github.com/coderstm/laravel-page-builder'],
+        ['id' => 'secondary_url', 'type' => 'url', 'label' => 'Secondary URL', 'default' => 'https://github.com/coders-tm/laravel-page-builder'],
     ],
     'presets' => [
         [
@@ -19,25 +19,30 @@
                 'description' => 'Install the package with Composer and enjoy pure Blade section composition.',
                 'command_text' => 'composer require coderstm/laravel-page-builder',
                 'button_label' => 'Read Documentation',
-                'button_url' => 'https://github.com/coderstm/laravel-page-builder',
+                'button_url' => 'https://github.com/coders-tm/laravel-page-builder',
                 'secondary_label' => 'Star on GitHub ⭐',
-                'secondary_url' => 'https://github.com/coderstm/laravel-page-builder',
+                'secondary_url' => 'https://github.com/coders-tm/laravel-page-builder',
             ],
         ],
     ],
 ])
 
-<section {!! $section->editorAttributes() !!} class="relative py-20 lg:py-28 bg-slate-950 text-white overflow-hidden border-t border-slate-800">
+<section {!! $section->editorAttributes() !!}
+    class="relative py-20 lg:py-28 bg-slate-950 text-white overflow-hidden border-t border-slate-800">
     {{-- Background glowing circles --}}
     <div class="pointer-events-none absolute inset-0 overflow-hidden">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-red-600/20 to-indigo-600/20 blur-3xl"></div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-red-600/20 to-indigo-600/20 blur-3xl">
+        </div>
     </div>
 
     <div class="container relative mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-        <div class="rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-indigo-950/40 p-8 sm:p-12 lg:p-16 text-center shadow-2xl backdrop-blur-xl">
-            
+        <div
+            class="rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-indigo-950/40 p-8 sm:p-12 lg:p-16 text-center shadow-2xl backdrop-blur-xl">
+
             @if ($section->settings->badge)
-                <span class="inline-flex items-center rounded-full bg-indigo-500/10 border border-indigo-500/30 px-4 py-1 text-xs font-bold text-indigo-300 mb-6">
+                <span
+                    class="inline-flex items-center rounded-full bg-indigo-500/10 border border-indigo-500/30 px-4 py-1 text-xs font-bold text-indigo-300 mb-6">
                     {{ $section->settings->badge }}
                 </span>
             @endif
@@ -52,7 +57,8 @@
 
             {{-- Terminal Command Box --}}
             @if ($section->settings->command_text)
-                <div class="inline-flex items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-950/90 px-5 py-3 font-mono text-sm text-indigo-300 shadow-inner max-w-xl w-full mx-auto mb-8">
+                <div
+                    class="inline-flex items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-950/90 px-5 py-3 font-mono text-sm text-indigo-300 shadow-inner max-w-xl w-full mx-auto mb-8">
                     <span class="truncate">$ {{ $section->settings->command_text }}</span>
                     <span class="text-xs text-slate-400 font-sans shrink-0">📋 copy</span>
                 </div>

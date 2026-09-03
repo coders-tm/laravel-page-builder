@@ -1,10 +1,6 @@
 @schema([
     'name' => 'Pricing & Plans',
-    'settings' => [
-        ['id' => 'badge', 'type' => 'text', 'label' => 'Section Badge', 'default' => 'Flexible Licensing'],
-        ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Choose the Right Edition for Your Project'],
-        ['id' => 'subtitle', 'type' => 'textarea', 'label' => 'Subtitle', 'default' => 'From open-source side projects to high-scale enterprise applications.'],
-    ],
+    'settings' => [['id' => 'badge', 'type' => 'text', 'label' => 'Section Badge', 'default' => 'Flexible Licensing'], ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Choose the Right Edition for Your Project'], ['id' => 'subtitle', 'type' => 'textarea', 'label' => 'Subtitle', 'default' => 'From open-source side projects to high-scale enterprise applications.']],
     'blocks' => [
         [
             'type' => 'pricing-card',
@@ -41,7 +37,7 @@
                         'description' => 'Perfect for individual developers and open-source Laravel applications.',
                         'is_popular' => false,
                         'button_label' => 'Install via Composer',
-                        'button_url' => 'https://github.com/coderstm/laravel-page-builder',
+                        'button_url' => 'https://github.com/coders-tm/laravel-page-builder',
                         'features_list' => "Full Blade @schema Engine\nMulti-Theme Shadowing\nJSON Page Storage\n13+ Schema Field Types\nZero Database Lock-in\nCommunity Discord Support",
                     ],
                 ],
@@ -83,7 +79,8 @@
         {{-- Section Header --}}
         <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
             @if ($section->settings->badge)
-                <span class="inline-flex items-center rounded-full bg-red-500/10 border border-red-500/30 px-3.5 py-1 text-xs font-semibold text-red-400">
+                <span
+                    class="inline-flex items-center rounded-full bg-red-500/10 border border-red-500/30 px-3.5 py-1 text-xs font-semibold text-red-400">
                     {{ $section->settings->badge }}
                 </span>
             @endif
@@ -107,9 +104,11 @@
                                 : 'border border-gray-800 bg-gray-950/60';
                         @endphp
 
-                        <div {!! $block->editorAttributes() !!} class="relative flex flex-col justify-between rounded-2xl p-6 sm:p-8 {{ $cardClasses }}">
+                        <div {!! $block->editorAttributes() !!}
+                            class="relative flex flex-col justify-between rounded-2xl p-6 sm:p-8 {{ $cardClasses }}">
                             @if ($isPopular)
-                                <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-red-600 to-indigo-600 px-3.5 py-0.5 text-xs font-bold uppercase tracking-wider text-white shadow-md">
+                                <div
+                                    class="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-red-600 to-indigo-600 px-3.5 py-0.5 text-xs font-bold uppercase tracking-wider text-white shadow-md">
                                     {{ $block->settings->badge }}
                                 </div>
                             @endif
@@ -119,7 +118,8 @@
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="text-xl font-bold text-white">{{ $block->settings->name }}</h3>
                                     @if (!$isPopular && $block->settings->badge)
-                                        <span class="rounded-full bg-gray-800 px-2.5 py-0.5 text-xs font-medium text-gray-300">
+                                        <span
+                                            class="rounded-full bg-gray-800 px-2.5 py-0.5 text-xs font-medium text-gray-300">
                                             {{ $block->settings->badge }}
                                         </span>
                                     @endif
@@ -127,9 +127,11 @@
 
                                 {{-- Price --}}
                                 <div class="flex items-baseline gap-1 mb-3">
-                                    <span class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">{{ $block->settings->price }}</span>
+                                    <span
+                                        class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">{{ $block->settings->price }}</span>
                                     @if ($block->settings->period)
-                                        <span class="text-sm font-medium text-gray-400">/ {{ $block->settings->period }}</span>
+                                        <span class="text-sm font-medium text-gray-400">/
+                                            {{ $block->settings->period }}</span>
                                     @endif
                                 </div>
 
@@ -139,13 +141,17 @@
 
                                 {{-- Features List --}}
                                 @php
-                                    $features = array_filter(explode("\n", str_replace("\r", "", $block->settings->features_list)));
+                                    $features = array_filter(
+                                        explode("\n", str_replace("\r", '', $block->settings->features_list)),
+                                    );
                                 @endphp
                                 <ul class="space-y-3 border-t border-gray-800/80 pt-6 mb-8 text-sm">
                                     @foreach ($features as $feature)
                                         <li class="flex items-center gap-2.5 text-gray-300">
-                                            <svg class="h-5 w-5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                            <svg class="h-5 w-5 shrink-0 text-indigo-400" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M5 13l4 4L19 7" />
                                             </svg>
                                             <span>{{ trim($feature) }}</span>
                                         </li>
