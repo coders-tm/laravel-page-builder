@@ -64,7 +64,7 @@ function main(): void {
     runCommand("node generate-icons.mjs")
 
     console.log("\n[build] Step 3: Building package...")
-    runCommand("npm run build")
+    runCommand("npx vite build")
 
     console.log(`\n[build] Step 4: Committing build version message: build: v${newVersion}...`)
     runCommand("git add -A")
