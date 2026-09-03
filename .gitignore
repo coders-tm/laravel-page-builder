@@ -15,5 +15,6 @@ hot
 workbench/storage
 
 # Documentation build artifacts
-docs/.vitepress/dist
-docs/.vitepress/cache
+website/node_modules
+website/docs/.vitepress/dist
+website/docs/.vitepress/cache

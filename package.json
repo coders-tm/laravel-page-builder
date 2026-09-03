@@ -13,9 +13,9 @@
     "format": "prettier --write \"resources/js/**/*.{ts,tsx,css}\"",
     "format:check": "prettier --check \"resources/js/**/*.{ts,tsx,css}\"",
     "prepare": "simple-git-hooks",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:dev": "npm --prefix website run dev",
+    "docs:build": "npm --prefix website run build",
+    "docs:preview": "npm --prefix website run preview"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
@@ -79,11 +79,6 @@
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.69.0",
-    "vite": "^6.0.0",
-    "vitepress": "^1.6.4"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.59.0",
-    "lightningcss-linux-x64-gnu": "^1.31.1"
+    "vite": "^6.0.0"
   }
 }
