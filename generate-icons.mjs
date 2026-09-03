@@ -20,7 +20,7 @@ import { createRequire } from "module";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, "..");
+const root = __dirname;
 const outDir = path.join(
     root,
     "resources/js/components/settings/fields/icon-data"
@@ -137,7 +137,14 @@ function toTitleCase(str) {
 // 2. Material Design Icons
 // ─────────────────────────────────────────────────────────────────────────────
 (function generateMd() {
-    const mdBase = path.join(root, "node_modules/@material-design-icons/svg");
+    let mdBase;
+    try {
+        mdBase = path.dirname(
+            require.resolve("@material-design-icons/svg/package.json")
+        );
+    } catch {
+        mdBase = path.join(root, "node_modules/@material-design-icons/svg");
+    }
 
     if (!fs.existsSync(mdBase)) {
         console.warn(
