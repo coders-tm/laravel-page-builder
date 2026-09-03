@@ -7,7 +7,7 @@ export default defineConfig({
   base: "/laravel-page-builder/",
   ignoreDeadLinks: true,
 
-  head: [["link", { rel: "icon", type: "image/svg+xml", href: "/logo.svg" }]],
+  head: [["link", { rel: "icon", type: "image/png", href: "/favicon.png" }]],
 
   vite: {
     css: {
@@ -22,8 +22,12 @@ export default defineConfig({
   },
 
   themeConfig: {
-    logo: "/logo.svg",
-    siteTitle: "Laravel Page Builder",
+    logo: {
+      light: "/logo.svg",
+      dark: "/logo-dark.svg",
+      alt: "Laravel Page Builder",
+    },
+    siteTitle: false,
 
     nav: [
       { text: "Sponsor", link: "/sponsor" },
