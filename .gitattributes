@@ -10,6 +10,7 @@
 /.github export-ignore
 /scripts export-ignore
 /docs export-ignore
+/website export-ignore
 /tests export-ignore
 /workbench export-ignore
 .gitattributes export-ignore
