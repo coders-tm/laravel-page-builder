@@ -17,3 +17,4 @@ workbench/storage
 # Documentation build artifacts
 docs/.vitepress/dist
 docs/.vitepress/cache
+package-lock.json
