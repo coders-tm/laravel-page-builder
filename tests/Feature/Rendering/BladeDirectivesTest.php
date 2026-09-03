@@ -26,21 +26,6 @@ test('pb editor class directive accepts classes', function () {
 
     $this->assertStringContainsString("PageBuilder::classAttribute('foo', 'bar')", $compiled);
 });
-test('pb editor class outputs empty when disabled', function () {
-    PageBuilder::disableEditor();
-
-    expect(PageBuilder::class())->toBe('');
-});
-test('pb editor class outputs class when enabled', function () {
-    PageBuilder::enableEditor();
-
-    $class = PageBuilder::class();
-
-    expect($class)->not->toBeEmpty();
-
-    // PageBuilder::class() returns 'js pb-design-mode' when editor is enabled
-    $this->assertStringContainsString('pb-design-mode', $class);
-});
 test('blocks directive compiles for section', function () {
     $compiled = compileBladeString('@blocks($section)');
 

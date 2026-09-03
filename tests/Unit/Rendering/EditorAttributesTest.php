@@ -2,36 +2,13 @@
 
 declare(strict_types=1);
 
-use PageBuilder\Collections\BlockCollection;
-use PageBuilder\Components\Block;
-use PageBuilder\Components\Section;
-use PageBuilder\Components\Settings;
 use PageBuilder\PageBuilder;
 use PageBuilder\Rendering\EditorAttributes;
 
 afterEach(function () {
     PageBuilder::disableEditor();
 });
-function makeEditorSection(string $id = 'hero-1', string $type = 'hero'): Section
-{
-    return new Section([
-        'id' => $id,
-        'type' => $type,
-        'name' => 'Hero',
-        'settings' => new Settings(['title' => 'Hello'], []),
-        'blocks' => new BlockCollection,
-    ]);
-}
-function makeEditorBlock(string $id = 'block-1', string $type = 'row'): Block
-{
-    return new Block([
-        'id' => $id,
-        'type' => $type,
-        'name' => 'Row',
-        'settings' => new Settings([], []),
-        'blocks' => new BlockCollection,
-    ]);
-}
+
 test('for section returns empty when editor off', function () {
     PageBuilder::disableEditor();
 

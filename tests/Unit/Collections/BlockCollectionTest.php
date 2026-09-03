@@ -4,17 +4,7 @@ declare(strict_types=1);
 
 use PageBuilder\Collections\BlockCollection;
 use PageBuilder\Components\Block;
-use PageBuilder\Components\Settings;
 
-function makeBlock(string $id, string $type = 'block'): Block
-{
-    return new Block([
-        'id' => $id,
-        'type' => $type,
-        'settings' => new Settings([], []),
-        'blocks' => new BlockCollection,
-    ]);
-}
 test('empty collection', function () {
     $collection = new BlockCollection;
 

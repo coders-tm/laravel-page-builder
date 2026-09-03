@@ -2,21 +2,8 @@
 
 declare(strict_types=1);
 
-use PageBuilder\Collections\BlockCollection;
 use PageBuilder\Collections\SectionCollection;
-use PageBuilder\Components\Section;
-use PageBuilder\Components\Settings;
 
-function makeSection(string $id, string $type = 'section', bool $disabled = false): Section
-{
-    return new Section([
-        'id' => $id,
-        'type' => $type,
-        'disabled' => $disabled,
-        'settings' => new Settings([], []),
-        'blocks' => new BlockCollection,
-    ]);
-}
 test('empty collection', function () {
     $collection = new SectionCollection;
 
