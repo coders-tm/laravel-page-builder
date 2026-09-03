@@ -357,7 +357,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Per-page layouts — header and footer configurable per-page via the `layout` key in page JSON
 - Recursive block nesting — container blocks (rows, columns) can hold child blocks to any depth
 - Theme blocks — register global block types that any section can accept via `@theme` wildcard
-- 21+ field types: `text`, `textarea`, `richtext`, `inline_richtext`, `select`, `radio`, `checkbox`, `range`, `number`, `color`, `color_background`, `image_picker`, `url`, `video_url`, `icon_fa`, `icon_md`, `text_alignment`, `html`, `blade`, `header`, `paragraph`, `external`
+- 21+ field types: `text`, `textarea`, `richtext`, `inline_richtext`, `select`, `radio`, `checkbox`, `range`, `number`, `color`, `color_background`, `image_picker`, `url`, `icon_fa`, `icon_md`, `text_alignment`, `html`, `blade`, `header`, `paragraph`, `external`
 - Editor mode — `data-editor-*` attributes injected only when the editor is active
 - `@blocks()` directive — renders top-level section blocks or nested child blocks of a container block
 - `@sections()` directive — renders layout slot sections (header/footer) from the Blade layout file
@@ -367,7 +367,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SectionRegistry` and `BlockRegistry` with support for additional discovery paths via `Section::add()` / `Block::add()`
 - Manual schema registration via `Section::register()` / `Block::register()`
 - `PageRenderer` service — loads page JSON, renders all enabled sections in order
-- `PagePublisher` — compiles pages into static Blade files
 - `PageRegistry` — cached page manifest at `bootstrap/cache/pagebuilder_pages.php`
 - Custom asset provider system — swap the default Laravel disk for S3, Cloudflare R2, Cloudinary, or any custom backend
 - Multi-theme support via `qirolab/laravel-themer` integration

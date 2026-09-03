@@ -80,7 +80,7 @@ class InstallPageBuilder extends Command
     }
 
     /**
-     * Copy stub theme views (layouts, sections, blocks) into the host application.
+     * Copy stub theme views (layouts, sections, blocks, pages) into the host application.
      */
     private function scaffoldThemeViews(bool $force): void
     {
@@ -90,6 +90,7 @@ class InstallPageBuilder extends Command
             'layouts' => resource_path('views/layouts'),
             'sections' => resource_path('views/sections'),
             'blocks' => resource_path('views/blocks'),
+            'pages' => resource_path('views/pages'),
             'templates' => resource_path('views/templates'),
         ];
 

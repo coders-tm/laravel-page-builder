@@ -16,7 +16,10 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.3, 8.4]
-        laravel: [12]
+        laravel: [12, 13]
+        exclude:
+          - laravel: 13
+            php: 8.3
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
 

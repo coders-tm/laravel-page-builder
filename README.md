@@ -32,7 +32,7 @@ It includes a visual editor, layout system, reusable sections and multi-theme su
 ## Requirements
 
 - PHP 8.2+
-- Laravel 11.x or 12.x
+- Laravel 11.x, 12.x, or 13.x
 
 ## Installation
 
@@ -51,12 +51,11 @@ php artisan pagebuilder:install
 This single command:
 
 1. Publishes `config/pagebuilder.php`
-2. Publishes database migrations
-3. Publishes the compiled editor frontend assets to `public/pagebuilder/`
-4. Scaffolds default starter views into your app:
+2. Scaffolds default starter views into your app:
    - `resources/views/layouts/page.blade.php` — base HTML layout
-   - `resources/views/sections/` — announcement, header, hero, rich-text, content, footer
+   - `resources/views/sections/` — announcement, header, hero, rich-text, content, page-content, footer
    - `resources/views/blocks/` — row, column, text
+   - `resources/views/templates/` — page.json
 
 **Options**
 
@@ -72,8 +71,16 @@ php artisan pagebuilder:install --force --migrate
 
 ### Run migrations (if not using `--migrate`)
 
+The package auto-loads its migrations, so you only need to run:
+
 ```bash
 php artisan migrate
+```
+
+If you need to customize the migration file, publish it first:
+
+```bash
+php artisan vendor:publish --tag=pagebuilder-migrations
 ```
 
 ### Configuration reference
@@ -115,6 +122,22 @@ return [
 
     // Reserved slugs that cannot be used for dynamic pages
     'preserved_pages' => ['home', 'admin', 'user', 'api', 'storage', 'uploads', 'files', 'vendor'],
+
+    // Global theme settings schema (editable from the editor)
+    'theme_settings_schema' => [
+        [
+            'name' => 'Colors',
+            'settings' => [
+                [
+                    'key'     => 'colors.primary',
+                    'label'   => 'Primary',
+                    'type'    => 'color',
+                    'default' => '#10b981',
+                    'css_var' => '--colors-primary',
+                ],
+            ],
+        ],
+    ],
 
     // Path to the JSON file storing theme setting values
     'theme_settings_path' => resource_path('settings.json'),
@@ -619,7 +642,6 @@ The `@schema` settings array supports these built-in types:
 | `color_background` | CSS background (gradients)       | —                           |
 | `image_picker`     | Media library selector           | —                           |
 | `url`              | Link/URL input                   | —                           |
-| `video_url`        | YouTube/Vimeo URL                | —                           |
 | `icon_fa`          | FontAwesome icon picker          | —                           |
 | `icon_md`          | Material Design icon picker      | —                           |
 | `text_alignment`   | Left/Center/Right segmented ctrl | —                           |
@@ -712,7 +734,7 @@ const myProvider = {
   async upload(file) {
     // Must return: { id, name, url, thumbnail, size, type }
   },
-};
+}
 ```
 
 The `url` field is what gets stored in page JSON and rendered in Blade — it must be a publicly accessible URL.
@@ -727,7 +749,7 @@ The `url` field is what gets stored in page JSON and rendered in Blade — it mu
     assets: {
       provider: myProvider,
     },
-  });
+  })
 </script>
 ```
 
@@ -738,28 +760,26 @@ Keep uploads server-side through a thin Laravel proxy controller that writes to 
 ```js
 const s3Provider = {
   async list({ page = 1, search = "" } = {}) {
-    const q = new URLSearchParams({ page, q: search });
-    const res = await fetch(`/api/pagebuilder/assets?${q}`);
-    if (!res.ok) throw new Error("Failed to fetch assets");
-    return res.json();
+    const q = new URLSearchParams({ page, q: search })
+    const res = await fetch(`/api/pagebuilder/assets?${q}`)
+    if (!res.ok) throw new Error("Failed to fetch assets")
+    return res.json()
   },
   async upload(file) {
-    const body = new FormData();
-    body.append("file", file);
+    const body = new FormData()
+    body.append("file", file)
     const res = await fetch("/api/pagebuilder/assets/upload", {
       method: "POST",
       headers: {
         "X-CSRF-TOKEN":
-          document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content") ?? "",
+          document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ?? "",
       },
       body,
-    });
-    if (!res.ok) throw new Error("Upload failed");
-    return res.json();
+    })
+    if (!res.ok) throw new Error("Upload failed")
+    return res.json()
   },
-};
+}
 ```
 
 For Spaces/R2, configure the S3-compatible endpoint in `.env` — no JS changes required:
@@ -776,10 +796,10 @@ AWS_USE_PATH_STYLE_ENDPOINT=true
 ```js
 const cloudinaryProvider = {
   async list({ page = 1, search = "" } = {}) {
-    const q = new URLSearchParams({ page, q: search });
-    const res = await fetch(`/api/pagebuilder/cloudinary/assets?${q}`);
-    if (!res.ok) throw new Error("Failed to fetch assets");
-    return res.json();
+    const q = new URLSearchParams({ page, q: search })
+    const res = await fetch(`/api/pagebuilder/cloudinary/assets?${q}`)
+    if (!res.ok) throw new Error("Failed to fetch assets")
+    return res.json()
   },
   async upload(file) {
     // Get a signed upload preset from your Laravel backend
@@ -788,42 +808,36 @@ const cloudinaryProvider = {
       headers: {
         "Content-Type": "application/json",
         "X-CSRF-TOKEN":
-          document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content") ?? "",
+          document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ?? "",
       },
       body: JSON.stringify({ filename: file.name }),
-    });
-    const { signature, timestamp, cloudName, apiKey, folder } =
-      await sigRes.json();
+    })
+    const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json()
 
-    const body = new FormData();
-    body.append("file", file);
-    body.append("api_key", apiKey);
-    body.append("timestamp", timestamp);
-    body.append("signature", signature);
-    body.append("folder", folder);
+    const body = new FormData()
+    body.append("file", file)
+    body.append("api_key", apiKey)
+    body.append("timestamp", timestamp)
+    body.append("signature", signature)
+    body.append("folder", folder)
 
-    const up = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-      { method: "POST", body },
-    );
-    if (!up.ok) throw new Error("Cloudinary upload failed");
-    const d = await up.json();
+    const up = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: "POST",
+      body,
+    })
+    if (!up.ok) throw new Error("Cloudinary upload failed")
+    const d = await up.json()
 
     return {
       id: d.public_id,
       name: d.original_filename,
       url: d.secure_url,
-      thumbnail: d.secure_url.replace(
-        "/upload/",
-        "/upload/w_200,h_200,c_fill/",
-      ),
+      thumbnail: d.secure_url.replace("/upload/", "/upload/w_200,h_200,c_fill/"),
       size: d.bytes,
       type: `${d.resource_type}/${d.format}`,
-    };
+    }
   },
-};
+}
 ```
 
 For the full provider contract and additional examples, see the [Developer Documentation](docs/index.md).
@@ -852,7 +866,6 @@ For the full provider contract and additional examples, see the [Developer Docum
 | `Renderer`        | Core rendering engine: hydrates JSON → objects, renders via Blade |
 | `PageRenderer`    | Loads page JSON, renders all enabled sections in order            |
 | `PageStorage`     | Reads/writes page JSON files to disk                              |
-| `PagePublisher`   | Compiles pages into static Blade files                            |
 | `PageBuilder`     | Static API for editor mode, CSS/JS asset URLs                     |
 
 ---

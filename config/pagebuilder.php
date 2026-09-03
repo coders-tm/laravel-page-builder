@@ -14,11 +14,11 @@ return [
 
     // Base URL path for the page builder routes (e.g., 'pagebuilder' or 'foo')
     // The editor will be accessible at /{prefix}/* and API endpoints at /{prefix}/*
-    'prefix' => 'pagebuilder',
+    'prefix' => env('PAGEBUILDER_PREFIX', 'pagebuilder'),
 
     // The prefix for the page builder public pages and editor.
     // If your pages are served at /foo/*, set this to 'foo'.
-    'basePath' => '/',
+    'basePath' => env('PAGEBUILDER_BASE_PATH', '/'),
 
     // Additional query parameters to preserve during editor navigation
     'preserved_params' => [],
@@ -57,9 +57,9 @@ return [
     |
     */
 
-    'disk' => 'public',
+    'disk' => env('PAGEBUILDER_DISK', 'public'),
 
-    'asset_directory' => 'pagebuilder',
+    'asset_directory' => env('PAGEBUILDER_ASSET_DIRECTORY', 'pagebuilder'),
 
     /*
     |--------------------------------------------------------------------------

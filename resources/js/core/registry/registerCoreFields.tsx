@@ -98,21 +98,6 @@ export function registerCoreFields() {
     </FieldWrapper>
   ))
 
-  FieldRegistry.register("video_url", ({ setting, value, onChange }: BaseFieldProps) => (
-    <FieldWrapper setting={setting}>
-      <TextField
-        setting={{
-          ...setting,
-          placeholder:
-            setting.placeholder || "https://www.youtube.com/watch?v=… or https://vimeo.com/…",
-        }}
-        value={value}
-        onChange={onChange}
-      />
-      {value && <p className="mt-1 text-[10px] text-gray-400">Supports YouTube and Vimeo URLs</p>}
-    </FieldWrapper>
-  ))
-
   // 4. Self-wrapping fields (no FieldWrapper needed)
   FieldRegistry.register("image_picker", ({ setting, value, onChange }: BaseFieldProps) => (
     <ImageField setting={setting} value={value} onChange={onChange} />

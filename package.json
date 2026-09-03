@@ -12,7 +12,10 @@
     "lint:fix": "eslint resources/js/ --fix",
     "format": "prettier --write \"resources/js/**/*.{ts,tsx,css}\"",
     "format:check": "prettier --check \"resources/js/**/*.{ts,tsx,css}\"",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
@@ -62,6 +65,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "@viteplus/versions": "^1.0.0",
     "autoprefixer": "^10.4.27",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
@@ -75,6 +79,7 @@
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.69.0",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "vitepress": "^1.6.4"
   }
 }

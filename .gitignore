@@ -13,3 +13,7 @@ composer.lock
 Thumbs.db
 hot
 workbench/storage
+
+# Documentation build artifacts
+docs/.vitepress/dist
+docs/.vitepress/cache
