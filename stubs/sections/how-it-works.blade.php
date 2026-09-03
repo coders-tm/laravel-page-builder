@@ -81,28 +81,49 @@
                 @foreach ($section->blocks as $block)
                     @if ($block->type === 'step-card')
                         <div {!! $block->editorAttributes() !!}
-                            class="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 relative">
+                            class="flex flex-col justify-between h-full rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 relative group hover:border-slate-700/80 transition-all duration-300 shadow-xl">
                             
                             {{-- Step Number & Title --}}
-                            <div>
+                            <div class="mb-6">
                                 <div class="flex items-center justify-between mb-4">
                                     <span class="text-3xl font-extrabold font-mono text-red-500/90">
                                         {{ $block->settings->step_number }}
                                     </span>
-                                    <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+                                    <span class="h-2.5 w-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/50"></span>
                                 </div>
                                 <h3 class="text-xl font-bold text-slate-100 mb-2">
                                     {{ $block->settings->title }}
                                 </h3>
-                                <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                                <p class="text-sm text-slate-400 leading-relaxed">
                                     {{ $block->settings->description }}
                                 </p>
                             </div>
 
-                            {{-- Code Snippet Preview --}}
+                            {{-- IDE Code Window UI --}}
                             @if ($block->settings->code_snippet)
-                                <div class="rounded-xl border border-slate-800 bg-slate-950 p-4 font-mono text-xs text-indigo-300 overflow-x-auto">
-                                    <pre><code>{!! e($block->settings->code_snippet) !!}</code></pre>
+                                <div class="mt-auto h-52 w-full flex flex-col rounded-xl border border-slate-800/90 bg-slate-950/90 shadow-inner overflow-hidden">
+                                    {{-- Window Header --}}
+                                    <div class="flex items-center justify-between border-b border-slate-800/80 bg-slate-900/60 px-3.5 py-2 shrink-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="h-2.5 w-2.5 rounded-full bg-red-500/80"></span>
+                                            <span class="h-2.5 w-2.5 rounded-full bg-yellow-500/80"></span>
+                                            <span class="h-2.5 w-2.5 rounded-full bg-green-500/80"></span>
+                                        </div>
+                                        <span class="text-[10px] font-mono text-slate-400 font-medium">
+                                            @if ($loop->index === 0)
+                                                hero.blade.php
+                                            @elseif ($loop->index === 1)
+                                                home.json
+                                            @else
+                                                PageController.php
+                                            @endif
+                                        </span>
+                                    </div>
+
+                                    {{-- Window Code Content --}}
+                                    <div class="p-4 flex-1 flex items-center font-mono text-[11px] sm:text-xs leading-relaxed text-indigo-300 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                        <pre class="m-0 p-0 font-mono text-[11px] sm:text-xs leading-relaxed text-slate-200 whitespace-pre w-full"><code>{!! e($block->settings->code_snippet) !!}</code></pre>
+                                    </div>
                                 </div>
                             @endif
                         </div>
