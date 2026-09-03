@@ -4,8 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'docs/**'
-      - '.github/workflows/docs.yml'
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+      - ".npmrc"
+      - "package.json"
+      - "package-lock.json"
 
   workflow_dispatch:
 
@@ -36,7 +39,14 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Setup FontAwesome Pro npm config
+        run: |
+          npm config set @fortawesome:registry https://npm.fontawesome.com/
+          npm config set //npm.fontawesome.com/:_authToken ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+
       - name: Install dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: npm ci
 
       - name: Build with VitePress
