@@ -6,28 +6,34 @@ title: Configuration
 
 Laravel Page Builder is configured through the `config/pagebuilder.php` file, published to your application during installation.
 
+```bash
+php artisan vendor:publish --tag=pagebuilder-config
+```
+
+---
+
+## Editor & Routing Configuration
+
 ### prefix
 
 - **Type:** `string`
-- **Default:** `'pagebuilder'`
+- **Default:** `env('PAGEBUILDER_PREFIX', 'pagebuilder')`
 
-Base URL path for the page builder routes.
+Base URL path for the page builder editor interface and internal API routes (e.g. `/pagebuilder`).
 
 ```php
-'prefix' => 'pagebuilder',   // Editor at /pagebuilder
-'prefix' => 'admin/builder', // Editor at /admin/builder
+'prefix' => env('PAGEBUILDER_PREFIX', 'pagebuilder'),
 ```
 
 ### basePath
 
 - **Type:** `string`
-- **Default:** `'/'`
+- **Default:** `env('PAGEBUILDER_BASE_PATH', '/')`
 
-The prefix for public pages and editor.
+The root URL prefix for dynamic public pages rendered by the page builder (e.g. `/home`, `/about`).
 
 ```php
-'basePath' => '/',    // Pages at /home, /about
-'basePath' => 'site', // Pages at /site/home, /site/about
+'basePath' => env('PAGEBUILDER_BASE_PATH', '/'),
 ```
 
 ### preserved_params
@@ -35,22 +41,28 @@ The prefix for public pages and editor.
 - **Type:** `array`
 - **Default:** `[]`
 
-Additional query parameters to preserve during editor navigation.
+Additional query parameters to preserve during editor navigation and frame reloads (e.g., `utm_source`, `ref`).
 
 ```php
-'preserved_params' => ['ref', 'utm_source', 'utm_medium'],
+'preserved_params' => [
+    // 'ref',
+    // 'utm_source',
+],
 ```
+
+---
+
+## Storage Paths
 
 ### pages
 
 - **Type:** `string`
 - **Default:** `resource_path('views/pages')`
 
-Path to page JSON data files.
+Path to the directory storing dynamic page JSON data files.
 
 ```php
 'pages' => resource_path('views/pages'),
-'pages' => storage_path('app/pagebuilder/pages'),
 ```
 
 ### sections
@@ -58,11 +70,10 @@ Path to page JSON data files.
 - **Type:** `string`
 - **Default:** `resource_path('views/sections')`
 
-Path to section Blade templates.
+Path to the directory storing section Blade templates (`.blade.php`).
 
 ```php
 'sections' => resource_path('views/sections'),
-'sections' => resource_path('views/pagebuilder/sections'),
 ```
 
 ### blocks
@@ -70,11 +81,10 @@ Path to section Blade templates.
 - **Type:** `string`
 - **Default:** `resource_path('views/blocks')`
 
-Path to theme block Blade templates.
+Path to the directory storing theme block Blade templates (`.blade.php`).
 
 ```php
 'blocks' => resource_path('views/blocks'),
-'blocks' => resource_path('views/pagebuilder/blocks'),
 ```
 
 ### templates
@@ -82,80 +92,101 @@ Path to theme block Blade templates.
 - **Type:** `string`
 - **Default:** `resource_path('views/templates')`
 
-Path to JSON template files.
+Path to the directory storing page layout JSON template files.
 
 ```php
 'templates' => resource_path('views/templates'),
-'templates' => resource_path('views/pagebuilder/templates'),
 ```
+
+---
+
+## Middleware & Security
 
 ### middleware
 
 - **Type:** `array`
 - **Default:** `['web']`
 
-Middleware applied to editor routes.
+Middleware pipeline applied to page builder editor and API routes. Add authentication middleware here to restrict builder access.
 
 ```php
-'middleware' => ['web'],                    // Public editor
-'middleware' => ['web', 'auth'],            // Authenticated users only
-'middleware' => ['web', 'auth', 'admin'],   // Admin users only
+'middleware' => [
+    'web',
+    // 'auth',
+],
 ```
+
+---
+
+## Asset Storage
 
 ### disk
 
 - **Type:** `string`
-- **Default:** `'public'`
+- **Default:** `env('PAGEBUILDER_DISK', 'public')`
 
-Filesystem disk for asset uploads.
+Filesystem disk (configured in `config/filesystems.php`) used for uploaded media and images.
 
 ```php
-'disk' => 'public',   // Local storage
-'disk' => 's3',       // AWS S3
-'disk' => 'r2',       // Cloudflare R2
+'disk' => env('PAGEBUILDER_DISK', 'public'),
 ```
 
 ### asset_directory
 
 - **Type:** `string`
-- **Default:** `'pagebuilder'`
+- **Default:** `env('PAGEBUILDER_ASSET_DIRECTORY', 'pagebuilder')`
 
-Directory within the disk for uploaded assets.
+Directory path within the selected storage disk where uploaded files are stored.
 
 ```php
-'asset_directory' => 'pagebuilder',
-'asset_directory' => 'uploads/pagebuilder',
+'asset_directory' => env('PAGEBUILDER_ASSET_DIRECTORY', 'pagebuilder'),
 ```
+
+---
+
+## Reserved Routes
 
 ### preserved_pages
 
 - **Type:** `array`
 - **Default:** `['home', 'admin', 'user', 'api', 'storage', 'uploads', 'files', 'vendor']`
 
-Reserved slugs that cannot be used for dynamic pages.
+Reserved URL slugs that cannot be assigned to dynamic pages created in the builder to prevent route collisions.
 
 ```php
-'preserved_pages' => ['home', 'admin', 'api'],
+'preserved_pages' => [
+    'home',
+    'admin',
+    'user',
+    'api',
+    'storage',
+    'uploads',
+    'files',
+    'vendor',
+],
 ```
+
+---
+
+## Theme Settings
 
 ### theme_settings_path
 
 - **Type:** `string`
 - **Default:** `resource_path('settings.json')`
 
-Path to the JSON file storing theme setting values.
+Path to the JSON file where global theme setting values are persisted.
 
 ```php
 'theme_settings_path' => resource_path('settings.json'),
-'theme_settings_path' => storage_path('app/pagebuilder/settings.json'),
 ```
 
 ### theme_settings_schema
 
 - **Type:** `array`
-- **Default:** _(colors, typography, and radius settings — see below)`
+- **Default:** Defined in `config/pagebuilder.php` (Colors, Typography, Radius & Shape)
 
-Schema definition for global theme settings editable from the editor. Each entry is a group with a name and an array of setting definitions.
+Schema definition for global design tokens editable via the builder side panel. Each item defines a group containing setting fields.
 
 ```php
 'theme_settings_schema' => [
@@ -166,6 +197,7 @@ Schema definition for global theme settings editable from the editor. Each entry
                 'key'     => 'colors.primary',
                 'label'   => 'Primary',
                 'type'    => 'color',
+                'mode'    => 'hsl',
                 'default' => 'hsl(168 94% 7%)',
                 'css_var' => '--color-primary',
             ],
@@ -178,7 +210,7 @@ Schema definition for global theme settings editable from the editor. Each entry
                 'key'     => 'fonts.body',
                 'label'   => 'Body font',
                 'type'    => 'google_font',
-                'default' => 'Inter, sans-serif',
+                'default' => 'Instrument Sans, Inter, sans-serif',
                 'css_var' => '--font-body',
             ],
         ],
@@ -186,30 +218,33 @@ Schema definition for global theme settings editable from the editor. Each entry
 ],
 ```
 
-**Setting fields:**
+**Setting Schema Fields:**
 
 | Field     | Required | Description                                                              |
 | --------- | -------- | ------------------------------------------------------------------------ |
-| `key`     | Yes      | Dot-notation key for storage (`colors.primary`)                          |
-| `type`    | Yes      | Field type: `color`, `text`, `select`, `google_font`                     |
-| `label`   | Yes      | Human-readable label shown in the editor panel                           |
-| `default` | Yes      | Fallback value when no override has been saved                           |
-| `css_var` | No       | CSS custom property updated live in the preview (e.g. `--color-primary`) |
+| `key`     | Yes      | Dot-notation key used for storage (e.g. `colors.primary`)                |
+| `label`   | Yes      | Field label displayed in the editor sidebar                              |
+| `type`    | Yes      | Field input type (`color`, `text`, `select`, `google_font`)              |
+| `mode`    | No       | Color format mode if type is `color` (e.g. `hsl`)                        |
+| `default` | Yes      | Fallback value when no custom value is saved                             |
+| `css_var` | No       | CSS variable updated dynamically in the preview (e.g. `--color-primary`) |
+
+---
 
 ## Environment Variables
 
-You can use environment variables to customize configuration per environment:
+The package configuration supports environment variable overrides for common settings:
 
-```env
+```ini
 PAGEBUILDER_PREFIX=pagebuilder
 PAGEBUILDER_BASE_PATH=/
 PAGEBUILDER_DISK=public
 PAGEBUILDER_ASSET_DIRECTORY=pagebuilder
 ```
 
-| Variable                      | Config Key        | Default       |
-| ----------------------------- | ----------------- | ------------- |
-| `PAGEBUILDER_PREFIX`          | `prefix`          | `pagebuilder` |
-| `PAGEBUILDER_BASE_PATH`       | `basePath`        | `/`           |
-| `PAGEBUILDER_DISK`            | `disk`            | `public`      |
-| `PAGEBUILDER_ASSET_DIRECTORY` | `asset_directory` | `pagebuilder` |
+| Variable                      | Config Key        | Default Value   | Description                            |
+| ----------------------------- | ----------------- | --------------- | -------------------------------------- |
+| `PAGEBUILDER_PREFIX`          | `prefix`          | `'pagebuilder'` | Editor and API URL route prefix        |
+| `PAGEBUILDER_BASE_PATH`       | `basePath`        | `'/'`           | Base URL path for dynamic public pages |
+| `PAGEBUILDER_DISK`            | `disk`            | `'public'`      | Storage disk for uploaded media assets |
+| `PAGEBUILDER_ASSET_DIRECTORY` | `asset_directory` | `'pagebuilder'` | Subfolder inside the disk for uploads  |
