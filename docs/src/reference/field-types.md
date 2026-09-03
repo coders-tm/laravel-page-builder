@@ -19,8 +19,6 @@ All input settings share these core attributes:
 | `info`        | string | Helper text displayed below the field.                  |
 | `placeholder` | string | Placeholder text (supported by most text inputs).       |
 
----
-
 ## Basic Input Settings
 
 ### `text`
@@ -91,8 +89,6 @@ Slider input. Requires `min`, `max`, and `step`.
   "unit": "px"
 }
 ```
-
----
 
 ## Specialized Input Settings
 
@@ -175,8 +171,6 @@ Material Design icon picker.
 }
 ```
 
----
-
 ## Content Settings
 
 ### `richtext`
@@ -241,8 +235,6 @@ Blade template code editor.
 }
 ```
 
----
-
 ## Layout Settings
 
 ### `header`
@@ -266,8 +258,6 @@ Sidebar informational text.
   "content": "This is a helper text."
 }
 ```
-
----
 
 ## Advanced Settings
 
@@ -296,8 +286,6 @@ Google Font selector.
   "default": "Inter"
 }
 ```
-
----
 
 ## Using Settings in Blade
 
@@ -351,8 +339,6 @@ Google Font selector.
     {!! $section->settings->content !!}
 </div>
 ```
-
----
 
 ## Tips
 

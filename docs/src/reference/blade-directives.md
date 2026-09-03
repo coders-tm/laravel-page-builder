@@ -37,8 +37,6 @@ Declares the schema for a section or block. This directive is a no-op at render 
 </section>
 ```
 
----
-
 ## @blocks
 
 Renders all blocks within a section or container block.
@@ -65,8 +63,6 @@ Renders all blocks within a section or container block.
 </div>
 ```
 
----
-
 ## @sections
 
 Renders layout zones (header, footer, etc.) from the page JSON data. This is a **custom page builder directive** — not standard Blade `@section`. It is self-closing.
@@ -89,8 +85,6 @@ Renders layout zones (header, footer, etc.) from the page JSON data. This is a *
 
 @sections('footer')
 ```
-
----
 
 ## @pbEditorClass
 
@@ -130,8 +124,6 @@ When editor is inactive:
 <html></html>
 ```
 
----
-
 ## @pbThemeFont
 
 Renders Google Font links for theme typography settings.
@@ -168,8 +160,6 @@ Renders Google Font links for theme typography settings.
 />
 ```
 
----
-
 ## Helper Functions
 
 ### pb_editor()
@@ -200,8 +190,6 @@ Returns Vite-processed URLs for theme assets.
 $url = theme_vite('resources/css/theme.css');
 $url = theme_vite('resources/js/theme.js');
 ```
-
----
 
 ## Component Variables
 
@@ -245,8 +233,6 @@ In layout Blade files, these variables are available:
 | `$page->meta_title`         | `string`   | SEO title              |
 | `$page->meta_description`   | `string`   | SEO description        |
 | `$page->editorAttributes()` | `string`   | Editor data attributes |
-
----
 
 ## Complete Example
 
@@ -305,8 +291,6 @@ In layout Blade files, these variables are available:
     {!! $block->settings->content !!}
 </div>
 ```
-
----
 
 ## Tips
 

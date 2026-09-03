@@ -1,6 +1,6 @@
 ---
-title: Sponsor Content & Table of Contents
-description: Table of contents for Laravel Page Builder sponsor-exclusive guides, SaaS architecture patterns, starter kits, and premium tutorials.
+title: Sponsor Content & Resources
+description: Sponsor-exclusive guides, SaaS architecture patterns, starter kits, and premium tutorials for Laravel Page Builder.
 ---
 
 # Sponsor Content & Resources
@@ -14,43 +14,35 @@ Support the development of Laravel Page Builder and unlock sponsor-exclusive res
 👉 **[Sponsor dipaksarkar on GitHub](https://github.com/sponsors/dipaksarkar)**
 :::
 
----
-
-## 📚 Table of Contents
-
-Here is the complete outline of premium guides, architecture recipes, and starter kits available to sponsors:
-
-### 1. SaaS Architecture & Multi-Tenancy
+## 1. SaaS Architecture & Multi-Tenancy
 
 - **Building a Page Builder SaaS**: Complete guide on integrating Laravel Page Builder into a Multi-Tenant SaaS platform.
 - **Database & Storage Strategies**: Single-database vs. multi-database tenant strategies for storing JSON page schemas.
 - **Dynamic Domain & Subdomain Routing**: Mapping custom domains and subdomains to tenant themes and pages.
 - **Subscription Tiering & Feature Flags**: Restricting section types, block types, and theme access based on user subscription plans.
 
-### 2. Advanced Theme System & Customization
+## 2. Advanced Theme System & Customization
 
 - **Multi-Theme Management**: Dynamic theme registration, fallback themes, and runtime theme switching.
 - **Custom Theme Marketplace**: Building a theme repository where users can install and switch themes on demand.
 - **Asset Pipeline & Compilation**: Best practices for compiling theme assets (Vite/Tailwind) without bloating the core application.
 
-### 3. Advanced Sections & Custom Components
+## 3. Advanced Sections & Custom Components
 
 - **Nested & Container Blocks**: Creating deep block hierarchies and dynamic layout grids.
 - **Custom Editor Field Types**: Extending the visual editor with custom input controls (Color pickers, Media library pickers, Rich Text editors).
 - **Interactive Component State**: Syncing Blade/Inertia state with page builder JSON schemas.
 
-### 4. High Performance & Enterprise Operations
+## 4. High Performance & Enterprise Operations
 
 - **Caching & Fragment Rendering**: Caching strategies for page JSON models, rendered HTML sections, and Redis cache invalidation.
 - **Static Site Generation (SSG)**: Pre-rendering Page Builder pages for ultra-fast CDN delivery.
 - **Role-Based Access Control (RBAC)**: Fine-grained permissions for editing specific sections, blocks, or theme settings.
 
-### 5. Pro Starter Kits & Repositories
+## 5. Pro Starter Kits & Repositories
 
 - **Laravel Page Builder SaaS Starter Kit**: A complete Laravel 11/12 repository featuring Multi-Tenancy, Stripe payments, User Management, and Page Builder.
 - **E-Commerce & Marketing Template Packs**: Pre-designed sections and blocks for landing pages, stores, and blogs.
-
----
 
 ## 🔑 How to Get Access
 

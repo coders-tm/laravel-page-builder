@@ -10,8 +10,6 @@ Laravel Page Builder is configured through the `config/pagebuilder.php` file, pu
 php artisan vendor:publish --tag=pagebuilder-config
 ```
 
----
-
 ## Editor & Routing Configuration
 
 ### prefix
@@ -49,8 +47,6 @@ Additional query parameters to preserve during editor navigation and frame reloa
     // 'utm_source',
 ],
 ```
-
----
 
 ## Storage Paths
 
@@ -98,8 +94,6 @@ Path to the directory storing page layout JSON template files.
 'templates' => resource_path('views/templates'),
 ```
 
----
-
 ## Middleware & Security
 
 ### middleware
@@ -115,8 +109,6 @@ Middleware pipeline applied to page builder editor and API routes. Add authentic
     // 'auth',
 ],
 ```
-
----
 
 ## Asset Storage
 
@@ -142,8 +134,6 @@ Directory path within the selected storage disk where uploaded files are stored.
 'asset_directory' => env('PAGEBUILDER_ASSET_DIRECTORY', 'pagebuilder'),
 ```
 
----
-
 ## Reserved Routes
 
 ### preserved_pages
@@ -165,8 +155,6 @@ Reserved URL slugs that cannot be assigned to dynamic pages created in the build
     'vendor',
 ],
 ```
-
----
 
 ## Theme Settings
 
@@ -228,8 +216,6 @@ Schema definition for global design tokens editable via the builder side panel. 
 | `mode`    | No       | Color format mode if type is `color` (e.g. `hsl`)                        |
 | `default` | Yes      | Fallback value when no custom value is saved                             |
 | `css_var` | No       | CSS variable updated dynamically in the preview (e.g. `--color-primary`) |
-
----
 
 ## Environment Variables
 
