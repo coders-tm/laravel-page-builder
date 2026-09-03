@@ -83,10 +83,10 @@ class InstallPageBuilder extends Command
 
         $targets = [
             'layouts' => resource_path('views/layouts'),
-            'sections' => resource_path('views/sections'),
-            'blocks' => resource_path('views/blocks'),
-            'pages' => resource_path('views/pages'),
-            'templates' => resource_path('views/templates'),
+            'sections' => config('pagebuilder.sections', resource_path('views/sections')),
+            'blocks' => config('pagebuilder.blocks', resource_path('views/blocks')),
+            'pages' => config('pagebuilder.pages', resource_path('views/pages')),
+            'templates' => config('pagebuilder.templates', resource_path('views/templates')),
         ];
 
         foreach ($targets as $dir => $destination) {
