@@ -44,11 +44,6 @@ class InstallPageBuilder extends Command
 
         $this->newLine();
         $this->components->info('Page Builder installed successfully.');
-        $this->newLine();
-        $this->line('  <fg=gray>Next steps:</>');
-        $this->line('  1. Review <fg=cyan>config/pagebuilder.php</> and update paths if needed.');
-        $this->line('  2. Run <fg=cyan>php artisan migrate</> if you have not already.');
-        $this->newLine();
 
         return self::SUCCESS;
     }
