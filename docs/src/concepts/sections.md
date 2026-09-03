@@ -109,7 +109,12 @@ use PageBuilder\Schema\SectionSchema;
 Section::register('custom-hero', new SectionSchema([
     'name' => 'Custom Hero',
     'settings' => [
-        ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Hello'],
+        [
+            'id' => 'title',
+            'type' => 'text',
+            'label' => 'Title',
+            'default' => 'Hello'
+        ],
     ],
 ]), 'my-views::sections.custom-hero');
 ```
@@ -177,16 +182,36 @@ Local blocks are defined directly inside a section's `@schema` `blocks` array. T
     'tag' => 'section',
     'class' => 'slideshow',
     'settings' => [
-        ['id' => 'title', 'type' => 'text', 'label' => 'Slideshow', 'default' => ''],
+        [
+            'id' => 'title',
+            'type' => 'text',
+            'label' => 'Slideshow',
+            'default' => ''
+        ],
     ],
     'blocks' => [
         [
             'type' => 'slide',
             'name' => 'Slide',
             'settings' => [
-                ['id' => 'image', 'type' => 'image_picker', 'label' => 'Image', 'default' => ''],
-                ['id' => 'title', 'type' => 'text', 'label' => 'Slide Title', 'default' => ''],
-                ['id' => 'link', 'type' => 'url', 'label' => 'Link', 'default' => '#'],
+                [
+                    'id' => 'image',
+                    'type' => 'image_picker',
+                    'label' => 'Image',
+                    'default' => ''
+                ],
+                [
+                    'id' => 'title',
+                    'type' => 'text',
+                    'label' => 'Slide Title',
+                    'default' => ''
+                ],
+                [
+                    'id' => 'link',
+                    'type' => 'url',
+                    'label' => 'Link',
+                    'default' => '#'
+                ],
             ],
         ],
     ],
@@ -225,9 +250,24 @@ Local blocks can also be **containers** with their own nested child blocks:
                     'type' => 'item',
                     'name' => 'Item',
                     'settings' => [
-                        ['id' => 'icon', 'type' => 'icon_fa', 'label' => 'Icon', 'default' => 'fas fa-circle-info'],
-                        ['id' => 'label', 'type' => 'text', 'label' => 'Label', 'default' => ''],
-                        ['id' => 'value', 'type' => 'richtext', 'label' => 'Value', 'default' => ''],
+                        [
+                            'id' => 'icon',
+                            'type' => 'icon_fa',
+                            'label' => 'Icon',
+                            'default' => 'fas fa-circle-info'
+                        ],
+                        [
+                            'id' => 'label',
+                            'type' => 'text',
+                            'label' => 'Label',
+                            'default' => ''
+                        ],
+                        [
+                            'id' => 'value',
+                            'type' => 'richtext',
+                            'label' => 'Value',
+                            'default' => ''
+                        ],
                     ],
                 ],
             ],

@@ -6,8 +6,33 @@ title: Architecture
 
 Laravel Page Builder follows a five-layer architecture. Dependencies flow **downward only**. Never import from a higher layer.
 
-```
-Schema → Registry → Components → Rendering → Services/Controllers
+```mermaid
+flowchart TD
+    subgraph Layer1["1. Schema Layer"]
+        direction LR
+        S1[SectionSchema] --- S2[BlockSchema] --- S3[SettingSchema]
+    end
+    subgraph Layer2["2. Registry Layer"]
+        direction LR
+        R1[SectionRegistry] --- R2[BlockRegistry] --- R3[SchemaExtractor]
+    end
+    subgraph Layer3["3. Components Layer"]
+        direction LR
+        C1[Section] --- C2[Block] --- C3[Settings]
+    end
+    subgraph Layer4["4. Rendering Layer"]
+        direction LR
+        RD1[Renderer] --- RD2[EditorAttributes] --- RD3[BladeDirectives]
+    end
+    subgraph Layer5["5. Services / Controllers Layer"]
+        direction LR
+        SV1[PageService] --- SV2[PageRenderer] --- SV3[PageStorage]
+    end
+
+    Layer1 -->|Discovers Schemas| Layer2
+    Layer2 -->|Hydrates JSON| Layer3
+    Layer3 -->|Blade Templates| Layer4
+    Layer4 -->|Page Delivery| Layer5
 ```
 
 ## The Five Layers
@@ -26,7 +51,12 @@ use PageBuilder\Schema\SectionSchema;
 $schema = new SectionSchema([
     'name' => 'Hero',
     'settings' => [
-        ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Welcome'],
+        [
+            'id' => 'title',
+            'type' => 'text',
+            'label' => 'Title',
+            'default' => 'Welcome'
+        ],
     ],
 ]);
 ```
@@ -106,26 +136,32 @@ $settings = Theme::settings();
 
 ### Page Rendering Flow
 
-1. **Request** — User visits `/`
-2. **Route** — `WebPageController` handles the request
-3. **Storage** — `PageStorage` loads `{slug}.json` from disk
-4. **Hydration** — `PageData::fromArray()` converts raw array to object
-5. **Registry** — For each section/block, look up schema in registry
-6. **Defaults** — Merge user settings with schema defaults
-7. **Components** — Create `Section` and `Block` objects
-8. **Rendering** — Render each section via Blade
-9. **Response** — Return rendered HTML
+1. **Resolution** — `Page::render($slug)` resolves page data via `PageService`, fetching stored JSON from `PageStorage` or template definitions from `TemplateStorage`.
+2. **Hydration** — `Renderer` hydrates the page JSON into runtime `Section` and `Block` instances, populating default setting values from registered schemas.
+3. **Execution** — `PageRenderer` iterates through active sections in order, executing section Blade templates and expanding nested `@blocks` directives.
+4. **Output** — Section HTML is compiled into the active master layout for delivery.
+
+```mermaid
+flowchart LR
+    Request["Request / Page::render($slug)"] --> Resolve["PageService<br/>(Resolve Page JSON)"]
+    Resolve --> Hydrate["Renderer<br/>(Hydrate Components)"]
+    Hydrate --> Render["PageRenderer<br/>(Render Blade Templates)"]
+    Render --> Output["Master Layout<br/>(Final HTML Output)"]
+```
 
 ### Editor Flow
 
-1. **Request** — User visits `/?editor=true`
-2. **Auth** — Check editor authorization (middleware + callback)
-3. **Shell** — Render editor shell (React SPA)
-4. **API** — Frontend loads page JSON via API
-5. **Edit** — User modifies sections/blocks
-6. **Save** — Frontend sends JSON to API
-7. **Storage** — `PageStorage` writes JSON to disk
-8. **Preview** — Live preview updates in iframe
+1. **Shell Load** — Editor interface (React SPA) initializes and loads page metadata.
+2. **Data Fetch** — Frontend fetches registered schemas and current page JSON via API.
+3. **Live Preview** — Visual edits update component state and render live within an iframe preview shell.
+4. **Persistence** — Saving updates passes JSON to `PageStorage` for file/database persistence.
+
+```mermaid
+flowchart LR
+    SPA["Editor SPA"] -->|Fetch JSON & Schemas| API["Page API"]
+    SPA -->|Live State Updates| Preview["Iframe Preview"]
+    SPA -->|Save Changes| Storage["PageStorage"]
+```
 
 ## Key Classes
 

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use PageBuilder\Facades\Page;
+use PageBuilder\PageBuilder;
 use Workbench\App\Models\Page as ModelsPage;
 
 /**
@@ -200,4 +201,82 @@ test('page content section renders empty when page has no content', function () 
     $html = $response->getContent();
     $this->assertStringContainsString('pt-12', $html);
     expect($html)->toMatch('/<div[^>]*prose[^>]*>\s*<\/div>/');
+});
+
+test('returns custom blade view response for non-editor request when custom view exists', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'custom-blade',
+        'title' => 'Custom Blade Page',
+    ]);
+
+    Page::routes();
+
+    $response = $this->get('/custom-blade');
+
+    $response->assertOk();
+    $response->assertViewIs('pages.custom-blade');
+    $response->assertSee('Custom blade page body');
+});
+
+test('returns editor frame layout when editor=true parameter is present and authorized even if custom blade view exists', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'custom-blade',
+        'title' => 'Custom Blade Page',
+    ]);
+
+    Page::routes();
+
+    PageBuilder::auth(fn () => true);
+
+    $response = $this->get('/custom-blade?editor=true');
+
+    $response->assertOk();
+    $response->assertViewIs('pagebuilder::layout');
+});
+
+test('returns custom blade view response when editor=true parameter is present but unauthorized and custom view exists', function () {
+    ModelsPage::factory()->create([
+        'slug' => 'custom-blade',
+        'title' => 'Custom Blade Page',
+    ]);
+
+    Page::routes();
+
+    PageBuilder::auth(fn () => false);
+
+    $response = $this->get('/custom-blade?editor=true');
+
+    $response->assertOk();
+    $response->assertViewIs('pages.custom-blade');
+    $response->assertSee('Custom blade page body');
+});
+
+test('returns nested custom blade view response for nested slug when custom view exists', function () {
+    $viewDir = __DIR__.'/../../../../workbench/resources/views/pages/nested';
+    $viewPath = $viewDir.'/custom.blade.php';
+    @mkdir($viewDir, 0755, true);
+    file_put_contents($viewPath, '<div>Nested Custom Blade View</div>');
+
+    try {
+        ModelsPage::factory()->create([
+            'slug' => 'custom',
+            'parent' => 'nested',
+            'title' => 'Nested Custom Page',
+        ]);
+
+        Page::routes();
+
+        $response = $this->get('/nested/custom');
+
+        $response->assertOk();
+        $response->assertViewIs('pages.nested.custom');
+        $response->assertSee('Nested Custom Blade View');
+    } finally {
+        @unlink($viewPath);
+        @rmdir($viewDir);
+    }
+});
+
+afterEach(function () {
+    PageBuilder::$authCallback = null;
 });

@@ -28,8 +28,18 @@ Place block templates in the configured blocks directory (default: `resources/vi
 @schema([
     'name' => 'Text',
     'settings' => [
-        ['id' => 'content', 'type' => 'richtext', 'label' => 'Content', 'default' => ''],
-        ['id' => 'alignment', 'type' => 'text_alignment', 'label' => 'Alignment', 'default' => 'left'],
+        [
+            'id' => 'content',
+            'type' => 'richtext',
+            'label' => 'Content',
+            'default' => ''
+        ],
+        [
+            'id' => 'alignment',
+            'type' => 'text_alignment',
+            'label' => 'Alignment',
+            'default' => 'left'
+        ],
     ],
 ])
 
@@ -105,9 +115,24 @@ Detection rule: an entry is a **local block** if it has both `type` and `name` k
             'type' => 'slide',
             'name' => 'Slide',
             'settings' => [
-                ['id' => 'image', 'type' => 'image_picker', 'label' => 'Image', 'default' => ''],
-                ['id' => 'title', 'type' => 'text', 'label' => 'Slide Title', 'default' => ''],
-                ['id' => 'link', 'type' => 'url', 'label' => 'Link', 'default' => '#'],
+                [
+                    'id' => 'image',
+                    'type' => 'image_picker',
+                    'label' => 'Image',
+                    'default' => ''
+                ],
+                [
+                    'id' => 'title',
+                    'type' => 'text',
+                    'label' => 'Slide Title',
+                    'default' => ''
+                ],
+                [
+                    'id' => 'link',
+                    'type' => 'url',
+                    'label' => 'Link',
+                    'default' => '#'
+                ],
             ],
         ],
     ],
@@ -128,9 +153,21 @@ Local blocks can also be **containers** with nested child blocks (also defined i
                     'type' => 'item',
                     'name' => 'Item',
                     'settings' => [
-                        ['id' => 'icon', 'type' => 'icon_fa', 'label' => 'Icon'],
-                        ['id' => 'label', 'type' => 'text', 'label' => 'Label'],
-                        ['id' => 'value', 'type' => 'richtext', 'label' => 'Value'],
+                        [
+                            'id' => 'icon',
+                            'type' => 'icon_fa',
+                            'label' => 'Icon'
+                        ],
+                        [
+                            'id' => 'label',
+                            'type' => 'text',
+                            'label' => 'Label'
+                        ],
+                        [
+                            'id' => 'value',
+                            'type' => 'richtext',
+                            'label' => 'Value'
+                        ],
                     ],
                 ],
             ],
@@ -222,10 +259,30 @@ Blocks use the same setting types as sections:
 ```blade
 @schema([
     'settings' => [
-        ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => ''],
-        ['id' => 'icon', 'type' => 'icon_fa', 'label' => 'Icon', 'default' => 'fas fa-star'],
-        ['id' => 'color', 'type' => 'color', 'label' => 'Color', 'default' => '#6366f1'],
-        ['id' => 'show_badge', 'type' => 'checkbox', 'label' => 'Show Badge', 'default' => true],
+        [
+            'id' => 'title',
+            'type' => 'text',
+            'label' => 'Title',
+            'default' => ''
+        ],
+        [
+            'id' => 'icon',
+            'type' => 'icon_fa',
+            'label' => 'Icon',
+            'default' => 'fas fa-star'
+        ],
+        [
+            'id' => 'color',
+            'type' => 'color',
+            'label' => 'Color',
+            'default' => '#6366f1'
+        ],
+        [
+            'id' => 'show_badge',
+            'type' => 'checkbox',
+            'label' => 'Show Badge',
+            'default' => true
+        ],
     ],
 ])
 ```
