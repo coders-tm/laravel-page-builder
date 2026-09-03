@@ -4,7 +4,7 @@ import sidebar from "./sidebar/index"
 export default defineConfig({
   title: "Laravel Page Builder",
   description: "Multi-theme, JSON-driven page builder for Laravel with visual editor",
-  base: "/",
+  base: "/laravel-page-builder/",
   ignoreDeadLinks: true,
 
   head: [["link", { rel: "icon", type: "image/svg+xml", href: "/logo.svg" }]],
