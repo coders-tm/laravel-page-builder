@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "website/**"
+      - "docs/**"
       - ".github/workflows/docs.yml"
 
   workflow_dispatch:
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: website
+        working-directory: docs
 
     steps:
       - name: Checkout
@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: website/package-lock.json
+          cache-dependency-path: docs/package-lock.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -50,7 +50,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: website/docs/.vitepress/dist
+          path: docs/src/.vitepress/dist
 
   deploy:
     environment:

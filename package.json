@@ -13,9 +13,9 @@
     "format": "prettier --write \"resources/js/**/*.{ts,tsx,css}\"",
     "format:check": "prettier --check \"resources/js/**/*.{ts,tsx,css}\"",
     "prepare": "simple-git-hooks",
-    "docs:dev": "npm --prefix website run dev",
-    "docs:build": "npm --prefix website run build",
-    "docs:preview": "npm --prefix website run preview"
+    "docs:dev": "npm --prefix docs run dev",
+    "docs:build": "npm --prefix docs run build",
+    "docs:preview": "npm --prefix docs run preview"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
