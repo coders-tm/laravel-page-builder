@@ -35,6 +35,7 @@ class InstallPageBuilder extends Command
         $this->components->info('Installing Page Builder...');
 
         $this->publishConfig($force);
+        $this->publishAssets($force);
         $this->scaffoldThemeViews($force);
 
         if ($this->option('migrate')) {
@@ -69,6 +70,10 @@ class InstallPageBuilder extends Command
         $this->components->task('Publishing assets', function () use ($force) {
             $this->callSilently('vendor:publish', [
                 '--tag' => 'pagebuilder-assets',
+                '--force' => $force,
+            ]);
+            $this->callSilently('vendor:publish', [
+                '--tag' => 'pagebuilder-statics',
                 '--force' => $force,
             ]);
         });

@@ -80,123 +80,32 @@ test('load returns null for invalid json', function () {
     }
 });
 test('preserved page persists title and meta', function () {
-    $data = [
-        'sections' => [
-            'banner-1' => [
-                'type' => 'banner',
-                'settings' => [
-                    'text' => 'Welcome Home',
-                ],
-            ],
-            'contact-form_1773542384140' => [
-                'type' => 'contact-form',
-                'settings' => [],
-                'blocks' => [
-                    'contact_info_block' => [
-                        'type' => 'contact-info',
-                        'blocks' => [
-                            'item_1' => [
-                                'type' => 'item',
-                                'settings' => [
-                                    'icon' => 'fas fa-location-dot',
-                                    'label' => 'Our Location',
-                                    'value' => '123 Fitness Street, Muscle City, MC 45678',
-                                ],
-                            ],
-                            'item_2' => [
-                                'type' => 'item',
-                                'settings' => [
-                                    'icon' => 'fas fa-phone',
-                                    'label' => 'Phone Number',
-                                    'value' => '+1 (555) 123-4567',
-                                ],
-                            ],
-                            'item_3' => [
-                                'type' => 'item',
-                                'settings' => [
-                                    'icon' => 'fas fa-envelope',
-                                    'label' => 'Email Address',
-                                    'value' => 'info@yourgym.com',
-                                ],
-                            ],
-                            'item_4' => [
-                                'type' => 'item',
-                                'settings' => [
-                                    'icon' => 'fas fa-clock',
-                                    'label' => 'Working Hours',
-                                    'value' => 'Mon–Fri: 5 AM – 11 PM<br>Sat–Sun: 7 AM – 9 PM',
-                                ],
-                            ],
-                        ],
-                        'order' => [
-                            'item_1',
-                            'item_2',
-                            'item_3',
-                            'item_4',
-                        ],
-                    ],
-                    'socials_block' => [
-                        'type' => 'socials',
-                        'blocks' => [
-                            'social_1' => [
-                                'type' => 'social',
-                                'settings' => [
-                                    'icon' => 'fa-brands fa-facebook-f',
-                                    'url' => '#',
-                                ],
-                            ],
-                            'social_2' => [
-                                'type' => 'social',
-                                'settings' => [
-                                    'icon' => 'fa-brands fa-instagram',
-                                    'url' => '#',
-                                ],
-                            ],
-                            'social_3' => [
-                                'type' => 'social',
-                                'settings' => [
-                                    'icon' => 'fa-brands fa-twitter',
-                                    'url' => '#',
-                                ],
-                            ],
-                        ],
-                        'order' => [
-                            'social_1',
-                            'social_2',
-                            'social_3',
-                        ],
-                    ],
-                ],
-                'order' => [
-                    'contact_info_block',
-                    'socials_block',
-                ],
-            ],
-        ],
-        'order' => [
-            'banner-1',
-            'contact-form_1773542384140',
-        ],
-        'title' => 'Home Page',
-        'meta' => [
+    $filePath = config('pagebuilder.pages').'/home.json';
+    $originalContent = file_get_contents($filePath);
+
+    try {
+        $data = json_decode($originalContent, true);
+        $data['title'] = 'Home Page';
+        $data['meta'] = [
             'meta_title' => 'SEO Home',
             'meta_description' => 'Home description',
-        ],
-    ];
+        ];
 
-    // 'home' is a preserved page by default
-    expect($this->storage->save('home', $data))->toBeTrue();
+        // 'home' is a preserved page by default
+        expect($this->storage->save('home', $data))->toBeTrue();
 
-    $loaded = $this->storage->load('home');
-    expect($loaded->title())->toBe('Home Page');
-    expect($loaded->meta()['meta_title'])->toBe('SEO Home');
-    expect($loaded->meta()['meta_description'])->toBe('Home description');
+        $loaded = $this->storage->load('home');
+        expect($loaded->title())->toBe('Home Page');
+        expect($loaded->meta()['meta_title'])->toBe('SEO Home');
+        expect($loaded->meta()['meta_description'])->toBe('Home description');
 
-    // Verify JSON file directly to be absolutely sure
-    $filePath = config('pagebuilder.pages').'/home.json';
-    $json = json_decode(file_get_contents($filePath), true);
-    expect($json)->toHaveKey('title');
-    expect($json)->toHaveKey('meta');
+        // Verify JSON file directly to be absolutely sure
+        $json = json_decode(file_get_contents($filePath), true);
+        expect($json)->toHaveKey('title');
+        expect($json)->toHaveKey('meta');
+    } finally {
+        file_put_contents($filePath, $originalContent);
+    }
 });
 test('regular page strips title and meta', function () {
     $data = [

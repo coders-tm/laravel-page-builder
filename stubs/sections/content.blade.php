@@ -1,7 +1,13 @@
 @schema([
     'name' => 'Content',
     'blocks' => [
-        ['type' => 'row'],
+        [
+            'type' => 'row',
+            'name' => 'Row',
+            'settings' => [
+                ['id' => 'columns', 'type' => 'select', 'label' => 'Columns', 'default' => '2'],
+            ],
+        ],
     ],
     'presets' => [
         [

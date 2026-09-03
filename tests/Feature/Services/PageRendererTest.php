@@ -9,7 +9,7 @@ beforeEach(function () {
     $this->pageRenderer = $this->app->make(PageRenderer::class);
 });
 test('render by slug', function () {
-    $this->get('/')->assertSee('Welcome Home');
+    $this->get('/')->assertSee('Build High-Performance Page Builders');
 });
 test('render page from array', function () {
     $html = $this->pageRenderer->renderPage([

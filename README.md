@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="art/logo-dark.svg" alt="Laravel Page Builder" width="350">
+  <img src="public/logo-dark.svg" alt="Laravel Page Builder" width="350">
 </p>
 
 <p align="center">

@@ -136,6 +136,10 @@ class PageBuilderServiceProvider extends ServiceProvider
         ], 'pagebuilder-assets');
 
         $this->publishes([
+            __DIR__.'/../../public' => public_path('statics'),
+        ], 'pagebuilder-statics');
+
+        $this->publishes([
             __DIR__.'/../../database/migrations' => database_path('migrations'),
         ], 'pagebuilder-migrations');
 

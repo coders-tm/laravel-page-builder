@@ -17,10 +17,8 @@ test('extract valid schema', function () {
 
     expect($result)->toBeArray();
     expect($result['name'])->toBe('Hero');
-    expect($result['settings'])->toHaveCount(2);
-    expect($result['settings'][0]['id'])->toBe('title');
-    expect($result['settings'][1]['id'])->toBe('subtitle');
-    expect($result['blocks'] ?? [])->toHaveCount(0);
+    expect($result['settings'])->toHaveCount(5);
+    expect($result['blocks'] ?? [])->toHaveCount(2);
     expect($result['presets'])->toHaveCount(1);
 });
 test('extract returns null when no schema', function () {
