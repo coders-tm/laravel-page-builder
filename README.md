@@ -17,6 +17,10 @@ A modern page builder for Laravel — build dynamic pages with layouts, sections
   <a href="https://coders-tm.github.io/laravel-page-builder/"><strong>Documentation</strong></a>
 </p>
 
+<p align="center">
+  <img src="art/intro.gif" alt="Laravel Page Builder Intro" />
+</p>
+
 ---
 
 ## Requirements
