@@ -11,6 +11,7 @@
 
 namespace PageBuilder\Observers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
 
 /**
@@ -22,15 +23,20 @@ class PageObserver
     /**
      * Handle the "saved" event (covers both created and updated).
      */
-    public function saved(mixed $page): void
+    public function saved(Model $page): void
     {
-        Artisan::call('pages:regenerate');
+        $this->regenerate();
     }
 
     /**
      * Handle the "deleted" event.
      */
-    public function deleted(mixed $page): void
+    public function deleted(Model $page): void
+    {
+        $this->regenerate();
+    }
+
+    private function regenerate(): void
     {
         Artisan::call('pages:regenerate');
     }

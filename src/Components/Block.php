@@ -24,7 +24,7 @@ use PageBuilder\Rendering\EditorAttributes;
  *     @blocks($block)
  *   </div>
  */
-class Block extends BaseComponent
+final class Block extends BaseComponent
 {
     public const DEFAULT_TYPE = 'block';
 

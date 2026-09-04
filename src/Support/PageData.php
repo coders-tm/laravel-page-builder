@@ -292,6 +292,23 @@ final class PageData implements Arrayable, ArrayAccess, Countable, Jsonable, Jso
     }
 
     /**
+     * Return a new PageData instance with merged layout overrides (immutable).
+     *
+     * @param  array<string, mixed>  $overrides  Partial layout config to merge
+     */
+    public function withMergedLayout(array $overrides): static
+    {
+        if (empty($overrides)) {
+            return $this;
+        }
+
+        $clone = clone $this;
+        $clone->mergeLayout($overrides);
+
+        return $clone;
+    }
+
+    /**
      * Return layout configuration as a type-safe LayoutConfig DTO.
      */
     public function layoutConfig(): LayoutConfig

@@ -154,7 +154,7 @@ final class Settings implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
     public function __toString(): string
     {
-        return '';
+        return json_encode($this->all());
     }
 
     // ─── ArrayAccess ─────────────────────────────────────────────
@@ -169,14 +169,14 @@ final class Settings implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         return $this->get((string) $offset);
     }
 
-    public function offsetSet(mixed $offset, mixed $value): void
+    public function offsetSet(mixed $offset, mixed $value): never
     {
-        $this->values[(string) $offset] = $value;
+        throw new \BadMethodCallException('Settings is immutable and cannot be modified.');
     }
 
-    public function offsetUnset(mixed $offset): void
+    public function offsetUnset(mixed $offset): never
     {
-        unset($this->values[(string) $offset]);
+        throw new \BadMethodCallException('Settings is immutable and cannot be modified.');
     }
 
     // ─── Serialization ──────────────────────────────────────────
@@ -191,7 +191,10 @@ final class Settings implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         return json_encode($this->jsonSerialize(), $options);
     }
 
-    public function jsonSerialize(): mixed
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
     {
         return $this->all();
     }

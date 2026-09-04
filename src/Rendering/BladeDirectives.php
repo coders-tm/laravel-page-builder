@@ -72,7 +72,7 @@ PHP;
 <?php
 \$__pb_overrides = \PageBuilder\Rendering\BladeDirectives::getPendingOverrides();
 if (! empty(\$__pb_overrides) && isset(\$__pb_layout) && \$__pb_layout instanceof \PageBuilder\Support\PageData) {
-    \$__pb_layout->mergeLayout(\$__pb_overrides);
+    \$__pb_layout = \$__pb_layout->withMergedLayout(\$__pb_overrides);
 }
 echo \PageBuilder\Rendering\BladeDirectives::renderLayoutSection(\$__pb_layout ?? null, {$expression});
 ?>

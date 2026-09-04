@@ -33,10 +33,8 @@ final class SectionCollection extends BaseCollection
     /**
      * Render all sections in order and return concatenated HTML.
      */
-    public function render(): string
+    public function render(RendererInterface $renderer): string
     {
-        $renderer = app(RendererInterface::class);
-
         $html = '';
 
         foreach ($this->items as $section) {

@@ -25,7 +25,7 @@ use PageBuilder\Support\PageData;
 class PageStorage
 {
     public function __construct(
-        protected LayoutSettings $layoutSettings,
+        protected readonly LayoutSettings $layoutSettings,
     ) {}
 
     /**

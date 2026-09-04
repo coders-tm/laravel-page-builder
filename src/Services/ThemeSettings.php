@@ -31,7 +31,7 @@ class ThemeSettings implements Arrayable, ArrayAccess, Countable, JsonSerializab
 {
     public const STORAGE_SECTION = 'theme';
 
-    protected SettingsStoreInterface $store;
+    protected readonly SettingsStoreInterface $store;
 
     public function __construct(?SettingsStoreInterface $store = null)
     {

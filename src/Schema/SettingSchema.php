@@ -12,6 +12,7 @@
 namespace PageBuilder\Schema;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 
 /**
@@ -19,8 +20,10 @@ use JsonSerializable;
  *
  * Each setting has a type (text, image, checkbox, etc.), an id that
  * becomes the key in the settings bag, a label, and an optional default.
+ *
+ * @phpstan-type SettingTypeString = 'text'|'textarea'|'image'|'image_picker'|'select'|'checkbox'|'radio'|'color'|'number'|'url'|'wysiwyg'|'repeater'|'page_link'
  */
-class SettingSchema implements Arrayable, JsonSerializable
+class SettingSchema implements Arrayable, Jsonable, JsonSerializable
 {
     public readonly ?string $id;
 
@@ -64,6 +67,14 @@ class SettingSchema implements Arrayable, JsonSerializable
     }
 
     /**
+     * Get the setting type as a typed enum value.
+     */
+    public function typeEnum(): SettingType
+    {
+        return SettingType::tryFrom($this->type) ?? SettingType::Text;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array
@@ -101,6 +112,11 @@ class SettingSchema implements Arrayable, JsonSerializable
         }
 
         return array_filter($data, fn ($v) => $v !== null);
+    }
+
+    public function toJson($options = 0): string
+    {
+        return json_encode($this->jsonSerialize(), $options);
     }
 
     /**

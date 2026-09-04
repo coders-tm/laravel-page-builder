@@ -12,6 +12,7 @@
 namespace PageBuilder\Schema;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 
 /**
@@ -20,8 +21,12 @@ use JsonSerializable;
  * Both `name` and `type` are required — no silent fallbacks.
  * Registered globally via BlockRegistry, or declared inline inside a SectionSchema.
  */
-class BlockSchema implements Arrayable, JsonSerializable
+class BlockSchema implements Arrayable, Jsonable, JsonSerializable
 {
+    use HasSettingDefaults;
+
+    public const THEME_WILDCARD = '@theme';
+
     public readonly string $type;
 
     public readonly string $name;
@@ -82,7 +87,7 @@ class BlockSchema implements Arrayable, JsonSerializable
     public function acceptsThemeBlocks(): bool
     {
         foreach ($this->blocks as $ref) {
-            if (($ref['type'] ?? null) === '@theme') {
+            if (($ref['type'] ?? null) === self::THEME_WILDCARD) {
                 return true;
             }
         }
@@ -93,15 +98,7 @@ class BlockSchema implements Arrayable, JsonSerializable
     /** @return array<string, mixed> */
     public function settingDefaults(): array
     {
-        $defaults = [];
-
-        foreach ($this->settings as $setting) {
-            if ($setting->id !== null && $setting->id !== '') {
-                $defaults[$setting->id] = $setting->default;
-            }
-        }
-
-        return $defaults;
+        return self::extractSettingDefaults($this->settings);
     }
 
     /** @return array<string, mixed> */
@@ -123,6 +120,11 @@ class BlockSchema implements Arrayable, JsonSerializable
         }
 
         return $data;
+    }
+
+    public function toJson($options = 0): string
+    {
+        return json_encode($this->jsonSerialize(), $options);
     }
 
     /**

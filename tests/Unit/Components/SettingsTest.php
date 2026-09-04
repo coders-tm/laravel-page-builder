@@ -94,8 +94,7 @@ test('invokable', function () {
 test('to string', function () {
     $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
 
-    // Settings __toString returns empty string (not JSON — use toArray/jsonSerialize for that)
-    expect((string) $settings)->toBe('');
+    expect((string) $settings)->toBe('{"color":"#000","title":"Hello"}');
 });
 test('array access', function () {
     $settings = new Settings(['title' => 'Hello'], ['color' => '#000']);
@@ -104,20 +103,16 @@ test('array access', function () {
     expect($settings['title'])->toBe('Hello');
     expect($settings['color'])->toBe('#000');
 });
-test('array access set mutates', function () {
+test('array access set throws', function () {
     $settings = new Settings([], []);
 
-    // Settings allows writes via ArrayAccess
     $settings['title'] = 'value';
-    expect($settings['title'])->toBe('value');
-});
-test('array access unset removes value', function () {
+})->throws(\BadMethodCallException::class, 'Settings is immutable');
+test('array access unset throws', function () {
     $settings = new Settings(['title' => 'Hello'], []);
 
-    // Settings allows unset via ArrayAccess
     unset($settings['title']);
-    expect($settings->get('title'))->toBeNull();
-});
+})->throws(\BadMethodCallException::class, 'Settings is immutable');
 test('to array', function () {
     $settings = new Settings(
         ['title' => 'Custom'],

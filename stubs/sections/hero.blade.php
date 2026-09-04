@@ -1,3 +1,14 @@
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 @schema([
     'name' => 'Hero',
     'settings' => [['id' => 'badge_text', 'type' => 'text', 'label' => 'Header Badge', 'default' => 'Welcome Home — Next-Gen Package'], ['id' => 'hero_image', 'type' => 'image_picker', 'label' => 'Hero Image', 'default' => '/statics/hero.png'], ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Build High-Performance Page Builders in Minutes with'], ['id' => 'title_highlight', 'type' => 'text', 'label' => 'Title Highlight', 'default' => 'Laravel & Blade'], ['id' => 'subtitle', 'type' => 'textarea', 'label' => 'Subtitle', 'default' => 'Hello World']],
@@ -62,10 +73,10 @@
                 </div>
 
                 {{-- Headline --}}
-                <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-slate-100 leading-tight">
+                <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-slate-100 leading-tight sm:leading-tight lg:leading-tight">
                     {{ $section->settings->title }}
                     <span
-                        class="block bg-gradient-to-r from-red-500 via-indigo-400 to-sky-400 bg-clip-text text-transparent">
+                        class="block bg-gradient-to-r from-red-500 via-indigo-400 to-sky-400 bg-clip-text text-transparent mt-1 sm:mt-2">
                         {{ $section->settings->title_highlight }}
                     </span>
                 </h1>

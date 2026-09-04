@@ -28,13 +28,13 @@ use PageBuilder\Services\ThemeSettings;
 class PageBuilderController extends Controller
 {
     public function __construct(
-        protected PageRenderer $pageRenderer,
-        protected PageStorage $pageStorage,
-        protected SectionRegistry $sectionRegistry,
-        protected BlockRegistry $blockRegistry,
-        protected RendererInterface $renderer,
-        protected ThemeSettings $themeSettings,
-        protected LayoutParser $layoutParser,
+        protected readonly PageRenderer $pageRenderer,
+        protected readonly PageStorage $pageStorage,
+        protected readonly SectionRegistry $sectionRegistry,
+        protected readonly BlockRegistry $blockRegistry,
+        protected readonly RendererInterface $renderer,
+        protected readonly ThemeSettings $themeSettings,
+        protected readonly LayoutParser $layoutParser,
     ) {}
 
     /**
@@ -63,7 +63,7 @@ class PageBuilderController extends Controller
     public function page(string $slug = 'home'): JsonResponse
     {
         $dbPage = Page::findBySlug($slug);
-        [$page, $isResolved] = Page::resolve($slug, $dbPage);
+        [$page] = Page::resolve($slug, $dbPage);
 
         $data = $page->toArray();
 
@@ -101,7 +101,7 @@ class PageBuilderController extends Controller
 
         if ($slug) {
             $dbPage = Page::findBySlug($slug);
-            [$page, $isResolved] = Page::resolve($slug, $dbPage);
+            [$page] = Page::resolve($slug, $dbPage);
 
             // Share the DB page model with all views rendered in this request
             Page::share($dbPage);

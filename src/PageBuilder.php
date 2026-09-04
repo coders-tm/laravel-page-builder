@@ -35,10 +35,8 @@ class PageBuilder
 
     /**
      * The callback used to authorize the editor.
-     *
-     * @var Closure|null
      */
-    public static $authCallback;
+    public static ?Closure $authCallback = null;
 
     /**
      * Set to true to prevent the service provider from auto-registering any routes.
@@ -52,10 +50,8 @@ class PageBuilder
 
     /**
      * The page model class name.
-     *
-     * @var string
      */
-    public static $pageModel = Models\Page::class;
+    public static string $pageModel = Models\Page::class;
 
     /**
      * Set to true to prevent the service provider from auto-registering any routes.
@@ -125,20 +121,16 @@ class PageBuilder
 
     /**
      * Register the editor authorization callback.
-     *
-     * @return void
      */
-    public static function auth(Closure $callback)
+    public static function auth(Closure $callback): void
     {
         static::$authCallback = $callback;
     }
 
     /**
      * Check if the request is authorized to access the editor.
-     *
-     * @return bool
      */
-    public static function checkAuth(Request $request)
+    public static function checkAuth(Request $request): bool
     {
         return (static::$authCallback ?: function () {
             return true;
@@ -168,16 +160,16 @@ class PageBuilder
 
     /**
      * Get the CSS for the PageBuilder editor.
-     *
-     * @return HtmlString
      */
-    public static function css()
+    public static function css(): HtmlString
     {
         if (file_exists(__DIR__.'/../dist/hot')) {
             return new HtmlString('');
         }
 
-        if (($css = @file_get_contents(__DIR__.'/../dist/app.css')) === false) {
+        $path = __DIR__.'/../dist/app.css';
+
+        if (! file_exists($path) || ($css = file_get_contents($path)) === false) {
             throw new RuntimeException('Unable to load the PageBuilder editor CSS. Please run "npm run build" in the package root.');
         }
 
@@ -186,13 +178,11 @@ class PageBuilder
 
     /**
      * Get the JS for the PageBuilder editor.
-     *
-     * @return HtmlString
      */
-    public static function js()
+    public static function js(): HtmlString
     {
         if (file_exists($hot = __DIR__.'/../dist/hot')) {
-            $url = rtrim(file_get_contents($hot), '/');
+            $url = e(rtrim((string) file_get_contents($hot), '/'));
 
             return new HtmlString(
                 "<script type='module' src='{$url}/@vite/client'></script>\n".
@@ -207,7 +197,9 @@ class PageBuilder
             );
         }
 
-        if (($js = @file_get_contents(__DIR__.'/../dist/app.umd.js')) === false) {
+        $path = __DIR__.'/../dist/app.umd.js';
+
+        if (! file_exists($path) || ($js = file_get_contents($path)) === false) {
             throw new RuntimeException('Unable to load the PageBuilder editor JavaScript. Please run "npm run build" in the package root.');
         }
 
@@ -217,9 +209,9 @@ class PageBuilder
     /**
      * Get the default JavaScript variables for PageBuilder.
      *
-     * @return array
+     * @return array{baseUrl: string, basePath: string, pages: list<array<string, mixed>>, sections: list<array{type: string, view: string, schema: mixed}>, blocks: list<array{type: string, view: string, schema: mixed}>, themeSettings: array<string, mixed>, preservedParams: list<string>}
      */
-    public static function scriptVariables()
+    public static function scriptVariables(): array
     {
         $pages = app(PageRegistry::class);
         $registry = app(SectionRegistry::class);

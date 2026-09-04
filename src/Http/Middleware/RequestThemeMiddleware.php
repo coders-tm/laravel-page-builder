@@ -13,19 +13,18 @@ namespace PageBuilder\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use PageBuilder\Services\Theme;
 
-class RequestThemeMiddleware
+final class RequestThemeMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if ($request->filled('theme')) {
-            Theme::set($request->theme);
+            Theme::set($request->string('theme')->value());
         }
 
         return $next($request);

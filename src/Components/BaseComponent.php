@@ -38,6 +38,9 @@ abstract class BaseComponent implements Arrayable, Jsonable, JsonSerializable
 
     public ?BaseComponent $parent = null;
 
+    /**
+     * @param  array{id?: string, type?: string, name?: string, disabled?: bool, settings?: Settings|array<string, mixed>, blocks?: BlockCollection|array<string, mixed>, parent?: ?BaseComponent}  $data
+     */
     public function __construct(array $data)
     {
         $this->parent = $data['parent'] ?? null;
@@ -104,11 +107,11 @@ abstract class BaseComponent implements Arrayable, Jsonable, JsonSerializable
         return json_encode($this->jsonSerialize(), $options);
     }
 
-    public function jsonSerialize(): mixed
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
     {
-        $data = $this->toArray();
-        unset($data['parent']);
-
-        return $data;
+        return $this->toArray();
     }
 }

@@ -24,7 +24,7 @@ use PageBuilder\Rendering\EditorAttributes;
  *     @blocks($section)
  *   </section>
  */
-class Section extends BaseComponent
+final class Section extends BaseComponent
 {
     public function editorAttributes(): string
     {

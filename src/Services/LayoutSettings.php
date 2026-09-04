@@ -25,11 +25,14 @@ class LayoutSettings
 {
     public const STORAGE_SECTION = 'layouts';
 
-    protected SettingsStoreInterface $store;
+    protected readonly SettingsStoreInterface $store;
 
-    public function __construct(?SettingsStoreInterface $store = null)
+    protected readonly LayoutParser $layoutParser;
+
+    public function __construct(?SettingsStoreInterface $store = null, ?LayoutParser $layoutParser = null)
     {
         $this->store = $store ?? app(SettingsStoreInterface::class);
+        $this->layoutParser = $layoutParser ?? app(LayoutParser::class);
     }
 
     /**
@@ -86,7 +89,7 @@ class LayoutSettings
         $result = $this->store->set(self::STORAGE_SECTION, $layoutType, $data);
 
         if ($result) {
-            app(LayoutParser::class)->flush();
+            $this->layoutParser->flush();
         }
 
         return $result;
@@ -102,7 +105,7 @@ class LayoutSettings
         $result = $this->store->forget(self::STORAGE_SECTION, $layoutType);
 
         if ($result) {
-            app(LayoutParser::class)->flush();
+            $this->layoutParser->flush();
         }
 
         return $result;
