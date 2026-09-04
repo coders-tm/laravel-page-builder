@@ -1,6 +1,6 @@
 {
   "name": "coderstm-laravel-page-builder",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "type": "module",
   "private": true,
   "description": "A section-based page builder for Laravel using layouts and JSON rendering.",
