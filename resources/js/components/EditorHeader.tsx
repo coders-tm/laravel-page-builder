@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 import React, { useCallback, useSyncExternalStore } from "react"
-import { DeviceSwitcher, UndoRedoControls, EditorLogo } from "./header"
+import { DeviceSwitcher, UndoRedoControls, EditorLogo, LanguageSelector } from "./header"
 import { Crosshair, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
@@ -25,7 +25,7 @@ import config from "@/config"
 export default function EditorHeader() {
   const editor = useEditorInstance()
   const { pages, saving } = useStore()
-  const { slug, device, setPage, setDevice } = useEditorNavigation()
+  const { slug, device, lang, setPage, setLang, setDevice } = useEditorNavigation()
   const { inspectorEnabled } = useEditorLayout()
   const isMobile = useMaxBreakpoint(768)
 
@@ -71,6 +71,8 @@ export default function EditorHeader() {
             </Select>
           </div>
         )}
+
+        <LanguageSelector currentLang={lang} onLangChange={setLang} />
       </div>
 
       {/* ── Center: Device switcher + Undo/Redo ────────────────── */}

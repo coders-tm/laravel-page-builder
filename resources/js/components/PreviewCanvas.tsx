@@ -27,7 +27,7 @@ const DRAG_SCALE = 0.6
  */
 export default function PreviewCanvas() {
   const editor = useEditorInstance()
-  const { slug, device, selectedSection, selectedBlock } = useEditorNavigation()
+  const { slug, device, lang, selectedSection, selectedBlock } = useEditorNavigation()
   const { inspectorEnabled, isDraggingLayout: isDragging } = useEditorLayout()
   const { saving } = useStore()
 
@@ -199,7 +199,7 @@ export default function PreviewCanvas() {
   }, [iframeRef])
 
   /* ── Preview URL ─────────────────────────────────────────────────── */
-  const previewUrl = slug ? api.getPreviewUrl(slug) : null
+  const previewUrl = slug ? api.getPreviewUrl(slug, lang) : null
 
   /* ── Live URL ────────────────────────────────────────────────────── */
   const liveUrl = useMemo(() => {

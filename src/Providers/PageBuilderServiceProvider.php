@@ -147,6 +147,9 @@ class PageBuilderServiceProvider extends ServiceProvider
         // Register theme middleware
         Route::aliasMiddleware('theme', Middleware\ThemeMiddleware::class);
 
+        // Register language middleware
+        Route::aliasMiddleware('lang', Middleware\SetLangMiddleware::class);
+
         if (! PageBuilder::$withoutRoutes) {
             PageBuilder::pageRoutes();
             PageBuilder::builderRoutes(config('pagebuilder.middleware', ['web']));
@@ -179,6 +182,7 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         // Commands
         $this->commands([
+            Commands\BenchmarkPage::class,
             Commands\InstallPageBuilder::class,
             Commands\RegeneratePages::class,
             Commands\ThemeLink::class,

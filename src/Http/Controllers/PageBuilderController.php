@@ -64,6 +64,9 @@ class PageBuilderController extends Controller
      */
     public function page(string $slug = 'home'): JsonResponse
     {
+        $lang = request()->input('lang');
+        PageBuilder::setLang($lang !== '' ? $lang : null);
+
         $dbPage = Page::findBySlug($slug);
         [$page] = Page::resolve($slug, $dbPage);
 
@@ -97,6 +100,9 @@ class PageBuilderController extends Controller
             'blocks' => 'nullable|array',
             'order' => 'nullable|array',
         ]);
+
+        $lang = $request->input('lang');
+        PageBuilder::setLang($lang !== '' ? $lang : null);
 
         $slug = $request->input('slug');
         $extraData = [];
@@ -143,6 +149,9 @@ class PageBuilderController extends Controller
             'order' => 'nullable|array',
         ]);
 
+        $lang = $request->input('lang');
+        PageBuilder::setLang($lang !== '' ? $lang : null);
+
         $slug = $request->input('slug');
 
         if ($slug) {
@@ -182,6 +191,9 @@ class PageBuilderController extends Controller
             'meta.meta_keywords' => 'nullable|string|max:255',
             'theme_settings' => 'nullable|array',
         ]);
+
+        $lang = $request->input('lang');
+        PageBuilder::setLang($lang !== '' ? $lang : null);
 
         $slug = $request->input('slug');
         $data = array_merge($request->input('data'), [

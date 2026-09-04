@@ -32,6 +32,9 @@ class PageStorage
 
     /**
      * Load and decode a page JSON file by slug.
+     *
+     * When a language is set, tries locale-specific files first
+     * (e.g. pages/{slug}.fr.json) before falling back to the default.
      */
     public function load(string $slug): ?PageData
     {
@@ -48,12 +51,14 @@ class PageStorage
      * Load raw page JSON data without converting to PageData.
      *
      * Returns the decoded JSON array, or null if the file doesn't exist.
+     * When a language is set, tries locale-specific files first
+     * (e.g. pages/{slug}.fr.json) before falling back to the default.
      *
      * @return array<string, mixed>|null
      */
     public function loadRaw(string $slug): ?array
     {
-        $filePath = $this->path($slug, 'json');
+        $filePath = $this->resolvePath($slug);
 
         if (! File::exists($filePath)) {
             return null;
@@ -67,14 +72,15 @@ class PageStorage
     /**
      * Persist a page's JSON data to disk, creating the pages directory if needed.
      *
-     * Layout splitting is based on the existing page.json:
+     * When a language is set, saves to the locale-specific path
+     * (e.g. pages/{slug}.fr.json). Layout splitting is based on the existing page.json:
      *  - No layout in existing page.json → save layout to LayoutSettings
      *  - Existing layout is a string → save layout to LayoutSettings
      *  - Existing layout is an object → save layout to page.json
      */
     public function save(string $slug, array|PageData $data): bool
     {
-        $filePath = $this->path($slug, 'json');
+        $filePath = $this->resolveSavePath($slug);
         $directory = dirname($filePath);
 
         if (! File::isDirectory($directory)) {
@@ -146,10 +152,54 @@ class PageStorage
     }
 
     /**
-     * Get the absolute path for a page file.
+     * Get the absolute path for a page file, with language-aware resolution.
+     *
+     * When a language is set, checks for the locale-specific file first
+     * (e.g. pages/{slug}.fr.json), falling back to the default (pages/{slug}.json).
      */
-    private function path(string $slug, string $extension): string
+    private function resolvePath(string $slug): string
     {
-        return config('pagebuilder.pages').'/'.$slug.'.'.$extension;
+        $lang = PageBuilder::getLang();
+
+        if ($lang !== null) {
+            $localePath = $this->buildPath($slug, 'json', $lang);
+
+            if (File::exists($localePath)) {
+                return $localePath;
+            }
+        }
+
+        return $this->buildPath($slug, 'json');
+    }
+
+    /**
+     * Get the absolute path for saving a page file.
+     *
+     * When a language is set, saves to the locale-specific path.
+     * Otherwise saves to the default path.
+     */
+    private function resolveSavePath(string $slug): string
+    {
+        $lang = PageBuilder::getLang();
+
+        if ($lang !== null) {
+            return $this->buildPath($slug, 'json', $lang);
+        }
+
+        return $this->buildPath($slug, 'json');
+    }
+
+    /**
+     * Build the absolute path for a page file.
+     */
+    private function buildPath(string $slug, string $extension, ?string $lang = null): string
+    {
+        $base = config('pagebuilder.pages').'/'.$slug;
+
+        if ($lang !== null) {
+            $base .= '.'.$lang;
+        }
+
+        return $base.'.'.$extension;
     }
 }

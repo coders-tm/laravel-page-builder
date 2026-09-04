@@ -15,6 +15,7 @@ export interface PageSlice {
   pages: any[]
   currentPage: Page | null
   currentSlug: string | null
+  currentLang: string | null
   sections: Record<string, SectionData>
   blocks: Record<string, BlockData>
   loading: boolean
@@ -29,6 +30,7 @@ export interface PageSlice {
   setPages: (pages: any[]) => void
   setCurrentPage: (page: Page | null) => void
   setCurrentSlug: (slug: string | null) => void
+  setCurrentLang: (lang: string | null) => void
   setSections: (sections: Record<string, SectionData>) => void
   setBlocks: (blocks: Record<string, BlockData>) => void
   setLoading: (loading: boolean) => void
@@ -55,6 +57,7 @@ export const createPageSlice: StateCreator<PageSlice, [["zustand/immer", never]]
   pages: config.pages || [],
   currentPage: null,
   currentSlug: null,
+  currentLang: null,
   sections: config.sections || {},
   blocks: config.blocks || {},
   loading: false,
@@ -65,6 +68,7 @@ export const createPageSlice: StateCreator<PageSlice, [["zustand/immer", never]]
   setPages: (pages) => set({ pages }),
   setCurrentPage: (page) => set({ currentPage: page }),
   setCurrentSlug: (slug) => set({ currentSlug: slug }),
+  setCurrentLang: (lang) => set({ currentLang: lang }),
   setSections: (sections) => set({ sections }),
   setBlocks: (blocks) => set({ blocks }),
   setLoading: (loading) => set({ loading }),
@@ -88,7 +92,8 @@ export const createPageSlice: StateCreator<PageSlice, [["zustand/immer", never]]
   loadPage: async (slug: string) => {
     set({ loading: true })
     try {
-      const raw = await api.getPage(slug)
+      const lang = get().currentLang
+      const raw = await api.getPage(slug, lang)
 
       // ── Flatten layout zones into the unified sections map ─────────
       // The API returns:
@@ -235,7 +240,13 @@ export const createPageSlice: StateCreator<PageSlice, [["zustand/immer", never]]
         },
       }
 
-      await api.savePage(state.currentSlug, payload, state.pageMeta, state.themeSettings.values)
+      await api.savePage(
+        state.currentSlug,
+        payload,
+        state.pageMeta,
+        state.themeSettings.values,
+        state.currentLang,
+      )
     } catch (err) {
       console.error("Failed to save:", err)
     } finally {
