@@ -36,6 +36,12 @@ class PageBuilder
     protected static ?bool $editorOverride = null;
 
     /**
+     * The current language for multilanguage page resolution.
+     * null = use default language | string = resolve locale-specific files.
+     */
+    protected static ?string $lang = null;
+
+    /**
      * The callback used to authorize the editor.
      */
     public static ?Closure $authCallback = null;
@@ -105,6 +111,27 @@ class PageBuilder
     public static function disableEditor(): void
     {
         static::$editorOverride = null;
+    }
+
+    /**
+     * Set the current language for multilanguage page resolution.
+     *
+     * When set, the page builder will first look for locale-specific files
+     * (e.g. pages/{slug}.fr.json) before falling back to the default (pages/{slug}.json).
+     *
+     * Pass null to reset to the default language.
+     */
+    public static function setLang(?string $lang): void
+    {
+        static::$lang = $lang !== '' ? $lang : null;
+    }
+
+    /**
+     * Get the current language for multilanguage page resolution.
+     */
+    public static function getLang(): ?string
+    {
+        return static::$lang;
     }
 
     /**
@@ -248,6 +275,7 @@ class PageBuilder
             ),
             'themeSettings' => app(ThemeSettings::class)->toArray(),
             'preservedParams' => config('pagebuilder.preserved_params', []),
+            'languages' => config('pagebuilder.languages', []),
         ];
     }
 

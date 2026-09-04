@@ -24,6 +24,14 @@ class WorkbenchServiceProvider extends ServiceProvider
     {
         Theme::set('default');
 
+        config([
+            'pagebuilder.languages' => [
+                ['code' => 'en', 'name' => 'English'],
+                ['code' => 'fr', 'name' => 'Français'],
+                ['code' => 'es', 'name' => 'Español'],
+            ],
+        ]);
+
         PageBuilder::usePageModel(Page::class);
     }
 }

@@ -32,11 +32,11 @@ function incrementVersion(currentVersion: string): string {
   let [major, minor, patch] = parts
 
   patch += 1
-  if (patch > 9) {
+  if (patch > 10) {
     patch = 0
     minor += 1
   }
-  if (minor > 9) {
+  if (minor > 10) {
     minor = 0
     major += 1
   }

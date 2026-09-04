@@ -44,6 +44,11 @@ class DatabaseSeeder extends Seeder
             'slug' => 'about',
         ]);
 
+        PageFactroy::new()->create([
+            'title' => 'Benchmark Page',
+            'slug' => 'benchmark',
+        ]);
+
         // PageFactroy::new()->times(50)->create();
     }
 }

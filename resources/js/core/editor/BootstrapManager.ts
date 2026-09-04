@@ -19,6 +19,7 @@ import { useStore } from "@/core/store/useStore"
 export class BootstrapManager {
   private initialLoaded = false
   private loadedSlug: string | null = null
+  private loadedLang: string | null = null
 
   constructor(
     private events: EventBus,
@@ -47,9 +48,13 @@ export class BootstrapManager {
   /**
    * Sync route state after initial data load.
    * - Redirect to first page when slug is missing
-   * - Load page when slug changes
+   * - Load page when slug or language changes
    */
-  async syncRoute(slug: string | undefined, pageList: any[]): Promise<void> {
+  async syncRoute(
+    slug: string | undefined,
+    pageList: any[],
+    lang: string | null = null,
+  ): Promise<void> {
     if (!slug) {
       // In email mode, we don't want to redirect to a page slug automatically.
       // We also respect the root path if no pages are available.
@@ -59,17 +64,19 @@ export class BootstrapManager {
       return
     }
 
-    if (this.loadedSlug === slug) return
+    if (this.loadedSlug === slug && this.loadedLang === lang) return
 
     this.loadedSlug = slug
+    this.loadedLang = lang
     this.history.reset()
     await this.pages.load(slug)
 
-    this.events.emit("bootstrap:page-loaded", { slug })
+    this.events.emit("bootstrap:page-loaded", { slug, lang })
   }
 
   reset(): void {
     this.loadedSlug = null
+    this.loadedLang = null
     this.initialLoaded = false
   }
 }

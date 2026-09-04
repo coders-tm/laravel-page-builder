@@ -25,7 +25,7 @@ export function useEditor() {
   const editor = useEditorInstance()
 
   // Register the router adapter (must be done at root level only).
-  const { slug } = useEditorNavigation({ registerAdapter: true })
+  const { slug, lang } = useEditorNavigation({ registerAdapter: true })
   const { pages, currentPage, loading } = useStore()
 
   // ── Bootstrap ──────────────────────────────────────────────────────
@@ -33,9 +33,14 @@ export function useEditor() {
     void editor.bootstrap.loadInitialData()
   }, [editor])
 
+  // Sync language from navigation into the store so loadPage/savePage use it.
   useEffect(() => {
-    void editor.bootstrap.syncRoute(slug, pages)
-  }, [editor, slug, pages])
+    useStore.getState().setCurrentLang(lang)
+  }, [lang])
+
+  useEffect(() => {
+    void editor.bootstrap.syncRoute(slug, pages, lang)
+  }, [editor, slug, pages, lang])
 
   // ── History snapshots ──────────────────────────────────────────────
   useEffect(() => {

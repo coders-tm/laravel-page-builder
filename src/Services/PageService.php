@@ -68,8 +68,10 @@ class PageService
         [$page, $isResolved] = $this->resolve($slug, $dbPage);
 
         // ── 1. Custom page view ───────────────────────────────────────────
-        if (View::exists("pages.{$slug}")) {
-            return view("pages.{$slug}", [
+        $customView = $this->resolveCustomView($slug);
+
+        if ($customView !== null) {
+            return view($customView, [
                 ...$this->pageMeta($dbPage, $page, $meta),
                 'slug' => $slug,
                 '__pb_layout' => $page,
@@ -147,6 +149,29 @@ class PageService
             '__pb_content' => $html,
             '__pb_layout' => $page,
         ]);
+    }
+
+    /**
+     * Resolve the custom Blade view for a page, with language-aware fallback.
+     *
+     * When a language is set, checks for the locale-specific view first
+     * (e.g. pages.fr.{slug}), falling back to the default (pages.{slug}).
+     *
+     * @return string|null The view name, or null if no custom view exists.
+     */
+    protected function resolveCustomView(string $slug): ?string
+    {
+        $lang = PageBuilder::getLang();
+
+        if ($lang !== null && View::exists("pages.{$lang}.{$slug}")) {
+            return "pages.{$lang}.{$slug}";
+        }
+
+        if (View::exists("pages.{$slug}")) {
+            return "pages.{$slug}";
+        }
+
+        return null;
     }
 
     /**

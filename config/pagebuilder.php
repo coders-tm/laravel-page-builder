@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
 
     /*
@@ -276,6 +287,23 @@ return [
         'uploads',
         'files',
         'vendor',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Languages
+    |--------------------------------------------------------------------------
+    |
+    | Define available languages for the multilanguage page builder.
+    | When non-empty, a language selector appears in the editor header.
+    | Pages are stored as {slug}.{code}.json (e.g. home.fr.json).
+    | The first entry is treated as the default language.
+    |
+    */
+
+    'languages' => [
+        // ['code' => 'en', 'name' => 'English'],
+        // ['code' => 'fr', 'name' => 'Français'],
     ],
 
 ];

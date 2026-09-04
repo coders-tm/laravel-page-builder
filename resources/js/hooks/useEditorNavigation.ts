@@ -43,6 +43,7 @@ export function useEditorNavigation({ registerAdapter = false }: UseEditorNaviga
 
   const selectedSection = searchParams.get("section") || null
   const device = searchParams.get("device") || "desktop"
+  const lang = searchParams.get("lang") || null
   const rawBlock = searchParams.get("block") || ""
   const blockPath: string[] = rawBlock ? rawBlock.split(",") : []
   const isEditorMode = searchParams.get("editor") === "true"
@@ -70,11 +71,12 @@ export function useEditorNavigation({ registerAdapter = false }: UseEditorNaviga
     editor.navigation.syncFromRoute({
       slug,
       device,
+      lang,
       selectedSection,
       blockPath,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, slug, device, selectedSection, blockPath.join(",")])
+  }, [editor, slug, device, lang, selectedSection, blockPath.join(",")])
 
   const version = useSyncExternalStore(
     (listener) => editor.navigation.subscribe(listener),
@@ -86,6 +88,7 @@ export function useEditorNavigation({ registerAdapter = false }: UseEditorNaviga
     () => ({
       ...editor.navigation.getSnapshot(),
       setPage: (nextSlug: string) => editor.navigation.setPage(nextSlug),
+      setLang: (nextLang: string | null) => editor.navigation.setLang(nextLang),
       setSelection: (sectionId: string | null, path: string[] = []) =>
         editor.navigation.setSelection(sectionId, path),
       setSection: (sectionId: string | null, block: string | string[] | null = null) =>

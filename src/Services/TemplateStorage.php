@@ -15,6 +15,7 @@ namespace PageBuilder\Services;
 
 use Illuminate\Support\Facades\File;
 use PageBuilder\Facades\Theme;
+use PageBuilder\PageBuilder;
 
 /**
  * Loads JSON template files from the templates directory.
@@ -129,17 +130,30 @@ final class TemplateStorage
     /**
      * Resolve the absolute file path for the template.
      *
-     * Checks the active theme first, then the configured templates directory.
+     * Resolution order (first match wins):
+     *   1. Active theme's views/templates/{name}.{lang}.json (when language is set)
+     *   2. Active theme's views/templates/{name}.json
+     *   3. config('pagebuilder.templates')/{name}.{lang}.json (when language is set)
+     *   4. config('pagebuilder.templates')/{name}.json
      */
     private function resolvePath(string $name): ?string
     {
-        // 1. Active theme path
-        $themePath = $this->resolveThemePath($name);
+        $lang = PageBuilder::getLang();
+
+        // 1. Active theme path (locale-specific first, then default)
+        $themePath = $this->resolveThemePath($name, $lang);
         if ($themePath !== null) {
             return $themePath;
         }
 
-        // 2. Default templates path
+        // 2. Default templates path (locale-specific first, then default)
+        if ($lang !== null) {
+            $localePath = rtrim($this->templatesPath, '/').'/'.str_replace('..', '', $name).'.'.$lang.'.json';
+            if (File::exists($localePath)) {
+                return $localePath;
+            }
+        }
+
         $path = rtrim($this->templatesPath, '/').'/'.str_replace('..', '', $name).'.json';
 
         return File::exists($path) ? $path : null;
@@ -147,10 +161,20 @@ final class TemplateStorage
 
     /**
      * Attempt to resolve the template from the active theme.
+     *
+     * Checks locale-specific template first when a language is set.
      */
-    private function resolveThemePath(string $name): ?string
+    private function resolveThemePath(string $name, ?string $lang = null): ?string
     {
         try {
+            // Check locale-specific template first
+            if ($lang !== null) {
+                $localePath = Theme::path('views/templates/'.$name.'.'.$lang.'.json');
+                if ($localePath !== null && File::exists($localePath)) {
+                    return $localePath;
+                }
+            }
+
             $themePath = Theme::path('views/templates/'.$name.'.json');
 
             return ($themePath !== null && File::exists($themePath)) ? $themePath : null;

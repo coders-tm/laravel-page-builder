@@ -7,10 +7,10 @@
  * file that was distributed with this source code.
  */
 import React, { useCallback, useSyncExternalStore } from "react"
-import { DeviceSwitcher, UndoRedoControls, EditorLogo } from "./header"
-import { Crosshair, LogOut } from "lucide-react"
+import { DeviceSwitcher, UndoRedoControls, EditorLogo, LanguageSelector } from "./header"
+import { Check, ChevronDown, Crosshair, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import * as SelectPrimitive from "@radix-ui/react-select"
 import { useEditorInstance } from "@/core/editorContext"
 import { useEditorNavigation } from "@/hooks/useEditorNavigation"
 import { useEditorLayout } from "@/hooks/useEditorLayout"
@@ -25,7 +25,7 @@ import config from "@/config"
 export default function EditorHeader() {
   const editor = useEditorInstance()
   const { pages, saving } = useStore()
-  const { slug, device, setPage, setDevice } = useEditorNavigation()
+  const { slug, device, lang, setPage, setLang, setDevice } = useEditorNavigation()
   const { inspectorEnabled } = useEditorLayout()
   const isMobile = useMaxBreakpoint(768)
 
@@ -57,24 +57,48 @@ export default function EditorHeader() {
 
         {config.mode !== "email" && (
           <div className="relative flex-shrink-0">
-            <Select value={slug || ""} onValueChange={(value) => setPage(value)}>
-              <SelectTrigger className="h-8 w-[160px] border-none bg-transparent font-medium text-gray-800 hover:bg-gray-100 focus:ring-0 focus:ring-offset-0">
-                <SelectValue placeholder="Select page…" />
-              </SelectTrigger>
-              <SelectContent>
-                {pages.map((p) => (
-                  <SelectItem key={p.slug} value={p.slug}>
-                    {p.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SelectPrimitive.Root value={slug || ""} onValueChange={(value) => setPage(value)}>
+              <SelectPrimitive.Trigger className="group/page group inline-flex h-8 w-[160px] items-center justify-between rounded-lg border-none bg-transparent px-3 py-1.5 font-medium text-gray-800 outline-none hover:bg-gray-100 focus:ring-0 focus:ring-offset-0 data-[placeholder]:text-gray-400 [&>span]:line-clamp-1">
+                <SelectPrimitive.Value placeholder="Select page…" />
+                <SelectPrimitive.Icon asChild>
+                  <ChevronDown className="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover/page:opacity-100 group-data-[state=open]/page:opacity-100" />
+                </SelectPrimitive.Icon>
+              </SelectPrimitive.Trigger>
+              <SelectPrimitive.Portal>
+                <SelectPrimitive.Content
+                  className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-96 min-w-[8rem] origin-[--radix-select-content-transform-origin] overflow-hidden rounded-md border border-gray-200 bg-white p-1 text-gray-900 shadow-md"
+                  position="popper"
+                  sideOffset={4}
+                >
+                  <SelectPrimitive.Viewport className="p-1">
+                    {pages.map((p) => (
+                      <SelectPrimitive.Item
+                        key={p.slug}
+                        value={p.slug}
+                        className="relative flex w-full cursor-default items-center rounded-sm py-1.5 pr-8 pl-3 text-sm outline-none select-none focus:bg-blue-50 focus:text-blue-600 data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                      >
+                        <span className="truncate">
+                          <SelectPrimitive.ItemText>{p.title}</SelectPrimitive.ItemText>
+                        </span>
+                        <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
+                          <SelectPrimitive.ItemIndicator>
+                            <Check className="h-4 w-4" />
+                          </SelectPrimitive.ItemIndicator>
+                        </span>
+                      </SelectPrimitive.Item>
+                    ))}
+                  </SelectPrimitive.Viewport>
+                </SelectPrimitive.Content>
+              </SelectPrimitive.Portal>
+            </SelectPrimitive.Root>
           </div>
         )}
       </div>
 
       {/* ── Center: Device switcher + Undo/Redo ────────────────── */}
       <div className="flex flex-1 items-center justify-center gap-1">
+        <LanguageSelector currentLang={lang} onLangChange={setLang} />
+
         <button
           type="button"
           onClick={() => editor.layout.toggleInspector()}

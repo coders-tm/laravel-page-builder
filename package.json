@@ -1,12 +1,13 @@
 {
   "name": "coderstm-laravel-page-builder",
-  "version": "1.4.8",
+  "version": "1.5.0",
   "type": "module",
   "private": true,
   "description": "A section-based page builder for Laravel using layouts and JSON rendering.",
   "scripts": {
     "dev": "vite",
-    "build": "npx tsx build.ts",
+    "build": "vite build",
+    "publish": "npx tsx build.ts",
     "generate:icons": "node generate-icons.mjs",
     "lint": "eslint resources/js/ --fix",
     "format": "prettier --write \"resources/js/**/*.{ts,tsx,css}\"",
