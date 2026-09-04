@@ -17,4 +17,4 @@ workbench/storage
 # Documentation build artifacts
 website/node_modules
 website/docs/.vitepress/dist
-website/docs/.vitepress/cache
+website/docs/.vitepress/cachevideos/

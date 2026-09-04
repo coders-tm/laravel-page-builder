@@ -252,7 +252,7 @@ test('returns custom blade view response when editor=true parameter is present b
 });
 
 test('returns nested custom blade view response for nested slug when custom view exists', function () {
-    $viewDir = __DIR__.'/../../../../workbench/resources/views/pages/nested';
+    $viewDir = resource_path('views/pages/nested');
     $viewPath = $viewDir.'/custom.blade.php';
     @mkdir($viewDir, 0755, true);
     file_put_contents($viewPath, '<div>Nested Custom Blade View</div>');

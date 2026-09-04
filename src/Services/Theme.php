@@ -39,6 +39,10 @@ class Theme extends Base
      */
     public static function set(string $theme, ?string $parentTheme = null): void
     {
+        if (! File::exists(self::finder()->getThemePath($theme))) {
+            return;
+        }
+
         $config = self::config($theme);
 
         if (! $parentTheme && isset($config['parent'])) {
@@ -46,10 +50,6 @@ class Theme extends Base
         }
 
         self::finder()->setActiveTheme($theme, $parentTheme);
-
-        if (! File::exists(self::finder()->getThemePath($theme))) {
-            return;
-        }
 
         // Load theme translations from the theme's lang directory
         self::loadTranslations($theme);

@@ -45,7 +45,7 @@ class PageService
 
         // Share the DB page model with all views rendered in this request,
         // so section views (e.g. page-content) can access $page->title, $page->content, etc.
-        View::share('page', $dbPage);
+        $this->share($dbPage);
 
         // ── 0. Editor frame mode ──────────────────────────────────────────
         // Load the editor frame only when explicitly requested.
@@ -321,5 +321,21 @@ class PageService
         }
 
         return (bool) $page->update($fillable);
+    }
+
+    /**
+     * Share data with all Blade views rendered in this request.
+     * If a Model or null is provided as the sole argument, it is shared under 'page'.
+     *
+     * @param  mixed  $key  Key name, array of key-values, or a Model/null to share under 'page'
+     * @param  mixed  $value  Value when $key is a string key name
+     */
+    public function share(mixed $key, mixed $value = null): mixed
+    {
+        if ($key instanceof Model || ($key === null && func_num_args() === 1)) {
+            return View::share('page', $key);
+        }
+
+        return View::share($key, $value);
     }
 }

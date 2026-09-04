@@ -8,7 +8,7 @@ use PageBuilder\Facades\Page;
 
 test('custom view takes precedence over editor mode', function () {
     // 1. Create a physical Blade view in the workbench
-    $viewPath = __DIR__.'/../../workbench/resources/views/pages/about-static.blade.php';
+    $viewPath = resource_path('views/pages/about-static.blade.php');
     @mkdir(dirname($viewPath), 0755, true);
     file_put_contents($viewPath, 'Custom Static Content');
 

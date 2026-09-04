@@ -6,7 +6,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\View as FacadesView;
 use PageBuilder\Facades\Page;
 use PageBuilder\PageBuilder;
 use PageBuilder\Registry\BlockRegistry;
@@ -96,7 +95,7 @@ class PageBuilderController extends Controller
             [$page, $isResolved] = Page::resolve($slug, $dbPage);
 
             // Share the DB page model with all views rendered in this request
-            FacadesView::share('page', $dbPage);
+            Page::share($dbPage);
             $extraData['page'] = $dbPage;
             $extraData['__pb_page'] = $dbPage;
         }
@@ -136,7 +135,7 @@ class PageBuilderController extends Controller
 
         if ($slug) {
             $dbPage = Page::findBySlug($slug);
-            View::share('page', $dbPage);
+            Page::share($dbPage);
         }
 
         $blockData = [

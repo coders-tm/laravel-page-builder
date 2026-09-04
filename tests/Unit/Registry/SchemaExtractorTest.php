@@ -9,7 +9,7 @@ beforeEach(function () {
 });
 function getFixturePath(string $type, string $filename): string
 {
-    return realpath(__DIR__.'/../../../workbench/resources/views/'.$type.'/'.$filename);
+    return resource_path('/views/'.$type.'/'.$filename);
 }
 test('extract valid schema', function () {
     $path = getFixturePath('sections', 'hero.blade.php');

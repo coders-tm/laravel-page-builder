@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PageBuilder\Collections\BlockCollection;
-use PageBuilder\Collections\SectionCollection;
 use PageBuilder\Components\Block;
 use PageBuilder\Components\Section;
 use PageBuilder\Components\Settings;

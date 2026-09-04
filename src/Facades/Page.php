@@ -8,6 +8,7 @@ use PageBuilder\Services\PageService;
 /**
  * @method static array resolve(string $slug, ?\Illuminate\Database\Eloquent\Model $dbPage = null)
  * @method static mixed render(string $slug, array $meta = [])
+ * @method static mixed share(mixed $key, mixed $value = null)
  * @method static void routes()
  * @method static array allActive()
  * @method static \Illuminate\Database\Eloquent\Model|null findBySlug(string $slug)
