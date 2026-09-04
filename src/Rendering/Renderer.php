@@ -13,15 +13,13 @@ namespace PageBuilder\Rendering;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
-use PageBuilder\Collections\BlockCollection;
 use PageBuilder\Components\BaseComponent;
 use PageBuilder\Components\Block;
 use PageBuilder\Components\Section;
 use PageBuilder\Components\Settings;
+use PageBuilder\Contracts\RendererInterface;
 use PageBuilder\PageBuilder;
-use PageBuilder\Registry\BlockRegistry;
 use PageBuilder\Registry\SectionRegistry;
-use PageBuilder\Schema\BlockSchema;
 use PageBuilder\Schema\SectionSchema;
 
 /**
@@ -31,7 +29,7 @@ use PageBuilder\Schema\SectionSchema;
  * using schema definitions from the SectionRegistry, then renders
  * them through Blade views.
  */
-class Renderer
+class Renderer implements RendererInterface
 {
     /**
      * Holds extra view variables (e.g. 'page') for the section currently being
@@ -41,9 +39,23 @@ class Renderer
      */
     protected array $renderContext = [];
 
+    /**
+     * Cache for View::exists() results to avoid repeated filesystem checks.
+     *
+     * @var array<string, bool>
+     */
+    protected array $viewExistsCache = [];
+
+    /**
+     * Cache for View objects keyed by view name to avoid repeated factory calls.
+     *
+     * @var array<string, \Illuminate\View\View>
+     */
+    protected array $viewCache = [];
+
     public function __construct(
         protected readonly SectionRegistry $registry,
-        protected readonly BlockRegistry $blockRegistry,
+        protected readonly BlockHydrator $hydrator,
     ) {}
 
     /**
@@ -59,9 +71,9 @@ class Renderer
             return "<!-- Section type '{$section->type}' not found -->";
         }
 
-        $viewName = $meta['view'];
+        $viewName = $meta->view;
 
-        if (! View::exists($viewName)) {
+        if (! $this->viewExists($viewName)) {
             return "<!-- View '{$viewName}' not found -->";
         }
 
@@ -82,7 +94,8 @@ class Renderer
         $this->renderContext = $evalData;
 
         try {
-            $html = (string) view($viewName, array_merge($data, ['section' => $section]))->render();
+            $viewData = array_merge($data, ['section' => $section]);
+            $html = $this->renderViewCached($viewName, $viewData);
         } finally {
             $this->renderContext = $previous;
         }
@@ -102,11 +115,7 @@ class Renderer
      * Only processes strings that actually contain {{ or @, so there is no
      * overhead for plain-text settings.
      *
-     * @template T of BaseComponent
-     *
-     * @param  T  $component
      * @param  array<string, mixed>  $data  Variables available to Blade expressions.
-     * @return T
      */
     protected function evaluateBladeInComponentSettings(BaseComponent $component, array $data): BaseComponent
     {
@@ -124,7 +133,7 @@ class Renderer
             }
 
             try {
-                $raw[$key] = Blade::render($value, $data, deleteCachedView: true);
+                $raw[$key] = Blade::render($value, $data);
                 $changed = true;
             } catch (\Throwable) {
                 // Leave unchanged on any compile/runtime error
@@ -146,7 +155,7 @@ class Renderer
     {
         $viewName = "blocks.{$block->type}";
 
-        if (! View::exists($viewName)) {
+        if (! $this->viewExists($viewName)) {
             return "<!-- Block view '{$viewName}' not found -->";
         }
 
@@ -156,10 +165,10 @@ class Renderer
             $block = $this->evaluateBladeInComponentSettings($block, $this->renderContext);
         }
 
-        return (string) view($viewName, [
+        return $this->renderViewCached($viewName, [
             'block' => $block,
             'parent' => $parent ?? $block->parent,
-        ])->render();
+        ]);
     }
 
     /**
@@ -191,41 +200,9 @@ class Renderer
     }
 
     /**
-     * Hydrate a raw block array into a typed Block object.
-     */
-    public function hydrateBlock(string $blockId, array $data, bool $editor = false): Block
-    {
-        $blockType = $data['type'] ?? 'block';
-
-        $themeEntry = $this->blockRegistry->get($blockType);
-        $blockSchema = $themeEntry['schema'] ?? null;
-
-        $settingDefaults = $blockSchema instanceof BlockSchema
-            ? $blockSchema->settingDefaults()
-            : [];
-
-        $nestedBlocks = $this->hydrateBlocks(
-            rawBlocks: is_array($data['blocks'] ?? null) ? $data['blocks'] : [],
-            blockOrder: $data['order'] ?? null,
-            schema: null,
-            editor: $editor,
-        );
-
-        return new Block([
-            'id' => $blockId,
-            'type' => $blockType,
-            'name' => $blockSchema?->name,
-            'disabled' => ! empty($data['disabled']),
-            'settings' => new Settings(
-                values: $data['settings'] ?? [],
-                defaults: $settingDefaults,
-            ),
-            'blocks' => $nestedBlocks,
-        ]);
-    }
-
-    /**
      * Hydrate a raw section array (from page JSON) into a typed Section object.
+     *
+     * @param  array{type?: string, settings?: array<string, mixed>, blocks?: array<string, mixed>, order?: list<string>|null, disabled?: bool}  $data
      */
     public function hydrateSection(string $sectionId, array $data, bool $editor = false): Section
     {
@@ -233,7 +210,7 @@ class Renderer
         $meta = $this->registry->get($type);
 
         /** @var SectionSchema|null $schema */
-        $schema = $meta['schema'] ?? null;
+        $schema = $meta?->schema;
 
         $settingDefaults = $schema ? $schema->settingDefaults() : [];
 
@@ -246,7 +223,7 @@ class Renderer
                 values: $data['settings'] ?? [],
                 defaults: $settingDefaults,
             ),
-            'blocks' => $this->hydrateBlocks(
+            'blocks' => $this->hydrator->hydrateBlocks(
                 rawBlocks: is_array($data['blocks'] ?? null) ? $data['blocks'] : [],
                 blockOrder: $data['order'] ?? null,
                 schema: $schema,
@@ -263,124 +240,77 @@ class Renderer
     }
 
     /**
-     * Build an ordered BlockCollection from raw block data.
-     *
-     * Disabled blocks are always skipped.
-     *
-     * Schema resolution: inline section block → BlockRegistry fallback.
-     * Nested blocks are hydrated recursively.
-     */
-    protected function hydrateBlocks(
-        array $rawBlocks,
-        ?array $blockOrder,
-        ?SectionSchema $schema,
-        bool $editor,
-    ): BlockCollection {
-        $order = $blockOrder ?? array_keys($rawBlocks);
-        $ordered = [];
-
-        foreach ($order as $blockId) {
-            if (! isset($rawBlocks[$blockId])) {
-                continue;
-            }
-
-            $raw = $rawBlocks[$blockId];
-            $disabled = ! empty($raw['disabled']);
-
-            if ($disabled) {
-                continue;
-            }
-
-            $blockType = $raw['type'] ?? 'block';
-
-            // 1. Look for an inline (static) block schema in the section.
-            $blockSchema = $schema?->blockSchema($blockType);
-
-            // 2. Fall back to BlockRegistry for type-reference-only entries,
-            //    @theme wildcards, and recursive nested hydration (schema === null).
-            if ($blockSchema === null) {
-                $themeEntry = $this->blockRegistry->get($blockType);
-                $blockSchema = $themeEntry['schema'] ?? null;
-            }
-
-            $settingDefaults = $blockSchema instanceof BlockSchema
-                ? $blockSchema->settingDefaults()
-                : [];
-
-            // Recursively hydrate nested blocks (e.g. columns inside a row).
-            $nestedBlocks = $this->hydrateBlocks(
-                rawBlocks: is_array($raw['blocks'] ?? null) ? $raw['blocks'] : [],
-                blockOrder: $raw['order'] ?? null,
-                schema: null,
-                editor: $editor,
-            );
-
-            $block = new Block([
-                'id' => $blockId,
-                'type' => $blockType,
-                'name' => $blockSchema?->name,
-                'disabled' => $disabled,
-                'settings' => new Settings(
-                    values: $raw['settings'] ?? [],
-                    defaults: $settingDefaults,
-                ),
-                'blocks' => $nestedBlocks,
-            ]);
-
-            // Post-hydration: Connect child blocks to parent block
-            foreach ($nestedBlocks as $child) {
-                $child->parent = $block;
-            }
-
-            $ordered[$blockId] = $block;
-        }
-
-        return new BlockCollection($ordered);
-    }
-
-    /**
      * Render a raw section array directly (for API preview calls).
      *
      * Hydrates the data into a Section object, then renders it.
      *
+     * @param  array{type?: string, settings?: array<string, mixed>, blocks?: array<string, mixed>, order?: list<string>|null, disabled?: bool}  $sectionData
      * @param  array<string, mixed>  $data  Extra view variables (e.g. ['page' => $pageData])
      */
     public function renderRawSection(string $sectionId, array $sectionData, bool $editor = false, array $data = []): string
     {
-        if ($editor) {
-            PageBuilder::enableEditor();
-        }
-
-        try {
-            $section = $this->hydrateSection($sectionId, $sectionData, $editor);
-
-            return $this->renderSection($section, $data);
-        } finally {
-            if ($editor) {
-                PageBuilder::disableEditor();
-            }
-        }
+        return $this->withEditor($editor, fn () => $this->renderSection(
+            $this->hydrateSection($sectionId, $sectionData, $editor), $data
+        ));
     }
 
     /**
      * Render a raw block array directly (for API preview calls).
      *
      * Hydrates the data into a Block object, then renders it.
+     *
+     * @param  array{type?: string, settings?: array<string, mixed>, blocks?: array<string, mixed>, order?: list<string>|null, disabled?: bool}  $blockData
      */
     public function renderRawBlock(string $blockId, array $blockData, bool $editor = false): string
+    {
+        return $this->withEditor($editor, fn () => $this->renderBlock(
+            $this->hydrator->hydrateBlock($blockId, $blockData, $editor)
+        ));
+    }
+
+    /**
+     * Execute a render callback with editor mode optionally enabled.
+     *
+     * Ensures editor mode is always disabled after the callback completes,
+     * even if the callback throws an exception.
+     */
+    private function withEditor(bool $editor, callable $render): string
     {
         if ($editor) {
             PageBuilder::enableEditor();
         }
 
         try {
-            $block = $this->hydrateBlock($blockId, $blockData, $editor);
-
-            return $this->renderBlock($block);
+            return $render();
         } finally {
             if ($editor) {
                 PageBuilder::disableEditor();
             }
         }
+    }
+
+    /**
+     * Check if a view exists, with filesystem result caching.
+     */
+    protected function viewExists(string $viewName): bool
+    {
+        return $this->viewExistsCache[$viewName] ??= View::exists($viewName);
+    }
+
+    /**
+     * Render a view using a cached View object to avoid repeated factory calls.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected function renderViewCached(string $viewName, array $data): string
+    {
+        if (! isset($this->viewCache[$viewName])) {
+            $this->viewCache[$viewName] = view($viewName);
+        }
+
+        $view = clone $this->viewCache[$viewName];
+        $view->with($data);
+
+        return (string) $view->render();
     }
 }

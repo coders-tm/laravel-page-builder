@@ -35,7 +35,7 @@ abstract class BaseRegistry
     /**
      * Cached resolved entries.
      *
-     * @var array<string, array{type: string, view: string, schema: TSchema}>|null
+     * @var array<string, RegistryEntry>|null
      */
     protected ?array $items = null;
 
@@ -103,17 +103,17 @@ abstract class BaseRegistry
     {
         $this->resolve();
 
-        $this->items[$type] = [
-            'type' => $type,
-            'view' => $view ?? "{$this->viewPrefix()}.{$type}",
-            'schema' => $schema,
-        ];
+        $this->items[$type] = new RegistryEntry(
+            type: $type,
+            view: $view ?? "{$this->viewPrefix()}.{$type}",
+            schema: $schema,
+        );
     }
 
     /**
      * Get a specific entry by type, or all entries.
      */
-    public function get(?string $type = null): ?array
+    public function get(?string $type = null): RegistryEntry|array|null
     {
         $this->resolve();
 
@@ -178,11 +178,11 @@ abstract class BaseRegistry
                 $schema = $this->createSchema($type, $rawSchema);
 
                 // Later registrations (themes) override earlier ones.
-                $this->items[$type] = [
-                    'type' => $type,
-                    'view' => $viewName,
-                    'schema' => $schema,
-                ];
+                $this->items[$type] = new RegistryEntry(
+                    type: $type,
+                    view: $viewName,
+                    schema: $schema,
+                );
             }
         }
     }

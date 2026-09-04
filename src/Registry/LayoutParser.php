@@ -117,7 +117,7 @@ class LayoutParser
         ];
 
         $meta = $this->sectionRegistry->get($key);
-        $schema = $meta['schema'] ?? null;
+        $schema = $meta?->schema;
 
         if (! ($schema instanceof SectionSchema) || empty($schema->presets)) {
             return $base;

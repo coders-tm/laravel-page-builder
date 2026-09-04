@@ -9,6 +9,7 @@
  * file that was distributed with this source code.
  */
 
+use PageBuilder\Registry\RegistryEntry;
 use PageBuilder\Registry\SectionRegistry;
 use PageBuilder\Schema\SectionSchema;
 
@@ -20,10 +21,9 @@ test('auto discovers sections from path', function () {
     expect($this->registry->has('hero'))->toBeTrue();
 
     $entry = $this->registry->get('hero');
-    expect($entry)->toBeArray();
-    expect($entry)->toHaveKey('schema');
-    expect($entry['schema'])->toBeInstanceOf(SectionSchema::class);
-    expect($entry['schema']->name)->toBe('Hero');
+    expect($entry)->toBeInstanceOf(RegistryEntry::class);
+    expect($entry->schema)->toBeInstanceOf(SectionSchema::class);
+    expect($entry->schema->name)->toBe('Hero');
 });
 test('types returns all registered types', function () {
     $types = $this->registry->types();
@@ -46,21 +46,21 @@ test('register manual schema', function () {
 
     expect($this->registry->has('custom'))->toBeTrue();
     $entry = $this->registry->get('custom');
-    expect($entry['schema']->name)->toBe('Custom Section');
-    expect($entry['view'])->toBe('sections.custom');
+    expect($entry->schema->name)->toBe('Custom Section');
+    expect($entry->view)->toBe('sections.custom');
 });
 test('get all returns all entries', function () {
     $all = $this->registry->get();
     expect($all)->toBeArray();
     expect($all)->toHaveKey('hero');
-    expect($all['hero']['schema'])->toBeInstanceOf(SectionSchema::class);
+    expect($all['hero']->schema)->toBeInstanceOf(SectionSchema::class);
 });
 test('has returns false for invalid schema', function () {
     expect($this->registry->has('non-schema-file-name'))->toBeFalse();
 });
 test('section with blocks and presets', function () {
     $entry = $this->registry->get('content');
-    $schema = $entry['schema'];
+    $schema = $entry->schema;
 
     expect($schema->name)->toBe('Content');
     expect($schema->settings)->toHaveCount(0);

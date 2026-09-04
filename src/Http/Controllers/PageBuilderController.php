@@ -15,12 +15,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use PageBuilder\Contracts\RendererInterface;
 use PageBuilder\Facades\Page;
 use PageBuilder\PageBuilder;
 use PageBuilder\Registry\BlockRegistry;
 use PageBuilder\Registry\LayoutParser;
 use PageBuilder\Registry\SectionRegistry;
-use PageBuilder\Rendering\Renderer;
 use PageBuilder\Services\PageRenderer;
 use PageBuilder\Services\PageStorage;
 use PageBuilder\Services\ThemeSettings;
@@ -32,7 +32,7 @@ class PageBuilderController extends Controller
         protected PageStorage $pageStorage,
         protected SectionRegistry $sectionRegistry,
         protected BlockRegistry $blockRegistry,
-        protected Renderer $renderer,
+        protected RendererInterface $renderer,
         protected ThemeSettings $themeSettings,
         protected LayoutParser $layoutParser,
     ) {}

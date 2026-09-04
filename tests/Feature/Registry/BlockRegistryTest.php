@@ -10,6 +10,7 @@
  */
 
 use PageBuilder\Registry\BlockRegistry;
+use PageBuilder\Registry\RegistryEntry;
 use PageBuilder\Schema\BlockSchema;
 
 beforeEach(function () {
@@ -19,14 +20,14 @@ test('auto discovers blocks from path', function () {
     expect($this->registry->has('row'))->toBeTrue();
 
     $entry = $this->registry->get('row');
-    expect($entry)->toBeArray();
-    expect($entry['schema'])->toBeInstanceOf(BlockSchema::class);
-    expect($entry['schema']->name)->toBe('Row');
-    expect($entry['schema']->type)->toBe('row');
+    expect($entry)->toBeInstanceOf(RegistryEntry::class);
+    expect($entry->schema)->toBeInstanceOf(BlockSchema::class);
+    expect($entry->schema->name)->toBe('Row');
+    expect($entry->schema->type)->toBe('row');
 });
 test('prepare raw schema injects type', function () {
     $entry = $this->registry->get('column');
-    expect($entry['schema']->type)->toBe('column');
+    expect($entry->schema->type)->toBe('column');
 });
 test('types returns all registered', function () {
     $types = $this->registry->types();
@@ -46,7 +47,7 @@ test('register manual block', function () {
 
     expect($this->registry->has('text'))->toBeTrue();
     $entry = $this->registry->get('text');
-    expect($entry['schema']->name)->toBe('Text Block');
+    expect($entry->schema->name)->toBe('Text Block');
 });
 test('skips blade files without schema', function () {
     expect($this->registry->has('non-schema'))->toBeFalse();

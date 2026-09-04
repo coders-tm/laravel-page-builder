@@ -19,68 +19,54 @@ use PageBuilder\Support\PageData;
 
 /**
  * Registers Blade directives for the page builder.
- *
- *   @blocks($section|$block)  — renders blocks within a section or container block
- *
- *   @schema([...])            — no-op (extracted at registration time)
- *
- *   @layout([...])            — partial layout config override (header/footer sections)
- *
- *   @editor(...)       — renders the <html> class attribute
- *
- *   @fonts                  — emits Google Fonts <link> tags
  */
 class BladeDirectives
 {
-    /**
-     * Pending layout overrides stored by @layout directive, awaiting application
-     * by the @sections directive when it renders a layout section.
-     *
-     * @var array<string, mixed>
-     */
-    private static array $pendingLayoutOverrides = [];
+    private const REQUEST_KEY = '_pb_layout_overrides';
 
     /**
      * Register all page builder Blade directives.
      */
     public static function register(): void
     {
-        // @block($block, $parent) — renders a single block
+        self::registerBlockDirectives();
+        self::registerLayoutDirectives();
+        self::registerUtilityDirectives();
+    }
+
+    private static function registerBlockDirectives(): void
+    {
         Blade::directive('block', function (string $expression) {
             return <<<PHP
 <?php
-echo app(\PageBuilder\Rendering\Renderer::class)->renderBlock({$expression});
+\$_pb_renderer = \$_pb_renderer ?? app(\PageBuilder\Contracts\RendererInterface::class);
+echo \$_pb_renderer->renderBlock({$expression});
 ?>
 PHP;
         });
 
-        // @blocks($section) — renders all blocks within a section
-        // @blocks($block)   — renders child blocks inside a container block
         Blade::directive('blocks', function (string $expression) {
             return <<<PHP
 <?php
+\$_pb_renderer = \$_pb_renderer ?? app(\PageBuilder\Contracts\RendererInterface::class);
 \$__pb_ctx = {$expression};
 if (\$__pb_ctx instanceof \PageBuilder\Components\Block) {
-    echo app(\PageBuilder\Rendering\Renderer::class)
-        ->renderBlockChildren(\$__pb_ctx);
+    echo \$_pb_renderer->renderBlockChildren(\$__pb_ctx);
 } else {
-    echo app(\PageBuilder\Rendering\Renderer::class)
-        ->renderBlocks(\$__pb_ctx);
+    echo \$_pb_renderer->renderBlocks(\$__pb_ctx);
 }
 unset(\$__pb_ctx);
 ?>
 PHP;
         });
+    }
 
-        // @schema() — no-op; extracted at registration time, ignored at render
+    private static function registerLayoutDirectives(): void
+    {
         Blade::directive('schema', function () {
             return '<?php /* @schema */ ?>';
         });
 
-        // @sections('key')
-        // Renders a layout section (header, footer, etc.) from $__pb_layout.
-        // Searches header zone then footer zone by key — no second argument needed.
-        // Also applies any pending layout overrides from @layout before rendering.
         Blade::directive('sections', function (string $expression) {
             return <<<PHP
 <?php
@@ -93,24 +79,6 @@ echo \PageBuilder\Rendering\BladeDirectives::renderLayoutSection(\$__pb_layout ?
 PHP;
         });
 
-        // @editor('dark') — renders class="dark js pb-design-mode" in editor mode.
-        Blade::directive('editor', function (string $expression) {
-            $expression = trim($expression);
-
-            return $expression === ''
-                ? "<?php echo \PageBuilder\PageBuilder::classAttribute(); ?>"
-                : "<?php echo \PageBuilder\PageBuilder::classAttribute({$expression}); ?>";
-        });
-
-        // @fonts — emits Google Fonts <link> tags for any google_font settings
-        Blade::directive('fonts', function () {
-            return '<?php echo \PageBuilder\Rendering\BladeDirectives::renderFonts(); ?>';
-        });
-
-        // @layout(['header' => [...], 'footer' => [...]])
-        // Stores a partial layout config that will be merged into $__pb_layout
-        // by the next @sections() directive call. Allows custom Blade pages to
-        // tweak header/footer sections without a full layout object.
         Blade::directive('layout', function (string $expression) {
             return sprintf(
                 '<?php \PageBuilder\Rendering\BladeDirectives::storePendingOverrides(%s); ?>',
@@ -119,16 +87,31 @@ PHP;
         });
     }
 
+    private static function registerUtilityDirectives(): void
+    {
+        Blade::directive('editor', function (string $expression) {
+            $expr = trim($expression);
+
+            return $expr === ''
+                ? "<?php echo \\PageBuilder\\PageBuilder::classAttribute(); ?>"
+                : "<?php echo \\PageBuilder\\PageBuilder::classAttribute({$expr}); ?>";
+        });
+
+        Blade::directive('fonts', function () {
+            return '<?php echo \PageBuilder\Rendering\BladeDirectives::renderFonts(); ?>';
+        });
+    }
+
     /**
      * Store pending layout overrides for application by the @sections directive.
      *
-     * Called by the compiled @layout directive when a layout array is provided.
+     * Uses request attributes to avoid static state issues in Octane.
      *
      * @param  array<string, mixed>  $overrides  Partial layout config to merge
      */
     public static function storePendingOverrides(array $overrides): void
     {
-        self::$pendingLayoutOverrides = $overrides;
+        request()->attributes->set(self::REQUEST_KEY, $overrides);
     }
 
     /**
@@ -138,8 +121,9 @@ PHP;
      */
     public static function getPendingOverrides(): array
     {
-        $overrides = self::$pendingLayoutOverrides;
-        self::$pendingLayoutOverrides = [];
+        $overrides = request()->attributes->get(self::REQUEST_KEY, []);
+
+        request()->attributes->remove(self::REQUEST_KEY);
 
         return $overrides;
     }
@@ -172,7 +156,7 @@ PHP;
         }
 
         // Reuse existing Renderer::renderRawSection() — same path as body sections
-        $renderer = app(Renderer::class);
+        $renderer = app(\PageBuilder\Contracts\RendererInterface::class);
 
         return $renderer->renderRawSection($key, $raw, PageBuilder::editor(), [
             '__pb_layout' => $layout,

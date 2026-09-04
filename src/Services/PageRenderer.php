@@ -11,7 +11,7 @@
 
 namespace PageBuilder\Services;
 
-use PageBuilder\Rendering\Renderer;
+use PageBuilder\Contracts\RendererInterface;
 use PageBuilder\Support\PageData;
 use PageBuilder\Support\WrapperParser;
 
@@ -23,7 +23,7 @@ use PageBuilder\Support\WrapperParser;
 class PageRenderer
 {
     public function __construct(
-        protected readonly Renderer $renderer,
+        protected readonly RendererInterface $renderer,
         protected readonly PageStorage $storage,
         protected readonly WrapperParser $wrapperParser,
     ) {}

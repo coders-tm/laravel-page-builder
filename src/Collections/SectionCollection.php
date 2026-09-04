@@ -12,7 +12,7 @@
 namespace PageBuilder\Collections;
 
 use PageBuilder\Components\Section;
-use PageBuilder\Rendering\Renderer;
+use PageBuilder\Contracts\RendererInterface;
 
 /**
  * Ordered collection of Section instances for a page.
@@ -35,7 +35,7 @@ final class SectionCollection extends BaseCollection
      */
     public function render(): string
     {
-        $renderer = app(Renderer::class);
+        $renderer = app(RendererInterface::class);
 
         $html = '';
 

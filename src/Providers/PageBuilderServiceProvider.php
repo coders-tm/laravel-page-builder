@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use PageBuilder\Commands;
+use PageBuilder\Contracts;
 use PageBuilder\Contracts\SettingsStoreInterface;
 use PageBuilder\Facades;
 use PageBuilder\Http\Middleware;
@@ -100,12 +101,20 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         // ─── Rendering ──────────────────────────────────────────
 
-        $this->app->singleton(Rendering\Renderer::class, function ($app) {
-            return new Rendering\Renderer(
-                $app->make(Registry\SectionRegistry::class),
+        $this->app->singleton(Rendering\BlockHydrator::class, function ($app) {
+            return new Rendering\BlockHydrator(
                 $app->make(Registry\BlockRegistry::class),
             );
         });
+
+        $this->app->singleton(Rendering\Renderer::class, function ($app) {
+            return new Rendering\Renderer(
+                $app->make(Registry\SectionRegistry::class),
+                $app->make(Rendering\BlockHydrator::class),
+            );
+        });
+
+        $this->app->alias(Rendering\Renderer::class, Contracts\RendererInterface::class);
 
         $this->app->singleton(PageRenderer::class, function ($app) {
             return new PageRenderer(

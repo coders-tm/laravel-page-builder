@@ -18,6 +18,7 @@ use Illuminate\Support\HtmlString;
 use PageBuilder\Facades\Page;
 use PageBuilder\Observers\PageObserver;
 use PageBuilder\Registry\BlockRegistry;
+use PageBuilder\Registry\RegistryEntry;
 use PageBuilder\Registry\SectionRegistry;
 use PageBuilder\Services\PageRegistry;
 use PageBuilder\Services\TemplateStorage;
@@ -243,8 +244,14 @@ class PageBuilder
                     ])
                     ->all()
             ),
-            'sections' => $registry->get(),
-            'blocks' => $blocks->get(),
+            'sections' => array_map(
+                static fn (RegistryEntry $entry): array => $entry->toArray(),
+                $registry->get() ?? []
+            ),
+            'blocks' => array_map(
+                static fn (RegistryEntry $entry): array => $entry->toArray(),
+                $blocks->get() ?? []
+            ),
             'themeSettings' => app(ThemeSettings::class)->toArray(),
             'preservedParams' => config('pagebuilder.preserved_params', []),
         ];

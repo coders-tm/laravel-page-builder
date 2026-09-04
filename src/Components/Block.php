@@ -26,9 +26,11 @@ use PageBuilder\Rendering\EditorAttributes;
  */
 class Block extends BaseComponent
 {
+    public const DEFAULT_TYPE = 'block';
+
     protected function defaultType(): string
     {
-        return 'block';
+        return self::DEFAULT_TYPE;
     }
 
     public function editorAttributes(): string
