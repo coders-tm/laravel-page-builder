@@ -1,8 +1,11 @@
-// AUTO-GENERATED — do not edit manually.
-// Re-generate with: yarn generate:icons
-//
-// Source: @material-design-icons/svg (10610 entries across 5 variants)
-
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 export type MdIcon = { label: string; value: string; group?: string };
 
 const MD_ICONS: MdIcon[] = [

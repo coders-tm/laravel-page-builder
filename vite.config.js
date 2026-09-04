@@ -11,11 +11,6 @@ function hotFilePlugin() {
         const address = server.httpServer?.address();
         const isAddressInfo = (x) => typeof x === "object";
         if (isAddressInfo(address)) {
-          // Normalise the bound address:
-          //   "::"  → IPv6 wildcard → use "localhost"
-          //   "::1" → IPv6 loopback → use "localhost"
-          //   any other IPv6 literal → wrap in brackets
-          //   everything else → use as-is
           let host = address.address;
           if (host === "::" || host === "::1") {
             host = "localhost";

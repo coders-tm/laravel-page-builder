@@ -1,14 +1,11 @@
-/**
- * DrawerManager — centralized mobile bottom-drawer state.
+/*
+ * This file is part of the Laravel Page Builder package.
  *
- * Tracks which panel (if any) is currently open in the mobile drawer.
- * Follows the same subscribe/notify pattern as LayoutManager so React
- * components can subscribe via useSyncExternalStore.
+ * (c) Dipak Sarkar <dipak@coderstm.com>
  *
- * This class is exported as a module-level singleton (`drawerManager`) so
- * any component can react to drawer state without prop drilling.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-
 export type MobileDrawerPanel = "sections" | "page" | "theme"
 
 interface DrawerState {

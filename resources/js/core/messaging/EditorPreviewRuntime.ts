@@ -1,5 +1,11 @@
-// Editor Script & Styles to be injected into the preview Iframe
-
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 export const EDITOR_CSS = `
 /* Disable pointer events on links/buttons in design mode so clicks hit our section boundaries */
 .pb-design-mode a[href]:not([data-live-text-setting]),

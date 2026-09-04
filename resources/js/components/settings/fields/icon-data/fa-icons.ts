@@ -1,9 +1,11 @@
-// AUTO-GENERATED — do not edit manually.
-// Re-generate with: yarn generate:icons
-//
-// Source: @fortawesome/free-{solid,regular,brands}-svg-icons
-// Total: 2141 entries
-
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 export type FaIcon = { label: string; value: string; group?: string };
 
 const FA_ICONS: FaIcon[] = [

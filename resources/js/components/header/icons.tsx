@@ -1,10 +1,11 @@
-/**
- * Icons from lucide-react for the editor header.
+/*
+ * This file is part of the Laravel Page Builder package.
  *
- * Re-exported here to keep the header layer clean and allow
- * for future custom icon overrides if needed.
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-
 export {
   Monitor as DesktopIcon,
   Smartphone as MobileIcon,

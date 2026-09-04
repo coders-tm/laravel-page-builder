@@ -1,3 +1,11 @@
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 var Zve = Object.defineProperty;
 var ehe = (a, e, l) => e in a ? Zve(a, e, { enumerable: !0, configurable: !0, writable: !0, value: l }) : a[e] = l;
 var He = (a, e, l) => ehe(a, typeof e != "symbol" ? e + "" : e, l);

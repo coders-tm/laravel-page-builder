@@ -1,13 +1,11 @@
-/**
- * Thin wrapper around the native Fetch API that handles:
+/*
+ * This file is part of the Laravel Page Builder package.
  *
- *  - CSRF token injection (reads from <meta name="csrf-token">)
- *  - Accept / Content-Type headers for JSON payloads
- *  - Consistent error handling with typed ApiError
+ * (c) Dipak Sarkar <dipak@coderstm.com>
  *
- * All methods return the parsed JSON body directly.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-
 export class ApiError extends Error {
   constructor(
     message: string,

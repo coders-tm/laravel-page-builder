@@ -1,11 +1,11 @@
-/**
- * Editor event map — defines every event the editor can emit
- * and its payload shape.
+/*
+ * This file is part of the Laravel Page Builder package.
  *
- * This gives consumers IntelliSense for `editor.on(…)` and
- * serves as living documentation of the event contract.
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-
 export interface EditorEventMap {
   /* ── Section events ──────────────────────────────────────────────── */
   "section:added": { sectionId: string; type: string }

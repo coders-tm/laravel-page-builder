@@ -1,3 +1,11 @@
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 (function(z2,La){typeof exports=="object"&&typeof module<"u"?module.exports=La():typeof define=="function"&&define.amd?define(La):(z2=typeof globalThis<"u"?globalThis:z2||self,z2.PageBuilder=La())})(this,(function(){"use strict";var Oje=Object.defineProperty;var Ije=(z2,La,Yl)=>La in z2?Oje(z2,La,{enumerable:!0,configurable:!0,writable:!0,value:Yl}):z2[La]=Yl;var He=(z2,La,Yl)=>Ije(z2,typeof La!="symbol"?La+"":La,Yl);var Mpe;function z2(a,e){for(var l=0;l<e.length;l++){const t=e[l];if(typeof t!="string"&&!Array.isArray(t)){for(const r in t)if(r!=="default"&&!(r in a)){const o=Object.getOwnPropertyDescriptor(t,r);o&&Object.defineProperty(a,r,o.get?o:{enumerable:!0,get:()=>t[r]})}}}return Object.freeze(Object.defineProperty(a,Symbol.toStringTag,{value:"Module"}))}function La(a){return a&&a.__esModule&&Object.prototype.hasOwnProperty.call(a,"default")?a.default:a}var Yl={exports:{}},yi={},z5={exports:{}},Je={};/**
  * @license React
  * react.production.min.js

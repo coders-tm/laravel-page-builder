@@ -3,7 +3,9 @@
 
 declare(strict_types=1);
 
-$licenseHeader = '<?php declare(strict_types=1);
+$marker = 'This file is part of the Laravel Page Builder package.';
+
+$phpHeader = '<?php declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -16,19 +18,41 @@ $licenseHeader = '<?php declare(strict_types=1);
 
 ';
 
-$marker = 'This file is part of the Laravel Page Builder package.';
+$jsHeader = <<<'JS'
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-$directories = [
+JS;
+
+$excludedDirs = ['workbench', 'vendor', 'node_modules', 'dist'];
+
+$phpDirs = [
     __DIR__ . '/../src',
     __DIR__ . '/../tests',
     __DIR__ . '/../routes',
 ];
 
-$excludedDirs = ['workbench', 'vendor', 'node_modules'];
+$jsDirs = [
+    __DIR__ . '/../resources/js',
+];
 
-function addLicenseHeader(string $path, string $licenseHeader, string $marker): bool
+$phpExtensions = ['php'];
+$jsExtensions = ['ts', 'tsx', 'js', 'jsx'];
+
+function addLicenseHeader(string $path, string $header, string $marker, array $extensions): bool
 {
-    if (!is_file($path) || pathinfo($path, PATHINFO_EXTENSION) !== 'php') {
+    if (!is_file($path)) {
+        return false;
+    }
+
+    $ext = pathinfo($path, PATHINFO_EXTENSION);
+    if (!in_array($ext, $extensions, true)) {
         return false;
     }
 
@@ -45,21 +69,34 @@ function addLicenseHeader(string $path, string $licenseHeader, string $marker): 
         $content = substr($content, 3);
     }
 
-    $content = preg_replace('/^<\?php\s*/', '', $content);
-    $content = preg_replace('/^declare\s*\(\s*strict_types\s*=\s*1\s*\)\s*;\s*/', '', $content);
-
-    $maxIterations = 10;
-    for ($i = 0; $i < $maxIterations; $i++) {
-        $original = $content;
-        $content = preg_replace('/^\/\*.*?\*\/\s*/s', '', $content);
+    if (in_array($ext, ['php'], true)) {
+        $content = preg_replace('/^<\?php\s*/', '', $content);
         $content = preg_replace('/^declare\s*\(\s*strict_types\s*=\s*1\s*\)\s*;\s*/', '', $content);
-        $content = preg_replace('/^\s+/', '', $content);
-        if ($content === $original) {
-            break;
+
+        $maxIterations = 10;
+        for ($i = 0; $i < $maxIterations; $i++) {
+            $original = $content;
+            $content = preg_replace('/^\/\*.*?\*\/\s*/s', '', $content);
+            $content = preg_replace('/^declare\s*\(\s*strict_types\s*=\s*1\s*\)\s*;\s*/', '', $content);
+            $content = preg_replace('/^\s+/', '', $content);
+            if ($content === $original) {
+                break;
+            }
+        }
+    } else {
+        $maxIterations = 10;
+        for ($i = 0; $i < $maxIterations; $i++) {
+            $original = $content;
+            $content = preg_replace('/^\/\*.*?\*\/\s*/s', '', $content);
+            $content = preg_replace('/^\/\/.*\n/', '', $content);
+            $content = preg_replace('/^\s+/', '', $content);
+            if ($content === $original) {
+                break;
+            }
         }
     }
 
-    file_put_contents($path, $licenseHeader . $content);
+    file_put_contents($path, $header . $content);
 
     return true;
 }
@@ -80,43 +117,76 @@ function isExcluded(string $path, array $excludedDirs): bool
     return false;
 }
 
-$args = array_slice($argv, 1);
-
-if (count($args) > 0) {
+function scanDirectories(array $directories, string $header, string $marker, array $extensions, array $excludedDirs): int
+{
     $updated = 0;
-    foreach ($args as $file) {
+    foreach ($directories as $directory) {
+        if (!is_dir($directory)) {
+            continue;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            $path = $file->getPathname();
+            if (isExcluded($path, $excludedDirs)) {
+                continue;
+            }
+            if (addLicenseHeader($path, $header, $marker, $extensions)) {
+                echo "Updated: $path\n";
+                $updated++;
+            }
+        }
+    }
+    return $updated;
+}
+
+$args = array_slice($argv, 1);
+$mode = 'all';
+$files = [];
+
+foreach ($args as $arg) {
+    if ($arg === '--js') {
+        $mode = 'js';
+    } elseif ($arg === '--php') {
+        $mode = 'php';
+    } else {
+        $files[] = $arg;
+    }
+}
+
+if (count($files) > 0) {
+    $updated = 0;
+    foreach ($files as $file) {
         $file = realpath($file) ?: $file;
         if (isExcluded($file, $excludedDirs)) {
             continue;
         }
-        if (addLicenseHeader($file, $licenseHeader, $marker)) {
-            $updated++;
+        $ext = pathinfo($file, PATHINFO_EXTENSION);
+        if (in_array($ext, $phpExtensions, true)) {
+            if (addLicenseHeader($file, $phpHeader, $marker, $phpExtensions)) {
+                $updated++;
+            }
+        } elseif (in_array($ext, $jsExtensions, true)) {
+            if (addLicenseHeader($file, $jsHeader, $marker, $jsExtensions)) {
+                $updated++;
+            }
         }
     }
     echo "Updated: $updated files\n";
     exit(0);
 }
 
-$updated = 0;
-foreach ($directories as $directory) {
-    if (!is_dir($directory)) {
-        continue;
-    }
+$total = 0;
 
-    $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS)
-    );
-
-    foreach ($iterator as $file) {
-        $path = $file->getPathname();
-        if (isExcluded($path, $excludedDirs)) {
-            continue;
-        }
-        if (addLicenseHeader($path, $licenseHeader, $marker)) {
-            echo "Updated: $path\n";
-            $updated++;
-        }
-    }
+if ($mode === 'all' || $mode === 'php') {
+    $total += scanDirectories($phpDirs, $phpHeader, $marker, $phpExtensions, $excludedDirs);
 }
 
-echo "Done! Updated: $updated files\n";
+if ($mode === 'all' || $mode === 'js') {
+    $total += scanDirectories($jsDirs, $jsHeader, $marker, $jsExtensions, $excludedDirs);
+}
+
+echo "Done! Updated: $total files\n";

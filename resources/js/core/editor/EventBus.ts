@@ -1,15 +1,11 @@
-/**
- * Typed event emitter for the editor.
+/*
+ * This file is part of the Laravel Page Builder package.
  *
- * Provides a publish/subscribe mechanism so that any manager or external
- * consumer can react to editor events without tight coupling.
+ * (c) Dipak Sarkar <dipak@coderstm.com>
  *
- * @example
- * const bus = new EventBus();
- * bus.on('section:added', ({ sectionId }) => { … });
- * bus.emit('section:added', { sectionId: 'hero_123' });
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-
 type Listener = (...args: any[]) => void
 
 export class EventBus {
