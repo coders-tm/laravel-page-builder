@@ -23,7 +23,7 @@ function runCommand(command: string): void {
   execSync(command, { cwd: rootDir, stdio: "inherit" })
 }
 
-function incrementVersion(currentVersion: string, bumpType: string = "patch"): string {
+function incrementVersion(currentVersion: string): string {
   const parts = currentVersion.split(".").map((p) => parseInt(p, 10))
   if (parts.length !== 3 || parts.some(isNaN)) {
     throw new Error(`Invalid version format in package.json: ${currentVersion}`)
@@ -31,19 +31,14 @@ function incrementVersion(currentVersion: string, bumpType: string = "patch"): s
 
   let [major, minor, patch] = parts
 
-  if (bumpType === "major") {
-    major += 1
-    minor = 0
+  patch += 1
+  if (patch > 9) {
     patch = 0
-  } else if (bumpType === "minor") {
     minor += 1
-    patch = 0
-  } else if (bumpType === "patch") {
-    patch += 1
-  } else if (/^\d+\.\d+\.\d+$/.test(bumpType)) {
-    return bumpType
-  } else {
-    throw new Error(`Unknown bump type or invalid version: ${bumpType}`)
+  }
+  if (minor > 9) {
+    minor = 0
+    major += 1
   }
 
   return `${major}.${minor}.${patch}`
@@ -63,8 +58,7 @@ function main(): void {
   const pkg = JSON.parse(pkgRaw)
 
   const oldVersion = pkg.version
-  const bumpArg = process.argv[2] || "patch"
-  const newVersion = incrementVersion(oldVersion, bumpArg)
+  const newVersion = incrementVersion(oldVersion)
 
   console.log(`[build] Step 1: Incrementing package.json version: ${oldVersion} -> ${newVersion}`)
 
@@ -82,7 +76,14 @@ function main(): void {
     prependBanner(resolve(rootDir, "dist/app.js"), licenseBanner)
     prependBanner(resolve(rootDir, "dist/app.umd.js"), licenseBanner)
 
-    console.log(`\n[build] Successfully built package and committed version v${newVersion}!`)
+    console.log("\n[build] Step 5: Committing changes...")
+    runCommand("git add -A")
+    runCommand(`git commit -m "chore: bump version to v${newVersion}"`)
+
+    console.log("\n[build] Step 6: Creating git tag...")
+    runCommand(`git tag v${newVersion}`)
+
+    console.log(`\n[build] Successfully built, committed, and tagged version v${newVersion}!`)
   } catch (error) {
     console.error("\n[build] Build process failed:", error)
     process.exit(1)
