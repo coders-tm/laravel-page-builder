@@ -4,48 +4,25 @@ declare(strict_types=1);
 
 namespace PageBuilder\Services;
 
-use Illuminate\Support\Facades\File;
+use PageBuilder\Contracts\SettingsStoreInterface;
 use PageBuilder\Registry\LayoutParser;
+use PageBuilder\Support\LayoutConfig;
 
 /**
- * Manages shared layout configurations stored in settings.json.
+ * Manages shared layout configurations stored in settings.json under `_pagebuilder.layouts`.
  *
- * Layout configurations live under the `_pagebuilder.layouts` key within
- * the settings file, keyed by layout type (e.g., "page", "simple").
- * Each layout definition contains header and footer zones with sections
- * and their rendering order.
- *
- * The `layout` property in page JSON documents can be either:
- *  - A string (layout type) — indicating "use shared layout from here"
- *  - An object (full layout definition) — indicating a "page-specific layout override"
+ * Each layout definition contains header and footer zones with sections and ordering.
+ * Delegates storage file I/O to SettingsStoreInterface and supports LayoutConfig DTOs.
  */
 class LayoutSettings
 {
-    /**
-     * The root JSON storage key for PageBuilder data.
-     *
-     * @var string
-     */
-    public const CONFIG_KEY = '_pagebuilder';
+    public const STORAGE_SECTION = 'layouts';
 
-    /**
-     * The cached raw `_pagebuilder` settings data.
-     *
-     * @var array<string, mixed>|null
-     */
-    protected ?array $cached = null;
+    protected SettingsStoreInterface $store;
 
-    /**
-     * The file path of the currently cached settings file.
-     */
-    protected ?string $cachedPath = null;
-
-    /**
-     * Get the resolved path to the settings JSON file.
-     */
-    protected function valuesPath(): string
+    public function __construct(?SettingsStoreInterface $store = null)
     {
-        return config('pagebuilder.theme_settings_path') ?? resource_path('settings.json');
+        $this->store = $store ?? app(SettingsStoreInterface::class);
     }
 
     /**
@@ -55,33 +32,51 @@ class LayoutSettings
      */
     public function all(): array
     {
-        return $this->loadRaw()['layouts'] ?? [];
+        $layouts = $this->store->get(self::STORAGE_SECTION);
+
+        return is_array($layouts) ? $layouts : [];
     }
 
     /**
-     * Get a specific layout configuration by its layout type.
+     * Check whether a specific layout configuration exists.
+     */
+    public function has(string $layoutType): bool
+    {
+        return array_key_exists($layoutType, $this->all());
+    }
+
+    /**
+     * Get a specific layout configuration array by layout type.
      *
      * @return array{header: array, footer: array}|array{}
      */
     public function get(string $layoutType): array
     {
-        return $this->all()[$layoutType] ?? [];
+        $all = $this->all();
+
+        return $all[$layoutType] ?? [];
+    }
+
+    /**
+     * Get a specific layout configuration as a type-safe LayoutConfig DTO.
+     */
+    public function getConfig(string $layoutType): LayoutConfig
+    {
+        return LayoutConfig::fromArray($this->get($layoutType));
     }
 
     /**
      * Save or overwrite a layout configuration for the given layout type.
      *
-     * Automatically flushes the LayoutParser cache after saving to ensure
-     * updated layout structures take immediate effect during rendering.
+     * Flushes the LayoutParser cache after saving to ensure changes take immediate effect.
      *
-     * @param  array<string, mixed>  $config
+     * @param  array<string, mixed>|LayoutConfig  $config
      */
-    public function save(string $layoutType, array $config): bool
+    public function save(string $layoutType, array|LayoutConfig $config): bool
     {
-        $raw = $this->loadRaw();
-        $raw['layouts'][$layoutType] = $config;
+        $data = $config instanceof LayoutConfig ? $config->toArray() : $config;
 
-        $result = $this->persist($raw);
+        $result = $this->store->set(self::STORAGE_SECTION, $layoutType, $data);
 
         if ($result) {
             app(LayoutParser::class)->flush();
@@ -97,10 +92,7 @@ class LayoutSettings
      */
     public function delete(string $layoutType): bool
     {
-        $raw = $this->loadRaw();
-        unset($raw['layouts'][$layoutType]);
-
-        $result = $this->persist($raw);
+        $result = $this->store->forget(self::STORAGE_SECTION, $layoutType);
 
         if ($result) {
             app(LayoutParser::class)->flush();
@@ -110,77 +102,10 @@ class LayoutSettings
     }
 
     /**
-     * Load the raw `_pagebuilder` root data array from disk.
-     *
-     * @return array<string, mixed>
-     */
-    private function loadRaw(): array
-    {
-        $path = $this->valuesPath();
-
-        if ($this->cached !== null && $this->cachedPath === $path) {
-            return $this->cached;
-        }
-
-        if (! File::exists($path)) {
-            $this->cached = [];
-            $this->cachedPath = $path;
-
-            return [];
-        }
-
-        $data = json_decode(File::get($path), true);
-
-        if (! is_array($data)) {
-            $this->cached = [];
-            $this->cachedPath = $path;
-
-            return [];
-        }
-
-        $this->cached = $data[self::CONFIG_KEY] ?? [];
-        $this->cachedPath = $path;
-
-        return $this->cached;
-    }
-
-    /**
-     * Persist `_pagebuilder` data to settings.json while preserving all other root keys.
-     *
-     * @param  array<string, mixed>  $data
-     */
-    private function persist(array $data): bool
-    {
-        $valuesPath = $this->valuesPath();
-
-        File::ensureDirectoryExists(dirname($valuesPath), 0755, true);
-
-        $existing = [];
-        if (File::exists($valuesPath)) {
-            $existing = json_decode(File::get($valuesPath), true);
-            if (! is_array($existing)) {
-                $existing = [];
-            }
-        }
-
-        $existing[self::CONFIG_KEY] = $data;
-
-        $json = json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        $result = File::put($valuesPath, $json) !== false;
-
-        if ($result) {
-            $this->cached = $data;
-            $this->cachedPath = $valuesPath;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Invalidate the in-memory cached layout data.
+     * Invalidate in-memory cached layout data.
      */
     public function flush(): void
     {
-        $this->cached = null;
+        $this->store->flush();
     }
 }

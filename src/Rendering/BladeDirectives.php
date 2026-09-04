@@ -138,9 +138,10 @@ PHP;
                 }
 
                 $key = $setting['key'] ?? null;
-                $family = ($key ? ($values[$key] ?? null) : null) ?? ($setting['default'] ?? null);
+                $family = $key ? $themeSettings->getString($key, (string) ($setting['default'] ?? '')) : (string) ($setting['default'] ?? '');
+                $family = trim($family);
 
-                if ($family) {
+                if ($family !== '') {
                     $fonts[] = $family;
                 }
             }

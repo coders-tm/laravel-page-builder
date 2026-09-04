@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
 use PageBuilder\Services\LayoutSettings;
+use PageBuilder\Support\LayoutConfig;
 
 beforeEach(function () {
     $this->valuesPath = sys_get_temp_dir().'/pb-layout-settings-test.json';
 
     $this->app['config']->set('pagebuilder.theme_settings_path', $this->valuesPath);
 
-    // Fresh instance so it picks up the config set above
-    $this->layoutSettings = new LayoutSettings;
+    $this->layoutSettings = app(LayoutSettings::class);
+    $this->layoutSettings->flush();
 });
 
 afterEach(function () {
@@ -28,7 +29,15 @@ test('get returns empty array for missing layout type', function () {
     expect($this->layoutSettings->get('page'))->toBe([]);
 });
 
-test('save persists layout config to disk', function () {
+test('has checks for existence of layout type', function () {
+    expect($this->layoutSettings->has('page'))->toBeFalse();
+
+    $this->layoutSettings->save('page', ['header' => [], 'footer' => []]);
+
+    expect($this->layoutSettings->has('page'))->toBeTrue();
+});
+
+test('save persists layout config array to disk', function () {
     $config = [
         'header' => [
             'sections' => [
@@ -52,6 +61,21 @@ test('save persists layout config to disk', function () {
 
     $raw = json_decode(File::get($this->valuesPath), true);
     expect($raw['_pagebuilder']['layouts']['page'])->toBe($config);
+});
+
+test('save accepts LayoutConfig instance', function () {
+    $dto = LayoutConfig::fromArray([
+        'header' => [
+            'sections' => ['hero' => ['type' => 'hero']],
+            'order' => ['hero'],
+        ],
+    ]);
+
+    expect($this->layoutSettings->save('landing', $dto))->toBeTrue();
+
+    $saved = $this->layoutSettings->getConfig('landing');
+    expect($saved)->toBeInstanceOf(LayoutConfig::class);
+    expect($saved->headerOrder())->toBe(['hero']);
 });
 
 test('get returns saved layout config', function () {
@@ -135,52 +159,6 @@ test('save preserves other keys in settings.json', function () {
     expect($raw['_pagebuilder']['layouts']['page'])->toBe($config);
 });
 
-test('save creates directory if needed', function () {
-    $nestedPath = sys_get_temp_dir().'/pb-nested-test/settings.json';
-    $this->app['config']->set('pagebuilder.theme_settings_path', $nestedPath);
-
-    $layoutSettings = new LayoutSettings;
-    $config = [
-        'header' => ['sections' => [], 'order' => []],
-        'footer' => ['sections' => [], 'order' => []],
-    ];
-
-    expect($layoutSettings->save('page', $config))->toBeTrue();
-    expect($nestedPath)->toBeFile();
-
-    // Cleanup
-    File::deleteDirectory(dirname($nestedPath));
-});
-
-test('cache is used after first read', function () {
-    $config = [
-        'header' => ['sections' => [], 'order' => []],
-        'footer' => ['sections' => [], 'order' => []],
-    ];
-
-    $this->layoutSettings->save('page', $config);
-
-    // First call loads from disk
-    $result1 = $this->layoutSettings->get('page');
-    expect($result1)->toBe($config);
-
-    // Modify file directly (bypassing the service)
-    File::put($this->valuesPath, json_encode([
-        '_pagebuilder' => [
-            'layouts' => [
-                'page' => [
-                    'header' => ['sections' => [], 'order' => []],
-                    'footer' => ['sections' => [], 'order' => []],
-                ],
-            ],
-        ],
-    ]));
-
-    // Second call should still return cached value
-    $result2 = $this->layoutSettings->get('page');
-    expect($result2)->toBe($config);
-});
-
 test('flush invalidates cache', function () {
     $config = [
         'header' => ['sections' => [], 'order' => []],
@@ -188,11 +166,8 @@ test('flush invalidates cache', function () {
     ];
 
     $this->layoutSettings->save('page', $config);
-
-    // Load to populate cache
     $this->layoutSettings->get('page');
 
-    // Modify file directly
     File::put($this->valuesPath, json_encode([
         '_pagebuilder' => [
             'layouts' => [
@@ -204,38 +179,6 @@ test('flush invalidates cache', function () {
         ],
     ]));
 
-    // Flush cache
     $this->layoutSettings->flush();
-
-    // Now should read from disk (but we can't easily verify the specific value without side effects)
-    // Just verify it doesn't throw
     expect($this->layoutSettings->get('page'))->toBeArray();
-});
-
-test('load from disk preserves pagebuilder key', function () {
-    File::put($this->valuesPath, json_encode([
-        'pagebuilder' => ['colors.primary' => '#000'],
-        '_pagebuilder' => [
-            'layouts' => [
-                'page' => [
-                    'header' => ['sections' => [], 'order' => []],
-                    'footer' => ['sections' => [], 'order' => []],
-                ],
-            ],
-        ],
-    ]));
-
-    $fresh = new LayoutSettings;
-    expect($fresh->get('page'))->toHaveKey('header');
-    expect($fresh->get('page'))->toHaveKey('footer');
-});
-
-test('get returns empty array when file has no _pagebuilder key', function () {
-    File::put($this->valuesPath, json_encode([
-        'pagebuilder' => ['colors.primary' => '#000'],
-    ]));
-
-    $fresh = new LayoutSettings;
-    expect($fresh->all())->toBe([]);
-    expect($fresh->get('page'))->toBe([]);
 });

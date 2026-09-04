@@ -6,6 +6,7 @@ namespace PageBuilder\Services;
 
 use Illuminate\Support\Facades\File;
 use PageBuilder\PageBuilder;
+use PageBuilder\Support\LayoutConfig;
 use PageBuilder\Support\PageData;
 
 /**
@@ -121,7 +122,7 @@ class PageStorage
             if (is_array($incomingLayout) && isset($incomingLayout['type'])) {
                 $config = $incomingLayout;
                 unset($config['source']);
-                $this->layoutSettings->save($layoutType, $config);
+                $this->layoutSettings->save($layoutType, LayoutConfig::fromArray($config));
             }
 
             $data['layout'] = $layoutType;

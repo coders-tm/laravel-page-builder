@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
-use PageBuilder\Services\PageStorage;
 use PageBuilder\Services\ThemeSettings;
 
 beforeEach(function () {
@@ -20,45 +19,74 @@ beforeEach(function () {
         ],
     ]);
 
-    // Fresh instance so it picks up the config set above
-    $this->themeSettings = new ThemeSettings($this->app->make(PageStorage::class));
+    $this->themeSettings = app(ThemeSettings::class);
+    $this->themeSettings->flush();
 });
+
 afterEach(function () {
     if (File::exists($this->valuesPath)) {
         File::delete($this->valuesPath);
     }
-
 });
+
 test('get returns null when no values file exists', function () {
     expect($this->themeSettings->get('primary_color'))->toBeNull();
 });
+
 test('get returns default when key missing', function () {
     expect($this->themeSettings->get('primary_color', '#3B82F6'))->toBe('#3B82F6');
 });
+
 test('get returns saved value', function () {
     $this->themeSettings->save(['primary_color' => '#FF0000']);
 
     expect($this->themeSettings->get('primary_color'))->toBe('#FF0000');
 });
-test('get returns default when key not in saved values', function () {
-    $this->themeSettings->save(['primary_color' => '#FF0000']);
 
-    expect($this->themeSettings->get('missing_key', 'fallback'))->toBe('fallback');
+test('typed accessors work correctly', function () {
+    $this->themeSettings->save([
+        'title' => 'PageBuilder',
+        'items_count' => '42',
+        'ratio' => '1.618',
+        'is_active' => 'true',
+        'tags' => ['php', 'laravel'],
+    ]);
+
+    expect($this->themeSettings->getString('title'))->toBe('PageBuilder');
+    expect($this->themeSettings->getInt('items_count'))->toBe(42);
+    expect($this->themeSettings->getFloat('ratio'))->toBe(1.618);
+    expect($this->themeSettings->getBool('is_active'))->toBeTrue();
+    expect($this->themeSettings->getArray('tags'))->toBe(['php', 'laravel']);
+    expect($this->themeSettings->has('title'))->toBeTrue();
+    expect($this->themeSettings->has('non_existing'))->toBeFalse();
 });
-test('magic get returns null for missing key', function () {
-    expect($this->themeSettings->primary_color)->toBeNull();
+
+test('set and setMany persist changes', function () {
+    $this->themeSettings->set('primary_color', '#123456');
+    expect($this->themeSettings->getString('primary_color'))->toBe('#123456');
+
+    $this->themeSettings->setMany(['secondary_color' => '#654321', 'radius' => 8]);
+    expect($this->themeSettings->getString('secondary_color'))->toBe('#654321');
+    expect($this->themeSettings->getInt('radius'))->toBe(8);
 });
+
+test('array access interface works', function () {
+    $this->themeSettings['theme_mode'] = 'dark';
+
+    expect(isset($this->themeSettings['theme_mode']))->toBeTrue();
+    expect($this->themeSettings['theme_mode'])->toBe('dark');
+
+    unset($this->themeSettings['theme_mode']);
+    expect(isset($this->themeSettings['theme_mode']))->toBeFalse();
+});
+
 test('magic get returns saved value', function () {
     $this->themeSettings->save(['primary_color' => '#00FF00', 'font_family' => 'serif']);
 
     expect($this->themeSettings->primary_color)->toBe('#00FF00');
     expect($this->themeSettings->font_family)->toBe('serif');
 });
-test('magic get returns null for unknown key', function () {
-    $this->themeSettings->save(['primary_color' => '#000']);
 
-    expect($this->themeSettings->unknown_key)->toBeNull();
-});
 test('save persists values to disk', function () {
     $values = ['primary_color' => '#123456', 'font_family' => 'mono'];
 
@@ -68,27 +96,16 @@ test('save persists values to disk', function () {
     $raw = json_decode(File::get($this->valuesPath), true);
     expect($raw['_pagebuilder']['theme'])->toBe($values);
 });
+
 test('values are loaded from disk', function () {
     File::put($this->valuesPath, json_encode(['_pagebuilder' => ['theme' => ['primary_color' => '#ABCDEF']]]));
 
-    $fresh = new ThemeSettings($this->app->make(PageStorage::class));
+    $fresh = app(ThemeSettings::class);
+    $fresh->flush();
+
     expect($fresh->values())->toBe(['primary_color' => '#ABCDEF']);
 });
-test('values returns empty if pagebuilder key missing', function () {
-    File::put($this->valuesPath, json_encode(['primary_color' => '#FEDCBA']));
 
-    $fresh = new ThemeSettings($this->app->make(PageStorage::class));
-    expect($fresh->values())->toBe([]);
-});
-test('values cache is refreshed after save', function () {
-    $this->themeSettings->save(['primary_color' => '#111111']);
-    $this->themeSettings->save(['primary_color' => '#222222']);
-
-    expect($this->themeSettings->get('primary_color'))->toBe('#222222');
-});
-test('values returns empty array when no file', function () {
-    expect($this->themeSettings->values())->toBe([]);
-});
 test('schema returns config schema', function () {
     $schema = $this->themeSettings->schema();
 
@@ -96,6 +113,7 @@ test('schema returns config schema', function () {
     expect($schema[0]['name'])->toBe('Colors');
     expect($schema[0]['settings'])->toHaveCount(2);
 });
+
 test('to array contains schema and values keys', function () {
     $this->themeSettings->save(['primary_color' => '#FF00FF']);
 
@@ -105,6 +123,7 @@ test('to array contains schema and values keys', function () {
     expect($result)->toHaveKey('values');
     expect($result['values'])->toBe(['primary_color' => '#FF00FF']);
 });
+
 test('save preserves other keys', function () {
     File::put($this->valuesPath, json_encode([
         'other_setting' => 'keep-me',

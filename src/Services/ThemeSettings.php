@@ -4,42 +4,31 @@ declare(strict_types=1);
 
 namespace PageBuilder\Services;
 
-use Illuminate\Support\Facades\File;
+use ArrayAccess;
+use Countable;
+use Illuminate\Contracts\Support\Arrayable;
+use JsonSerializable;
+use PageBuilder\Contracts\SettingsStoreInterface;
 
 /**
- * Manages global theme settings stored in settings.json.
+ * Manages global theme settings stored in settings.json via SettingsStoreInterface.
  *
- * Theme setting definitions (type, label, default, etc.) are declared in the
- * `pagebuilder.theme_settings_schema` configuration array. Current theme values
- * are persisted under the `_pagebuilder.theme` key in settings.json.
+ * Provides strict type-safe accessors (getString, getInt, getBool, getArray, etc.),
+ * implements ArrayAccess, Arrayable, JsonSerializable, and Countable contracts,
+ * and maintains full integration with Blade views and editor APIs.
+ *
+ * @implements ArrayAccess<string, mixed>
+ * @implements Arrayable<string, mixed>
  */
-class ThemeSettings
+class ThemeSettings implements Arrayable, ArrayAccess, Countable, JsonSerializable
 {
-    /**
-     * The root JSON storage key for PageBuilder data.
-     *
-     * @var string
-     */
-    public const CONFIG_KEY = '_pagebuilder';
+    public const STORAGE_SECTION = 'theme';
 
-    /**
-     * The cached theme setting values loaded from disk.
-     *
-     * @var array<string, mixed>|null
-     */
-    protected ?array $cachedValues = null;
+    protected SettingsStoreInterface $store;
 
-    /**
-     * The file path of the currently cached settings file.
-     */
-    protected ?string $cachedPath = null;
-
-    /**
-     * Get the resolved path to the settings JSON file.
-     */
-    protected function valuesPath(): string
+    public function __construct(?SettingsStoreInterface $store = null)
     {
-        return config('pagebuilder.theme_settings_path') ?? resource_path('settings.json');
+        $this->store = $store ?? app(SettingsStoreInterface::class);
     }
 
     /**
@@ -53,101 +42,134 @@ class ThemeSettings
     }
 
     /**
-     * Load the current theme settings values from disk under `_pagebuilder.theme`.
+     * Load the current theme settings values from storage under `_pagebuilder.theme`.
      *
      * @return array<string, mixed>
      */
     public function values(): array
     {
-        $path = $this->valuesPath();
+        $data = $this->store->get(self::STORAGE_SECTION);
 
-        if ($this->cachedValues !== null && $this->cachedPath === $path) {
-            return $this->cachedValues;
-        }
-
-        if (! File::exists($path)) {
-            $this->cachedValues = [];
-            $this->cachedPath = $path;
-
-            return [];
-        }
-
-        $data = json_decode(File::get($path), true);
-
-        if (! is_array($data)) {
-            $this->cachedValues = [];
-            $this->cachedPath = $path;
-
-            return [];
-        }
-
-        $themeValues = $data[self::CONFIG_KEY]['theme'] ?? [];
-
-        $this->cachedValues = is_array($themeValues) ? $themeValues : [];
-        $this->cachedPath = $path;
-
-        return $this->cachedValues;
+        return is_array($data) ? $data : [];
     }
 
     /**
-     * Persist theme settings values to disk under `_pagebuilder.theme`.
-     *
-     * Preserves other keys within `_pagebuilder` (such as layouts) as well as
-     * top-level keys in the settings file.
+     * Persist theme settings values to storage under `_pagebuilder.theme`.
      *
      * @param  array<string, mixed>  $values
      */
     public function save(array $values): bool
     {
-        $valuesPath = $this->valuesPath();
-
-        File::ensureDirectoryExists(dirname($valuesPath), 0755, true);
-
-        // Read existing content to preserve other keys
-        $existing = [];
-        if (File::exists($valuesPath)) {
-            $existing = json_decode(File::get($valuesPath), true);
-            if (! is_array($existing)) {
-                $existing = [];
-            }
-        }
-
-        if (! isset($existing[self::CONFIG_KEY]) || ! is_array($existing[self::CONFIG_KEY])) {
-            $existing[self::CONFIG_KEY] = [];
-        }
-
-        $existing[self::CONFIG_KEY]['theme'] = $values;
-
-        $json = json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        $result = File::put($valuesPath, $json) !== false;
-
-        if ($result) {
-            $this->cachedValues = $values;
-            $this->cachedPath = $valuesPath;
-        }
-
-        return $result;
+        return $this->store->set(self::STORAGE_SECTION, $values);
     }
 
     /**
-     * Invalidate the in-memory cached theme settings data.
+     * Invalidate in-memory cached theme settings data.
      */
     public function flush(): void
     {
-        $this->cachedValues = null;
-        $this->cachedPath = null;
+        $this->store->flush();
     }
 
     /**
-     * Get a single theme setting value by key, with an optional default fallback.
+     * Check if a setting key exists.
+     */
+    public function has(string $key): bool
+    {
+        $values = $this->values();
+
+        return array_key_exists($key, $values);
+    }
+
+    /**
+     * Get a setting value by key, with fallback.
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        return $this->values()[$key] ?? $default;
+        $values = $this->values();
+
+        return $values[$key] ?? $default;
     }
 
     /**
-     * Allow property-style access to theme settings (e.g. $theme->primary_color).
+     * Get setting value strictly as string.
+     */
+    public function getString(string $key, string $default = ''): string
+    {
+        $value = $this->get($key, $default);
+
+        return is_scalar($value) ? (string) $value : $default;
+    }
+
+    /**
+     * Get setting value strictly as integer.
+     */
+    public function getInt(string $key, int $default = 0): int
+    {
+        $value = $this->get($key, $default);
+
+        return is_numeric($value) ? (int) $value : $default;
+    }
+
+    /**
+     * Get setting value strictly as float.
+     */
+    public function getFloat(string $key, float $default = 0.0): float
+    {
+        $value = $this->get($key, $default);
+
+        return is_numeric($value) ? (float) $value : $default;
+    }
+
+    /**
+     * Get setting value strictly as boolean.
+     */
+    public function getBool(string $key, bool $default = false): bool
+    {
+        $value = $this->get($key, $default);
+
+        return is_bool($value) ? $value : (bool) filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $default;
+    }
+
+    /**
+     * Get setting value strictly as array.
+     *
+     * @return array<mixed>
+     */
+    public function getArray(string $key, array $default = []): array
+    {
+        $value = $this->get($key, $default);
+
+        return is_array($value) ? $value : $default;
+    }
+
+    /**
+     * Set a single theme setting value and persist to storage.
+     */
+    public function set(string $key, mixed $value): static
+    {
+        $current = $this->values();
+        $current[$key] = $value;
+        $this->save($current);
+
+        return $this;
+    }
+
+    /**
+     * Merge and persist multiple settings values.
+     *
+     * @param  array<string, mixed>  $values
+     */
+    public function setMany(array $values): static
+    {
+        $current = array_merge($this->values(), $values);
+        $this->save($current);
+
+        return $this;
+    }
+
+    /**
+     * Allow property-style access in Blade views (e.g., $theme->primary_color).
      */
     public function __get(string $key): mixed
     {
@@ -155,7 +177,7 @@ class ThemeSettings
     }
 
     /**
-     * Return the combined schema and current values formatted for the editor.
+     * Return the schema and current values array formatted for the editor.
      *
      * @return array{schema: array, values: array<string, mixed>}
      */
@@ -165,5 +187,49 @@ class ThemeSettings
             'schema' => $this->schema(),
             'values' => $this->values(),
         ];
+    }
+
+    /**
+     * Serialize to JSON array.
+     *
+     * @return array{schema: array, values: array<string, mixed>}
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * Count the number of active setting values.
+     */
+    public function count(): int
+    {
+        return count($this->values());
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return is_string($offset) && $this->has($offset);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return is_string($offset) ? $this->get($offset) : null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if (is_string($offset)) {
+            $this->set($offset, $value);
+        }
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        if (is_string($offset)) {
+            $current = $this->values();
+            unset($current[$offset]);
+            $this->save($current);
+        }
     }
 }

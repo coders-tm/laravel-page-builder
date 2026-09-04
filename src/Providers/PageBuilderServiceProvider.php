@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use PageBuilder\Commands;
+use PageBuilder\Contracts\SettingsStoreInterface;
 use PageBuilder\Facades;
 use PageBuilder\Http\Middleware;
 use PageBuilder\PageBuilder;
@@ -66,11 +67,22 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         // ─── Page services ───────────────────────────────────────
 
+        $this->app->singleton(
+            SettingsStoreInterface::class,
+            Services\SettingsStore::class
+        );
+
         $this->app->singleton(PageRegistry::class);
         $this->app->singleton(PageStorage::class);
         $this->app->singleton(TemplateStorage::class);
-        $this->app->singleton(ThemeSettings::class);
-        $this->app->singleton(LayoutSettings::class);
+
+        $this->app->singleton(ThemeSettings::class, function ($app) {
+            return new ThemeSettings($app->make(SettingsStoreInterface::class));
+        });
+
+        $this->app->singleton(LayoutSettings::class, function ($app) {
+            return new LayoutSettings($app->make(SettingsStoreInterface::class));
+        });
 
         // ─── Support utilities ───────────────────────────────────
 
