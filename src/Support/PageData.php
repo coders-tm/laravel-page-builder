@@ -4,70 +4,80 @@ declare(strict_types=1);
 
 namespace PageBuilder\Support;
 
+use ArrayAccess;
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 
-final class PageData implements Arrayable, Jsonable, JsonSerializable
+/**
+ * Immutable Data Transfer Object representing parsed page builder page data.
+ *
+ * Encapsulates body sections, render ordering, layout resolution (headers/footers),
+ * title, PageMeta DTO, and wrapper attributes.
+ *
+ * @implements ArrayAccess<string, mixed>
+ * @implements Arrayable<string, mixed>
+ */
+final class PageData implements Arrayable, ArrayAccess, Countable, Jsonable, JsonSerializable
 {
+    private readonly PageMeta $metaObject;
+
     /**
-     * @param  array<string, array>  $sections
-     * @param  array<string>  $order
+     * @param  array<string, array<string, mixed>>  $sections
+     * @param  array<int, string>  $order
      * @param  array<string, mixed>  $layout
+     * @param  array<string, mixed>|PageMeta  $meta
      */
     public function __construct(
         private readonly array $sections = [],
         private readonly array $order = [],
         private readonly array $layout = [],
         private readonly string $title = '',
-        private readonly array $meta = [],
+        array|PageMeta $meta = [],
         private readonly ?string $wrapper = null,
-    ) {}
+    ) {
+        $this->metaObject = $meta instanceof PageMeta ? $meta : PageMeta::fromArray($meta);
+    }
 
     /**
      * Create a PageData instance from a raw decoded page JSON array.
-     *
-     * The `layout` field in `$data` can be either:
-     *  - A string (layout type, e.g. "page") — resolved from shared layout config
-     *  - An object (full layout config) — page-specific override
-     *  - Missing — defaults to "page" string (shared)
      *
      * Three-layer merge priority (lowest to highest):
      *  1. $defaultLayout — schema defaults from LayoutParser
      *  2. $sharedLayout  — shared config from LayoutSettings
      *  3. $data['layout'] — page-specific override from page JSON
      *
-     * The resolved layout always includes a `source` field:
-     *  - "shared" — layout came from LayoutSettings (or defaults)
-     *  - "page"   — layout is a page-specific override
-     *
      * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>  $defaultLayout  Default layout from LayoutParser (optional)
-     * @param  array<string, mixed>  $sharedLayout  Shared layout from LayoutSettings (optional)
+     * @param  array<string, mixed>|LayoutConfig  $defaultLayout
+     * @param  array<string, mixed>|LayoutConfig  $sharedLayout
      */
-    public static function fromArray(array $data, array $defaultLayout = [], array $sharedLayout = []): self
-    {
+    public static function fromArray(
+        array $data,
+        array|LayoutConfig $defaultLayout = [],
+        array|LayoutConfig $sharedLayout = [],
+    ): self {
         $sections = is_array($data['sections'] ?? null) ? $data['sections'] : [];
-        $order = is_array($data['order'] ?? null) ? $data['order'] : array_keys($sections);
+        $order = is_array($data['order'] ?? null) ? array_values($data['order']) : array_keys($sections);
 
-        // Detect if layout is string (shared) or object (page-specific).
+        $defaultLayoutArr = $defaultLayout instanceof LayoutConfig ? $defaultLayout->toArray() : $defaultLayout;
+        $sharedLayoutArr = $sharedLayout instanceof LayoutConfig ? $sharedLayout->toArray() : $sharedLayout;
+
+        // Detect layout type string vs page-specific override object
         $layoutValue = $data['layout'] ?? null;
 
         if (is_string($layoutValue)) {
-            // String: layout type only — use shared layout, merged with defaults.
             $storedLayout = ['type' => $layoutValue];
             $layoutSource = 'shared';
         } elseif (is_array($layoutValue)) {
-            // Object: full layout config — page-specific override.
             $storedLayout = $layoutValue;
             $layoutSource = 'page';
         } else {
-            // Missing: default to shared "page" layout.
             $storedLayout = [];
             $layoutSource = 'shared';
         }
 
-        $layout = self::mergeLayouts($defaultLayout, $sharedLayout, $storedLayout);
+        $layout = self::mergeLayouts($defaultLayoutArr, $sharedLayoutArr, $storedLayout);
 
         if (! empty($layout)) {
             $layout['source'] = $layoutSource;
@@ -77,25 +87,20 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             ? $data['wrapper']
             : null;
 
+        $metaData = is_array($data['meta'] ?? null) ? $data['meta'] : [];
+
         return new self(
             sections: $sections,
             order: $order,
             layout: $layout,
             title: (string) ($data['title'] ?? ''),
-            meta: is_array($data['meta'] ?? null) ? $data['meta'] : [],
+            meta: PageMeta::fromArray($metaData),
             wrapper: $wrapper,
         );
     }
 
     /**
      * Merge three layout layers: default, shared, and stored (per-page).
-     *
-     * Layout structure: { type, header: { sections, order }, footer: { sections, order } }
-     *
-     * Priority (highest wins):
-     *  1. $default — schema defaults from LayoutParser
-     *  2. $shared  — shared config from LayoutSettings
-     *  3. $stored  — page-specific override from page JSON
      *
      * @param  array<string, mixed>  $default
      * @param  array<string, mixed>  $shared
@@ -128,15 +133,10 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     /**
      * Merge a single zone (header or footer) from three layers.
      *
-     * Priority (highest wins):
-     *  1. $default — schema defaults from LayoutParser
-     *  2. $shared  — shared config from LayoutSettings
-     *  3. $stored  — page-specific override from page JSON
-     *
      * @param  array<string, mixed>  $default
      * @param  array<string, mixed>  $shared
      * @param  array<string, mixed>  $stored
-     * @return array{sections: array, order: array}
+     * @return array{sections: array<string, mixed>, order: array<int, string>}
      */
     private static function mergeZone(array $default, array $shared, array $stored): array
     {
@@ -144,10 +144,8 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         $sharedSections = $shared['sections'] ?? [];
         $storedSections = $stored['sections'] ?? [];
 
-        // Start with defaults.
         $sections = $defaultSections;
 
-        // Deep-merge shared layout sections on top.
         foreach ($sharedSections as $key => $section) {
             if (isset($sections[$key])) {
                 $sections[$key] = array_merge($sections[$key], $section, [
@@ -163,7 +161,6 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             }
         }
 
-        // Deep-merge stored (page-specific) sections on top.
         foreach ($storedSections as $key => $section) {
             if (isset($sections[$key])) {
                 $sections[$key] = array_merge($sections[$key], $section, [
@@ -179,19 +176,18 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             }
         }
 
-        // Order priority: stored > shared > default.
         $order = $stored['order'] ?? $shared['order'] ?? $default['order'] ?? array_keys($sections);
 
         return [
             'sections' => $sections,
-            'order' => $order,
+            'order' => array_values($order),
         ];
     }
 
     /**
-     * Return the ordered list of section IDs defining render order.
+     * Return ordered list of section IDs.
      *
-     * @return array<string>
+     * @return array<int, string>
      */
     public function order(): array
     {
@@ -199,7 +195,17 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return the raw section data for a given ID, or null if not found.
+     * Check if a body section exists.
+     */
+    public function hasSection(string $id): bool
+    {
+        return array_key_exists($id, $this->sections);
+    }
+
+    /**
+     * Return section data for a given section ID, or null.
+     *
+     * @return array<string, mixed>|null
      */
     public function section(string $id): ?array
     {
@@ -207,9 +213,9 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return all sections as a raw map keyed by section ID.
+     * Return all body sections map.
      *
-     * @return array<string, array>
+     * @return array<string, array<string, mixed>>
      */
     public function sections(): array
     {
@@ -217,7 +223,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return the page title, falling back to an empty string when not set.
+     * Return page title.
      */
     public function title(): string
     {
@@ -225,15 +231,33 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return the page SEO metadata.
+     * Return page SEO metadata as PageMeta DTO.
      */
-    public function meta(): array
+    public function meta(): PageMeta
     {
-        return $this->meta;
+        return $this->metaObject;
     }
 
     /**
-     * Return the layout source: "shared" or "page".
+     * Return raw layout structure.
+     *
+     * @return array<string, mixed>
+     */
+    public function layout(): array
+    {
+        return $this->layout;
+    }
+
+    /**
+     * Return layout configuration as a type-safe LayoutConfig DTO.
+     */
+    public function layoutConfig(): LayoutConfig
+    {
+        return LayoutConfig::fromArray($this->layout);
+    }
+
+    /**
+     * Return layout source: "shared" or "page".
      */
     public function layoutSource(): string
     {
@@ -241,7 +265,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return the layout type identifier (defaults to "page").
+     * Return layout type identifier (defaults to "page").
      */
     public function layoutType(): string
     {
@@ -249,7 +273,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return the full Blade view name for the layout (e.g. "layouts.page").
+     * Return full Blade view name for layout.
      */
     public function layoutView(): string
     {
@@ -257,14 +281,12 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return the raw section data for a given layout key, or null if absent/disabled.
+     * Return section data for a given layout key, or null if absent/disabled.
      *
-     * Searches both the header and footer zones, returning the first match.
-     * Normalises missing `blocks` and `order` to empty arrays before returning.
+     * @return array<string, mixed>|null
      */
     public function layoutSection(string $key): ?array
     {
-        // Search header zone then footer zone.
         $raw = ($this->layout['header']['sections'] ?? [])[$key]
             ?? ($this->layout['footer']['sections'] ?? [])[$key]
             ?? null;
@@ -284,12 +306,9 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return all layout sections as a normalised flat map keyed by section key.
+     * Return all layout sections as a flattened map.
      *
-     * Merges header and footer zones so callers that just want the full list
-     * don't need to know about zones.
-     *
-     * @return array<string, array>
+     * @return array<string, array<string, mixed>>
      */
     public function layoutSections(): array
     {
@@ -307,9 +326,9 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return the header zone array (sections + order), or an empty zone.
+     * Return header zone structure.
      *
-     * @return array{sections: array, order: array}
+     * @return array{sections: array<string, mixed>, order: array<int, string>}
      */
     public function layoutHeader(): array
     {
@@ -317,21 +336,20 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         $sections = array_map(fn (array $s) => array_merge(['blocks' => [], 'order' => []], $s), $zone['sections'] ?? []);
         $order = $zone['order'] ?? [];
 
-        // If we have sections but no order, default to section keys.
         if ($order === [] && $sections !== []) {
             $order = array_keys($sections);
         }
 
         return [
             'sections' => $sections,
-            'order' => $order,
+            'order' => array_values($order),
         ];
     }
 
     /**
-     * Return the footer zone array (sections + order), or an empty zone.
+     * Return footer zone structure.
      *
-     * @return array{sections: array, order: array}
+     * @return array{sections: array<string, mixed>, order: array<int, string>}
      */
     public function layoutFooter(): array
     {
@@ -339,21 +357,18 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         $sections = array_map(fn (array $s) => array_merge(['blocks' => [], 'order' => []], $s), $zone['sections'] ?? []);
         $order = $zone['order'] ?? [];
 
-        // If we have sections but no order, default to section keys.
         if ($order === [] && $sections !== []) {
             $order = array_keys($sections);
         }
 
         return [
             'sections' => $sections,
-            'order' => $order,
+            'order' => array_values($order),
         ];
     }
 
     /**
-     * Return the wrapper CSS-selector string, or null when no wrapper is set.
-     *
-     * Example: "div#main.container[data-page=1]"
+     * Return wrapper CSS selector string, or null.
      */
     public function wrapper(): ?string
     {
@@ -361,7 +376,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Determine if the page has no sections.
+     * Determine if page has no body sections.
      */
     public function isEmpty(): bool
     {
@@ -369,7 +384,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Determine if the page has at least one section.
+     * Determine if page has at least one body section.
      */
     public function isNotEmpty(): bool
     {
@@ -377,6 +392,16 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Count body sections.
+     */
+    public function count(): int
+    {
+        return count($this->sections);
+    }
+
+    /**
+     * Convert to raw associative array structure.
+     *
      * @return array<string, mixed>
      */
     public function toArray(): array
@@ -397,7 +422,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             'order' => $this->order,
             'layout' => $layout,
             'title' => $this->title,
-            'meta' => $this->meta,
+            'meta' => $this->metaObject->toArray(),
         ];
 
         if ($this->wrapper !== null) {
@@ -418,7 +443,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Magic getter for Blade compatibility (e.g. $page->title).
+     * Magic getter for Blade compatibility (e.g. $page->title, $page->meta, $page->sections).
      */
     public function __get(string $name): mixed
     {
@@ -427,5 +452,31 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         }
 
         return null;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return is_string($offset) && array_key_exists($offset, $this->toArray());
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        if (! is_string($offset)) {
+            return null;
+        }
+
+        $array = $this->toArray();
+
+        return $array[$offset] ?? null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        // Readonly DTO
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        // Readonly DTO
     }
 }

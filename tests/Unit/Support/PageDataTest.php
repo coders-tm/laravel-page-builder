@@ -1,7 +1,9 @@
 <?php
 
 declare(strict_types=1);
+use PageBuilder\Support\LayoutConfig;
 use PageBuilder\Support\PageData;
+use PageBuilder\Support\PageMeta;
 
 function sampleData(): array
 {
@@ -858,4 +860,40 @@ test('empty all layouts returns empty layout', function () {
 
     $output = $data->toArray();
     expect($output['layout'])->toBe([]);
+});
+
+test('meta returns PageMeta instance', function () {
+    $data = PageData::fromArray([
+        ...sampleData(),
+        'meta' => [
+            'meta_title' => 'Test SEO Title',
+            'meta_description' => 'Test SEO Description',
+        ],
+    ]);
+
+    $meta = $data->meta();
+
+    expect($meta)->toBeInstanceOf(PageMeta::class);
+    expect($meta->metaTitle())->toBe('Test SEO Title');
+    expect($meta->metaDescription())->toBe('Test SEO Description');
+});
+
+test('layoutConfig returns LayoutConfig instance', function () {
+    $data = PageData::fromArray(sampleDataWithLayout());
+
+    $config = $data->layoutConfig();
+
+    expect($config)->toBeInstanceOf(LayoutConfig::class);
+    expect($config->headerSections())->toHaveKey('header');
+});
+
+test('countable and array access interfaces work', function () {
+    $data = PageData::fromArray(sampleData());
+
+    expect(count($data))->toBe(2);
+    expect($data->hasSection('hero'))->toBeTrue();
+    expect($data->hasSection('unknown'))->toBeFalse();
+    expect(isset($data['title']))->toBeTrue();
+    expect($data['title'])->toBe('Home Page');
+    expect(isset($data['non_existent']))->toBeFalse();
 });

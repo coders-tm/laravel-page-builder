@@ -123,7 +123,7 @@ test('regular page strips title and meta', function () {
 
     $loaded = $this->storage->load('regular-page');
     expect($loaded->title())->toBe('');
-    expect($loaded->meta())->toBe([]);
+    expect($loaded->meta()->isEmpty())->toBeTrue();
 
     // Verify JSON file directly
     $filePath = config('pagebuilder.pages').'/regular-page.json';
