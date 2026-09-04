@@ -10,15 +10,38 @@ use PageBuilder\Support\PageData;
 
 /**
  * Handles loading and persisting page JSON data to disk.
+ *
+ * Also manages layout splitting: when saving, layout data is split
+ * between the page JSON (page-specific) and LayoutSettings (shared).
  */
 class PageStorage
 {
-    public function __construct() {}
+    public function __construct(
+        protected LayoutSettings $layoutSettings,
+    ) {}
 
     /**
      * Load and decode a page JSON file by slug.
      */
     public function load(string $slug): ?PageData
+    {
+        $data = $this->loadRaw($slug);
+
+        if ($data === null) {
+            return null;
+        }
+
+        return PageData::fromArray($data);
+    }
+
+    /**
+     * Load raw page JSON data without converting to PageData.
+     *
+     * Returns the decoded JSON array, or null if the file doesn't exist.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function loadRaw(string $slug): ?array
     {
         $filePath = $this->path($slug, 'json');
 
@@ -28,15 +51,16 @@ class PageStorage
 
         $data = json_decode(File::get($filePath), true);
 
-        if (! is_array($data)) {
-            return null;
-        }
-
-        return PageData::fromArray($data);
+        return is_array($data) ? $data : null;
     }
 
     /**
      * Persist a page's JSON data to disk, creating the pages directory if needed.
+     *
+     * Layout splitting is based on the existing page.json:
+     *  - No layout in existing page.json → save layout to LayoutSettings
+     *  - Existing layout is a string → save layout to LayoutSettings
+     *  - Existing layout is an object → save layout to page.json
      */
     public function save(string $slug, array|PageData $data): bool
     {
@@ -49,6 +73,9 @@ class PageStorage
 
         $payload = $data instanceof PageData ? $data->toArray() : $data;
 
+        // Handle layout splitting based on existing page.json.
+        $payload = $this->splitLayout($payload, $slug);
+
         // Strip DB-only fields — title and meta are persisted to the database, not the JSON file.
         // Except for preserved slugs (like home), which don't have a database record.
         if (! PageBuilder::isPreservedPage($slug)) {
@@ -58,6 +85,54 @@ class PageStorage
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         return File::put($filePath, $json) !== false;
+    }
+
+    /**
+     * Split layout data between page JSON and LayoutSettings.
+     *
+     * Decision is based on the EXISTING page.json's layout value:
+     *  - No layout exists → save config to LayoutSettings, store type string in page JSON
+     *  - Existing layout is a string → save config to LayoutSettings, store type string in page JSON
+     *  - Existing layout is an object → save full layout object to page JSON
+     *
+     * @param  array<string, mixed>  $data  The new data to save
+     * @param  string  $slug  The page slug
+     * @return array<string, mixed>
+     */
+    private function splitLayout(array $data, string $slug): array
+    {
+        $incomingLayout = $data['layout'] ?? null;
+
+        // Load existing page.json to check what's already stored.
+        $existing = $this->loadRaw($slug);
+        $existingLayout = $existing['layout'] ?? null;
+
+        // Determine save target based on existing layout:
+        //  - No existing layout or existing is string → save to LayoutSettings
+        //  - Existing is object → save to page.json
+        $saveToLayoutSettings = ! is_array($existingLayout);
+
+        if ($saveToLayoutSettings) {
+            // Save to LayoutSettings, store only type string in page JSON.
+            $layoutType = is_array($incomingLayout)
+                ? ($incomingLayout['type'] ?? 'page')
+                : (is_string($incomingLayout) ? $incomingLayout : 'page');
+
+            if (is_array($incomingLayout) && isset($incomingLayout['type'])) {
+                $config = $incomingLayout;
+                unset($config['source']);
+                $this->layoutSettings->save($layoutType, $config);
+            }
+
+            $data['layout'] = $layoutType;
+        } else {
+            // Save to page.json — strip the editor-only `source` key.
+            if (is_array($data['layout'] ?? null)) {
+                unset($data['layout']['source']);
+            }
+        }
+
+        return $data;
     }
 
     /**

@@ -12,6 +12,7 @@ use PageBuilder\PageBuilder;
 use PageBuilder\Registry;
 use PageBuilder\Rendering;
 use PageBuilder\Services;
+use PageBuilder\Services\LayoutSettings;
 use PageBuilder\Services\PageRegistry;
 use PageBuilder\Services\PageRenderer;
 use PageBuilder\Services\PageStorage;
@@ -69,6 +70,7 @@ class PageBuilderServiceProvider extends ServiceProvider
         $this->app->singleton(PageStorage::class);
         $this->app->singleton(TemplateStorage::class);
         $this->app->singleton(ThemeSettings::class);
+        $this->app->singleton(LayoutSettings::class);
 
         // ─── Support utilities ───────────────────────────────────
 

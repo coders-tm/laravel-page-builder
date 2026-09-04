@@ -20,6 +20,7 @@ class PageService
         protected readonly PageRenderer $pageRenderer,
         protected readonly PageStorage $pageStorage,
         protected readonly LayoutParser $layoutParser,
+        protected readonly LayoutSettings $layoutSettings,
         protected readonly EditorPreviewShell $editorPreviewShell,
         protected readonly TemplateStorage $templateStorage,
         protected readonly TemplateVariableResolver $variableResolver,
@@ -100,8 +101,9 @@ class PageService
         if ($stored !== null) {
             $layoutType = $stored->layoutType() ?? 'page';
             $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
+            $sharedLayout = $this->layoutSettings->get($layoutType);
 
-            return [$this->buildPage($stored, $defaultLayout, $dbPage), true];
+            return [$this->buildPage($stored, $defaultLayout, $sharedLayout, $dbPage), true];
         }
 
         $templateData = $this->resolveTemplate($dbPage);
@@ -109,13 +111,18 @@ class PageService
         if ($templateData !== null) {
             $resolvedData = $this->variableResolver->resolve($templateData, $dbPage);
             $templateLayout = $this->resolveTemplateLayout($resolvedData);
+            $templateLayoutType = $resolvedData['layout'] ?? 'page';
+            $sharedLayout = is_string($templateLayoutType)
+                ? $this->layoutSettings->get($templateLayoutType)
+                : [];
 
-            return [$this->buildPageFromTemplate($resolvedData, $templateLayout, $dbPage), true];
+            return [$this->buildPageFromTemplate($resolvedData, $templateLayout, $sharedLayout, $dbPage), true];
         }
 
         $defaultLayout = $this->layoutParser->defaultLayout('page');
+        $sharedLayout = $this->layoutSettings->get('page');
 
-        return [$this->buildPage(null, $defaultLayout, $dbPage), false];
+        return [$this->buildPage(null, $defaultLayout, $sharedLayout, $dbPage), false];
     }
 
     /**
@@ -181,26 +188,30 @@ class PageService
      *
      * @param  array<string, mixed>  $templateData  Resolved (variable-substituted) template data
      * @param  array<string, mixed>  $defaultLayout
+     * @param  array<string, mixed>  $sharedLayout
      */
-    protected function buildPageFromTemplate(array $templateData, array $defaultLayout, mixed $dbPage): PageData
+    protected function buildPageFromTemplate(array $templateData, array $defaultLayout, array $sharedLayout, mixed $dbPage): PageData
     {
         return PageData::fromArray([
             'sections' => $templateData['sections'] ?? [],
             'order' => $templateData['order'] ?? [],
             'wrapper' => $templateData['wrapper'] ?? null,
             'title' => $dbPage?->title ?? '',
-        ], $defaultLayout);
+        ], $defaultLayout, $sharedLayout);
     }
 
     /**
      * Build a PageData instance from stored JSON, merging the DB page title.
+     *
+     * @param  array<string, mixed>  $defaultLayout
+     * @param  array<string, mixed>  $sharedLayout
      */
-    protected function buildPage(?PageData $stored, array $defaultLayout, mixed $dbPage): PageData
+    protected function buildPage(?PageData $stored, array $defaultLayout, array $sharedLayout, mixed $dbPage): PageData
     {
         $data = $stored?->toArray() ?? [];
         $data['title'] = $dbPage?->title ?? $data['title'] ?? '';
 
-        return PageData::fromArray($data, $defaultLayout);
+        return PageData::fromArray($data, $defaultLayout, $sharedLayout);
     }
 
     /**

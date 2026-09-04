@@ -27,30 +27,51 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a PageData instance from a raw decoded page JSON array.
      *
-     * When the JSON has no `layout` key (or an empty one), the caller may
-     * supply a `$defaultLayout` array (built by LayoutParser) which will be
-     * used as the base. Any keys already present in `$data['layout']` will
-     * deep-merge on top, so per-page settings always win.
+     * The `layout` field in `$data` can be either:
+     *  - A string (layout type, e.g. "page") — resolved from shared layout config
+     *  - An object (full layout config) — page-specific override
+     *  - Missing — defaults to "page" string (shared)
      *
-     * Layout shape:
+     * Three-layer merge priority (lowest to highest):
+     *  1. $defaultLayout — schema defaults from LayoutParser
+     *  2. $sharedLayout  — shared config from LayoutSettings
+     *  3. $data['layout'] — page-specific override from page JSON
      *
-     *   layout: {
-     *     type: "page",
-     *     header: { sections: { "header": {...} }, order: ["header"] },
-     *     footer: { sections: { "footer": {...} }, order: ["footer"] }
-     *   }
+     * The resolved layout always includes a `source` field:
+     *  - "shared" — layout came from LayoutSettings (or defaults)
+     *  - "page"   — layout is a page-specific override
      *
      * @param  array<string, mixed>  $data
      * @param  array<string, mixed>  $defaultLayout  Default layout from LayoutParser (optional)
+     * @param  array<string, mixed>  $sharedLayout  Shared layout from LayoutSettings (optional)
      */
-    public static function fromArray(array $data, array $defaultLayout = []): self
+    public static function fromArray(array $data, array $defaultLayout = [], array $sharedLayout = []): self
     {
         $sections = is_array($data['sections'] ?? null) ? $data['sections'] : [];
         $order = is_array($data['order'] ?? null) ? $data['order'] : array_keys($sections);
 
-        // Merge stored layout over the default, so per-page settings win.
-        $storedLayout = is_array($data['layout'] ?? null) ? $data['layout'] : [];
-        $layout = self::mergeLayouts($defaultLayout, $storedLayout);
+        // Detect if layout is string (shared) or object (page-specific).
+        $layoutValue = $data['layout'] ?? null;
+
+        if (is_string($layoutValue)) {
+            // String: layout type only — use shared layout, merged with defaults.
+            $storedLayout = ['type' => $layoutValue];
+            $layoutSource = 'shared';
+        } elseif (is_array($layoutValue)) {
+            // Object: full layout config — page-specific override.
+            $storedLayout = $layoutValue;
+            $layoutSource = 'page';
+        } else {
+            // Missing: default to shared "page" layout.
+            $storedLayout = [];
+            $layoutSource = 'shared';
+        }
+
+        $layout = self::mergeLayouts($defaultLayout, $sharedLayout, $storedLayout);
+
+        if (! empty($layout)) {
+            $layout['source'] = $layoutSource;
+        }
 
         $wrapper = isset($data['wrapper']) && is_string($data['wrapper']) && $data['wrapper'] !== ''
             ? $data['wrapper']
@@ -67,77 +88,99 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Merge a default layout with a stored (per-page) layout.
+     * Merge three layout layers: default, shared, and stored (per-page).
      *
      * Layout structure: { type, header: { sections, order }, footer: { sections, order } }
      *
-     * Rules:
-     *  - `type` from $stored wins if present.
-     *  - Each zone (header/footer) is merged independently: stored section
-     *    settings deep-merge over default section settings, so a partially-saved
-     *    header still gets the schema defaults for any missing keys.
-     *  - Zone `order` from $stored wins if non-empty; otherwise default order used.
+     * Priority (highest wins):
+     *  1. $default — schema defaults from LayoutParser
+     *  2. $shared  — shared config from LayoutSettings
+     *  3. $stored  — page-specific override from page JSON
      *
      * @param  array<string, mixed>  $default
+     * @param  array<string, mixed>  $shared
      * @param  array<string, mixed>  $stored
      * @return array<string, mixed>
      */
-    private static function mergeLayouts(array $default, array $stored): array
+    private static function mergeLayouts(array $default, array $shared, array $stored): array
     {
-        if (empty($default) && empty($stored)) {
+        if (empty($default) && empty($shared) && empty($stored)) {
             return [];
         }
 
-        $type = $stored['type'] ?? $default['type'] ?? 'page';
+        $type = $stored['type'] ?? $shared['type'] ?? $default['type'] ?? 'page';
 
         return [
             'type' => $type,
             'header' => self::mergeZone(
                 $default['header'] ?? [],
+                $shared['header'] ?? [],
                 $stored['header'] ?? [],
             ),
             'footer' => self::mergeZone(
                 $default['footer'] ?? [],
+                $shared['footer'] ?? [],
                 $stored['footer'] ?? [],
             ),
         ];
     }
 
     /**
-     * Merge a single zone (header or footer) from default and stored data.
+     * Merge a single zone (header or footer) from three layers.
+     *
+     * Priority (highest wins):
+     *  1. $default — schema defaults from LayoutParser
+     *  2. $shared  — shared config from LayoutSettings
+     *  3. $stored  — page-specific override from page JSON
      *
      * @param  array<string, mixed>  $default
+     * @param  array<string, mixed>  $shared
      * @param  array<string, mixed>  $stored
      * @return array{sections: array, order: array}
      */
-    private static function mergeZone(array $default, array $stored): array
+    private static function mergeZone(array $default, array $shared, array $stored): array
     {
         $defaultSections = $default['sections'] ?? [];
+        $sharedSections = $shared['sections'] ?? [];
         $storedSections = $stored['sections'] ?? [];
 
-        // Start with defaults, deep-merge stored settings on top.
+        // Start with defaults.
         $sections = $defaultSections;
 
-        foreach ($storedSections as $key => $storedSection) {
+        // Deep-merge shared layout sections on top.
+        foreach ($sharedSections as $key => $section) {
             if (isset($sections[$key])) {
-                $sections[$key] = array_merge($sections[$key], $storedSection, [
+                $sections[$key] = array_merge($sections[$key], $section, [
                     'settings' => array_merge(
                         $sections[$key]['settings'] ?? [],
-                        $storedSection['settings'] ?? [],
+                        $section['settings'] ?? [],
                     ),
-                    'blocks' => $storedSection['blocks'] ?? $sections[$key]['blocks'] ?? [],
-                    'order' => $storedSection['order'] ?? $sections[$key]['order'] ?? [],
+                    'blocks' => $section['blocks'] ?? $sections[$key]['blocks'] ?? [],
+                    'order' => $section['order'] ?? $sections[$key]['order'] ?? [],
                 ]);
             } else {
-                $sections[$key] = $storedSection;
+                $sections[$key] = $section;
             }
         }
 
-        // Order: stored wins if non-empty, otherwise default, otherwise key order.
-        $storedOrder = isset($stored['order']) && is_array($stored['order']) && ! empty($stored['order'])
-            ? $stored['order']
-            : null;
-        $order = $storedOrder ?? ($default['order'] ?? array_keys($sections));
+        // Deep-merge stored (page-specific) sections on top.
+        foreach ($storedSections as $key => $section) {
+            if (isset($sections[$key])) {
+                $sections[$key] = array_merge($sections[$key], $section, [
+                    'settings' => array_merge(
+                        $sections[$key]['settings'] ?? [],
+                        $section['settings'] ?? [],
+                    ),
+                    'blocks' => $section['blocks'] ?? $sections[$key]['blocks'] ?? [],
+                    'order' => $section['order'] ?? $sections[$key]['order'] ?? [],
+                ]);
+            } else {
+                $sections[$key] = $section;
+            }
+        }
+
+        // Order priority: stored > shared > default.
+        $order = $stored['order'] ?? $shared['order'] ?? $default['order'] ?? array_keys($sections);
 
         return [
             'sections' => $sections,
@@ -187,6 +230,14 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     public function meta(): array
     {
         return $this->meta;
+    }
+
+    /**
+     * Return the layout source: "shared" or "page".
+     */
+    public function layoutSource(): string
+    {
+        return (string) ($this->layout['source'] ?? 'shared');
     }
 
     /**
@@ -263,10 +314,17 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     public function layoutHeader(): array
     {
         $zone = $this->layout['header'] ?? [];
+        $sections = array_map(fn (array $s) => array_merge(['blocks' => [], 'order' => []], $s), $zone['sections'] ?? []);
+        $order = $zone['order'] ?? [];
+
+        // If we have sections but no order, default to section keys.
+        if ($order === [] && $sections !== []) {
+            $order = array_keys($sections);
+        }
 
         return [
-            'sections' => array_map(fn (array $s) => array_merge(['blocks' => [], 'order' => []], $s), $zone['sections'] ?? []),
-            'order' => $zone['order'] ?? [],
+            'sections' => $sections,
+            'order' => $order,
         ];
     }
 
@@ -278,10 +336,17 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     public function layoutFooter(): array
     {
         $zone = $this->layout['footer'] ?? [];
+        $sections = array_map(fn (array $s) => array_merge(['blocks' => [], 'order' => []], $s), $zone['sections'] ?? []);
+        $order = $zone['order'] ?? [];
+
+        // If we have sections but no order, default to section keys.
+        if ($order === [] && $sections !== []) {
+            $order = array_keys($sections);
+        }
 
         return [
-            'sections' => array_map(fn (array $s) => array_merge(['blocks' => [], 'order' => []], $s), $zone['sections'] ?? []),
-            'order' => $zone['order'] ?? [],
+            'sections' => $sections,
+            'order' => $order,
         ];
     }
 
@@ -321,6 +386,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         if (! empty($this->layout)) {
             $layout = [
                 'type' => $this->layoutType(),
+                'source' => $this->layoutSource(),
                 'header' => $this->layoutHeader(),
                 'footer' => $this->layoutFooter(),
             ];

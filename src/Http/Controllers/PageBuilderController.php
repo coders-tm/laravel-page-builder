@@ -156,6 +156,7 @@ class PageBuilderController extends Controller
      * POST /pagebuilder/save-page
      *
      * Save page JSON data and persist page meta to the database.
+     * Layout splitting is handled by PageStorage::save().
      */
     public function savePage(Request $request): JsonResponse
     {
