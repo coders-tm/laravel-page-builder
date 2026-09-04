@@ -1,4 +1,6 @@
-@extends('layouts.page')
+@extends('layouts.page', [
+    'title' => 'Custom Blade',
+])
 
 @layout([
     'header' => [
