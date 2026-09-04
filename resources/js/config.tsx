@@ -30,6 +30,12 @@ export interface PageBuilderConfig {
    * Additional query parameters to preserve during navigation.
    */
   preservedParams?: string[]
+  /**
+   * Available languages for multilanguage page editing.
+   * When non-empty, a language selector appears in the editor header.
+   * The first entry is treated as the default language.
+   */
+  languages?: Array<{ code: string; name: string }>
   fields: Record<
     string,
     | {

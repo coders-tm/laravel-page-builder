@@ -11,6 +11,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
+use PageBuilder\Collections\BlockCollection;
+use PageBuilder\Components\Block;
+use PageBuilder\Components\Settings;
 use PageBuilder\PageBuilder;
 use PageBuilder\Rendering\EditorAttributes;
 
@@ -72,12 +75,12 @@ test('for section does not include pb-disabled-section when enabled', function (
 test('for block includes pb-disabled-block attribute when disabled', function () {
     PageBuilder::enableEditor();
 
-    $block = new \PageBuilder\Components\Block([
+    $block = new Block([
         'id' => 'block-1',
         'type' => 'text',
         'disabled' => true,
-        'settings' => new \PageBuilder\Components\Settings([], []),
-        'blocks' => new \PageBuilder\Collections\BlockCollection,
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
     ]);
     $result = EditorAttributes::forBlock($block);
 
@@ -88,12 +91,12 @@ test('for block includes pb-disabled-block attribute when disabled', function ()
 test('for block does not include pb-disabled-block when enabled', function () {
     PageBuilder::enableEditor();
 
-    $block = new \PageBuilder\Components\Block([
+    $block = new Block([
         'id' => 'block-1',
         'type' => 'text',
         'disabled' => false,
-        'settings' => new \PageBuilder\Components\Settings([], []),
-        'blocks' => new \PageBuilder\Collections\BlockCollection,
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
     ]);
     $result = EditorAttributes::forBlock($block);
 
@@ -113,12 +116,12 @@ test('for section includes disabled flag in JSON meta when disabled', function (
 test('for block includes disabled flag in JSON meta when disabled', function () {
     PageBuilder::enableEditor();
 
-    $block = new \PageBuilder\Components\Block([
+    $block = new Block([
         'id' => 'block-1',
         'type' => 'text',
         'disabled' => true,
-        'settings' => new \PageBuilder\Components\Settings([], []),
-        'blocks' => new \PageBuilder\Collections\BlockCollection,
+        'settings' => new Settings([], []),
+        'blocks' => new BlockCollection,
     ]);
     $result = EditorAttributes::forBlock($block);
 

@@ -21,6 +21,7 @@ interface NavigationAdapter {
 interface NavigationState {
   slug?: string
   device: string
+  lang: string | null
   selectedSection: string | null
   blockPath: string[]
 }
@@ -38,6 +39,7 @@ export class NavigationManager {
   private state: NavigationState = {
     slug: undefined,
     device: "desktop",
+    lang: null,
     selectedSection: null,
     blockPath: [],
   }
@@ -86,6 +88,10 @@ export class NavigationManager {
     return this.state.device
   }
 
+  get lang(): string | null {
+    return this.state.lang
+  }
+
   get selectedSection(): string | null {
     return this.state.selectedSection
   }
@@ -108,6 +114,7 @@ export class NavigationManager {
     return {
       slug: this.slug,
       device: this.device,
+      lang: this.lang,
       selectedSection: this.selectedSection,
       selectedBlock: this.selectedBlock,
       parentBlockId: this.parentBlockId,
@@ -122,13 +129,16 @@ export class NavigationManager {
   syncFromRoute(input: {
     slug?: string
     device: string
+    lang: string | null
     selectedSection: string | null
     blockPath: string[]
   }): void {
     const prev = this.state
     const pageChanged = prev.slug !== input.slug
+    const langChanged = prev.lang !== input.lang
     const changed =
       pageChanged ||
+      langChanged ||
       prev.device !== input.device ||
       prev.selectedSection !== input.selectedSection ||
       prev.blockPath.join(",") !== input.blockPath.join(",")
@@ -138,6 +148,7 @@ export class NavigationManager {
     this.setState({
       slug: input.slug,
       device: input.device,
+      lang: input.lang,
       selectedSection: input.selectedSection,
       blockPath: [...input.blockPath],
     })
@@ -147,10 +158,10 @@ export class NavigationManager {
 
     this.events.emit("navigation:changed", this.getSnapshot())
 
-    if (pageChanged) {
+    if (pageChanged || langChanged) {
       window.dispatchEvent(
         new CustomEvent("pagebuilder:page-change", {
-          detail: { slug: input.slug ?? null },
+          detail: { slug: input.slug ?? null, lang: input.lang },
         }),
       )
     }
@@ -179,13 +190,16 @@ export class NavigationManager {
     const params: Record<string, string> = {}
 
     if (current) {
-      // Always preserve 'editor'
+      // Always preserve 'editor' and 'lang'
       if (current.has("editor")) {
         params.editor = current.get("editor")!
       }
+      if (current.has("lang")) {
+        params.lang = current.get("lang")!
+      }
 
       // Preserve configurable params
-      const preserved = ["editor", ...(config.preservedParams || [])]
+      const preserved = ["editor", "lang", ...(config.preservedParams || [])]
 
       current.forEach((value, key) => {
         if (preserved.includes(key)) {
@@ -243,6 +257,17 @@ export class NavigationManager {
     if (this.selectedSection) params.section = this.selectedSection
     if (this.blockPath.length > 0) params.block = this.blockPath.join(",")
     if (device !== "desktop") params.device = device
+    this.adapter?.setSearchParams(params)
+  }
+
+  setLang(lang: string | null): void {
+    this.setState({ lang })
+
+    const params = this.getPreservedParams()
+    if (this.selectedSection) params.section = this.selectedSection
+    if (this.blockPath.length > 0) params.block = this.blockPath.join(",")
+    if (this.device !== "desktop") params.device = this.device
+    if (lang) params.lang = lang
     this.adapter?.setSearchParams(params)
   }
 
