@@ -1,4 +1,4 @@
-<html @pbEditorClass('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html @editor('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -12,7 +12,7 @@
     </title>
 
     <!-- Fonts and Icons -->
-    @themeFont
+    @fonts
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
 

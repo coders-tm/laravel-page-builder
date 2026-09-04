@@ -75,7 +75,7 @@ Converts runtime objects into HTML via Blade views.
 | ------------------ | ------------------------------------------------------------------------------------------------------- |
 | `Renderer`         | `renderSection`, `renderBlock`, `renderBlocks`, `renderBlockChildren`, `hydrateSection`, `hydrateBlock` |
 | `EditorAttributes` | `forSection`, `forBlock`, `autoInjectLiveText`                                                          |
-| `BladeDirectives`  | Registers `@blocks`, `@schema`, `@sections`, `@pbEditorClass`                                           |
+| `BladeDirectives`  | Registers `@blocks`, `@schema`, `@sections`, `@editor`                                                  |
 
 Rules:
 
@@ -198,13 +198,14 @@ php artisan theme:link         # Symlink theme public assets
 
 ## Blade Directives
 
-| Directive                | Purpose                                                                     |
-| ------------------------ | --------------------------------------------------------------------------- |
-| `@schema([...])`         | Schema definition; no-op at render time, extracted at registration          |
-| `@blocks($section)`      | Renders all top-level blocks of a section                                   |
-| `@blocks($block)`        | Renders all child blocks of a container block                               |
-| `@sections('header')`    | Renders a layout slot (header / footer)                                     |
-| `@pbEditorClass('dark')` | Renders the `<html>` class attribute and adds editor classes in editor mode |
+| Directive             | Purpose                                                                     |
+| --------------------- | --------------------------------------------------------------------------- |
+| `@schema([...])`      | Schema definition; no-op at render time, extracted at registration          |
+| `@blocks($section)`   | Renders all top-level blocks of a section                                   |
+| `@blocks($block)`     | Renders all child blocks of a container block                               |
+| `@sections('header')` | Renders a layout slot (header / footer)                                     |
+| `@layout([...])`      | Partial layout config override for custom Blade pages                       |
+| `@editor('dark')`     | Renders the `<html>` class attribute and adds editor classes in editor mode |
 
 > Never call `@blocks()` outside a Blade view. Never call the renderer directly from a template.
 
@@ -948,7 +949,7 @@ The Page Builder reads the active theme from this config and registers its secti
 {{-- themes/my-theme/views/layouts/page.blade.php --}}
 
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @pbEditorClass>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @editor>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -976,7 +977,7 @@ Key directives:
 
 | Directive             | Purpose                                                   |
 | --------------------- | --------------------------------------------------------- |
-| `@pbEditorClass`      | Adds `js pb-design-mode` class to `<html>` in editor mode |
+| `@editor`             | Adds `js pb-design-mode` class to `<html>` in editor mode |
 | `@sections('header')` | Renders the `header` layout section                       |
 | `@sections('footer')` | Renders the `footer` layout section                       |
 | `@yield('content')`   | Where the page's sections are output                      |
@@ -1165,7 +1166,7 @@ This allows themes to completely replace `row.blade.php`, `column.blade.php`, or
 
 ```
 - [ ] Create themes/{name}/views/layouts/page.blade.php
-- [ ] Add @pbEditorClass(...) to <html>, @sections('header'), @yield('content'), @sections('footer')
+- [ ] Add @editor(...) to <html>, @sections('header'), @yield('content'), @sections('footer')
 - [ ] Create theme sections in themes/{name}/views/sections/
 - [ ] Create theme blocks in themes/{name}/views/blocks/
 - [ ] Register theme in config/themer.php
@@ -1239,6 +1240,7 @@ All rendering must go through `Renderer`. Never call `view()->make()` or `Blade:
 - **Circular layer imports** — services may use `Renderer`; `Renderer` must not use any service.
 - **Template ignored when JSON exists** — if `pages/{slug}.json` exists for a page, the template is never consulted.
 - **`layout: false` skips header/footer** — when set, `@sections('header')` and `@sections('footer')` render nothing.
+- **`@layout` must be placed after a blank line following `@extends`** — Blade's compiler requires `@extends` to be the first statement in the view. Placing `@layout` immediately after `@extends` without a blank line causes `@extends` to be silently dropped, resulting in an empty rendered output. Always add a blank line between `@extends` and `@layout`.
 - **Wrapper tag not in allowed list** — only `div`, `main`, `section` are accepted; other tags fall back to `<div>`.
 - **Circular variable reference** — `{{ $page->template }}` resolves to the template name string, not rendered content.
 - **Non-string placeholder values** — numbers and booleans on the model are cast to string (e.g. `true` → `"1"`).

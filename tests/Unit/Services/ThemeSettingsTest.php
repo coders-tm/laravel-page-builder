@@ -140,3 +140,29 @@ test('save preserves other keys', function () {
     expect($raw['_pagebuilder']['layouts']['page'])->toBe(['header' => [], 'footer' => []]);
     expect($raw['_pagebuilder']['theme']['primary_color'])->toBe('#FFFFFF');
 });
+
+test('fontElements returns empty string when no google_font settings exist', function () {
+    expect($this->themeSettings->fontElements())->toBe('');
+});
+
+test('fontElements returns google font link tags based on schema and saved values', function () {
+    $this->app['config']->set('pagebuilder.theme_settings_schema', [
+        [
+            'name' => 'Typography',
+            'settings' => [
+                ['key' => 'body_font', 'type' => 'google_font', 'default' => 'Inter'],
+                ['key' => 'heading_font', 'type' => 'google_font', 'default' => 'Roboto'],
+            ],
+        ],
+    ]);
+
+    $this->themeSettings->save(['body_font' => 'Poppins']);
+
+    $html = $this->themeSettings->fontElements();
+
+    expect($html)->toContain('https://fonts.googleapis.com/css2?');
+    expect($html)->toContain('family=Poppins');
+    expect($html)->toContain('family=Roboto');
+    expect($html)->toContain('<link rel="preconnect" href="https://fonts.googleapis.com">');
+});
+

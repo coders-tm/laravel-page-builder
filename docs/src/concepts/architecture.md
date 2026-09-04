@@ -100,7 +100,7 @@ Blade rendering engine that transforms JSON into HTML.
 
 - `Renderer` — Core rendering engine: hydrates JSON into objects, renders via Blade
 - `EditorAttributes` — Generates `data-editor-*` attributes for sections/blocks
-- `BladeDirectives` — Registers `@blocks`, `@sections`, `@schema`, `@pbEditorClass`
+- `BladeDirectives` — Registers `@blocks`, `@sections`, `@schema`, `@editor`
 
 ```php
 use PageBuilder\Facades\Page;

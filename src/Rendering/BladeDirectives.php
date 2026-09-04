@@ -17,10 +17,22 @@ use PageBuilder\Support\PageData;
  *
  *   @schema([...])            — no-op (extracted at registration time)
  *
- *   @pbEditorClass(...)       — renders the <html> class attribute
+ *   @layout([...])            — partial layout config override (header/footer sections)
+ *
+ *   @editor(...)       — renders the <html> class attribute
+ *
+ *   @fonts                  — emits Google Fonts <link> tags
  */
 class BladeDirectives
 {
+    /**
+     * Pending layout overrides stored by @layout directive, awaiting application
+     * by the @sections directive when it renders a layout section.
+     *
+     * @var array<string, mixed>
+     */
+    private static array $pendingLayoutOverrides = [];
+
     /**
      * Register all page builder Blade directives.
      */
@@ -61,15 +73,21 @@ PHP;
         // @sections('key')
         // Renders a layout section (header, footer, etc.) from $__pb_layout.
         // Searches header zone then footer zone by key — no second argument needed.
+        // Also applies any pending layout overrides from @layout before rendering.
         Blade::directive('sections', function (string $expression) {
-            return sprintf(
-                '<?php echo \PageBuilder\Rendering\BladeDirectives::renderLayoutSection($__pb_layout ?? null, %s); ?>',
-                trim($expression),
-            );
+            return <<<PHP
+<?php
+\$__pb_overrides = \PageBuilder\Rendering\BladeDirectives::getPendingOverrides();
+if (! empty(\$__pb_overrides) && isset(\$__pb_layout) && \$__pb_layout instanceof \PageBuilder\Support\PageData) {
+    \$__pb_layout->mergeLayout(\$__pb_overrides);
+}
+echo \PageBuilder\Rendering\BladeDirectives::renderLayoutSection(\$__pb_layout ?? null, {$expression});
+?>
+PHP;
         });
 
-        // @pbEditorClass('dark') — renders class="dark js pb-design-mode" in editor mode.
-        Blade::directive('pbEditorClass', function (string $expression) {
+        // @editor('dark') — renders class="dark js pb-design-mode" in editor mode.
+        Blade::directive('editor', function (string $expression) {
             $expression = trim($expression);
 
             return $expression === ''
@@ -77,10 +95,46 @@ PHP;
                 : "<?php echo \PageBuilder\PageBuilder::classAttribute({$expression}); ?>";
         });
 
-        // @themeFont — emits Google Fonts <link> tags for any google_font settings
-        Blade::directive('themeFont', function () {
-            return '<?php echo \PageBuilder\Rendering\BladeDirectives::renderThemeFont(); ?>';
+        // @fonts — emits Google Fonts <link> tags for any google_font settings
+        Blade::directive('fonts', function () {
+            return '<?php echo \PageBuilder\Rendering\BladeDirectives::renderFonts(); ?>';
         });
+
+        // @layout(['header' => [...], 'footer' => [...]])
+        // Stores a partial layout config that will be merged into $__pb_layout
+        // by the next @sections() directive call. Allows custom Blade pages to
+        // tweak header/footer sections without a full layout object.
+        Blade::directive('layout', function (string $expression) {
+            return sprintf(
+                '<?php \PageBuilder\Rendering\BladeDirectives::storePendingOverrides(%s); ?>',
+                $expression,
+            );
+        });
+    }
+
+    /**
+     * Store pending layout overrides for application by the @sections directive.
+     *
+     * Called by the compiled @layout directive when a layout array is provided.
+     *
+     * @param  array<string, mixed>  $overrides  Partial layout config to merge
+     */
+    public static function storePendingOverrides(array $overrides): void
+    {
+        self::$pendingLayoutOverrides = $overrides;
+    }
+
+    /**
+     * Retrieve and clear pending layout overrides.
+     *
+     * @return array<string, mixed>
+     */
+    public static function getPendingOverrides(): array
+    {
+        $overrides = self::$pendingLayoutOverrides;
+        self::$pendingLayoutOverrides = [];
+
+        return $overrides;
     }
 
     /**
@@ -125,45 +179,8 @@ PHP;
      * Uses the saved value when available, falls back to the setting default.
      * Returns an empty string when no google_font settings are configured.
      */
-    public static function renderThemeFont(): string
+    public static function renderFonts(): string
     {
-        $themeSettings = app(ThemeSettings::class);
-        $values = $themeSettings->values();
-        $fonts = [];
-
-        foreach ($themeSettings->schema() as $group) {
-            foreach ($group['settings'] ?? [] as $setting) {
-                if (($setting['type'] ?? '') !== 'google_font') {
-                    continue;
-                }
-
-                $key = $setting['key'] ?? null;
-                $family = $key ? $themeSettings->getString($key, (string) ($setting['default'] ?? '')) : (string) ($setting['default'] ?? '');
-                $family = trim($family);
-
-                if ($family !== '') {
-                    $fonts[] = $family;
-                }
-            }
-        }
-
-        $fonts = array_unique($fonts);
-
-        if (empty($fonts)) {
-            return '';
-        }
-
-        $query = implode('&', array_map(
-            static fn (string $f) => 'family='.rawurlencode($f).':wght@400;500;600;700',
-            $fonts
-        ));
-
-        $href = 'https://fonts.googleapis.com/css2?'.$query.'&display=swap';
-
-        return implode("\n", [
-            '<link rel="preconnect" href="https://fonts.googleapis.com">',
-            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
-            '<link href="'.e($href).'" rel="stylesheet">',
-        ]);
+        return app(ThemeSettings::class)->fontElements();
     }
 }

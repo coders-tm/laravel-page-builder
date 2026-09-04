@@ -42,11 +42,10 @@
             <a href="/"
                 class="group flex items-center gap-2 text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">
                 @if ($section->settings->logo_image)
-                    <img src="{{ asset($section->settings->logo_image) }}" alt="{{ $brandTitle }}"
-                        class="h-8 w-auto group-hover:scale-105 transition-transform" />
+                    <img src="{{ asset($section->settings->logo_image) }}" alt="{{ $brandTitle }}" class="h-8 w-auto" />
                 @else
                     <span
-                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-red-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-red-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />

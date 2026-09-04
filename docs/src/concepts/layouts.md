@@ -24,7 +24,7 @@ Create a layout Blade file:
 
 ```blade
 {{-- resources/views/layouts/page.blade.php --}}
-<html @pbEditorClass('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html @editor('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -116,6 +116,123 @@ Pages can define custom layout sections in their JSON. The `layout` key controls
 
 When the editor saves this data, `@sections('header')` in your layout Blade file renders the `site-header` section, and `@sections('footer')` renders the `site-footer` section.
 
+## Custom Blade Page Layouts
+
+Custom Blade pages (`pages/{slug}.blade.php`) can also override layout sections using the `@layout` directive. This allows you to tweak header/footer settings without a full page JSON.
+
+### Syntax
+
+```blade
+@extends('layouts.page')
+
+@layout([
+    'header' => [
+        'sections' => [
+            'header' => [
+                'settings' => ['sticky' => false],
+            ],
+        ],
+    ],
+])
+
+@section('content')
+<main>
+    <p>Custom blade page body</p>
+</main>
+@endsection
+```
+
+The `@layout` directive accepts a partial layout array — the same structure used in page JSON's `layout` object. Only the keys you specify are overridden; everything else inherits from the default/shared layout.
+
+### Partial Config Examples
+
+Override a single setting:
+
+```blade
+@layout([
+    'header' => [
+        'sections' => [
+            'header' => [
+                'settings' => ['sticky' => false],
+            ],
+        ],
+    ],
+])
+```
+
+Add a new section:
+
+```blade
+@layout([
+    'header' => [
+        'sections' => [
+            'announcement' => [
+                'type' => 'announcement',
+                'settings' => ['text' => 'Sale!'],
+                'blocks' => [],
+                'order' => [],
+            ],
+        ],
+        'order' => ['announcement', 'header'],
+    ],
+])
+```
+
+Override both header and footer:
+
+```blade
+@layout([
+    'header' => [
+        'sections' => [
+            'header' => [
+                'settings' => ['logo' => '/custom-logo.png'],
+            ],
+        ],
+    ],
+    'footer' => [
+        'sections' => [
+            'footer' => [
+                'settings' => ['tagline' => 'Custom tagline'],
+            ],
+        ],
+    ],
+])
+```
+
+### How It Works
+
+1. `@layout([...])` stores the partial config as pending overrides
+2. The next `@sections('key')` call in the layout view applies the overrides to `$__pb_layout` via `PageData::mergeLayout()`
+3. The merged layout is used for rendering
+
+The overrides use the same 3-layer merge as page JSON — they are applied as the highest-priority layer on top of the default and shared layout configs.
+
+::: warning
+`@layout` must be placed after a blank line following `@extends`. Blade's compiler requires `@extends` to be the first statement in the view. Placing `@layout` immediately after `@extends` without a blank line causes `@extends` to be silently dropped, resulting in an empty rendered output.
+
+```blade
+{{-- CORRECT: blank line between @extends and @layout --}}
+@extends('layouts.page')
+
+@layout([...])
+
+@section('content')
+...
+@endsection
+```
+
+```blade
+{{-- WRONG: no blank line — @extends will be dropped --}}
+@extends('layouts.page')
+@layout([...])
+
+@section('content')
+...
+@endsection
+```
+
+:::
+
 ## Layout Zones
 
 | Zone      | Description       | How to render         |
@@ -150,7 +267,7 @@ Define custom layout types by creating additional Blade files:
 
 ```blade
 {{-- resources/views/layouts/simple.blade.php --}}
-<html @pbEditorClass('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html @editor('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <title>{{ $meta_title ?? ($title ?? '') . ' | ' . config('app.name') }}</title>
@@ -385,5 +502,5 @@ The system resolves layouts in this order:
 2. **Use `@sections`** — Self-closing directive for header/footer zones, content comes from page JSON
 3. **Responsive design** — Make layouts responsive by default
 4. **SEO basics** — Include `$meta_title`, `$meta_description` in the `<head>`
-5. **Editor support** — Always include `@pbEditorClass` on the `<html>` tag
+5. **Editor support** — Always include `@editor` on the `<html>` tag
 6. **Use shared layouts** — Store common header/footer configs in `LayoutSettings` to avoid duplicating across pages

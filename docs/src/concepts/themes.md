@@ -53,7 +53,7 @@ mkdir -p themes/my-theme/{assets/css,assets/js}
 
 ```blade
 {{-- themes/my-theme/views/layouts/page.blade.php --}}
-<html @pbEditorClass('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html @editor('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -262,4 +262,4 @@ Theme::set(Route::currentRouteName());
 2. **Use presets** — Provide common configurations as presets
 3. **Asset versioning** — Use file modification timestamps for cache busting
 4. **Responsive design** — Make themes responsive by default
-5. **Editor support** — Always include `@pbEditorClass` and `editorAttributes()`
+5. **Editor support** — Always include `@editor` and `editorAttributes()`

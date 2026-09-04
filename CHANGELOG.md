@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`@layout` Blade directive** — Custom Blade pages can now override layout sections (header/footer) using `@layout([...])`. Accepts a partial layout config array that merges with the default/shared layout, allowing per-page tweaks without a full page JSON.
+- **`PageData::mergeLayout()`** — New method for merging partial layout overrides into an existing PageData instance, used by the `@layout` directive pipeline.
 - **`SettingsStoreInterface` & `SettingsStore`** — Abstract storage layer handling low-level `settings.json` file operations, atomic updates, caching, and preservation of root keys outside `_pagebuilder`.
 - **`LayoutConfig` DTO** — Type-safe Value Object for structured layout header/footer zone management (`header()`, `footer()`, `headerSections()`, `footerSections()`, `headerOrder()`, `footerOrder()`).
 - **`PageMeta` DTO** — Immutable Value Object representing page SEO metadata (`title`, `meta_title`, `meta_description`, `meta_keywords`) with strict typed accessors (`title()`, `metaTitle()`, `metaDescription()`, `metaKeywords()`, `isEmpty()`).
@@ -390,7 +392,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Editor mode — `data-editor-*` attributes injected only when the editor is active
 - `@blocks()` directive — renders top-level section blocks or nested child blocks of a container block
 - `@sections()` directive — renders layout slot sections (header/footer) from the Blade layout file
-- `@pbEditorClass` directive — outputs CSS class when editor mode is active
+- `@editor` directive — outputs CSS class when editor mode is active
 - `pb_editor()` global helper — returns `true` when the editor is active
 - Built-in `section`, `row`, and `column` Blade views with Tailwind CSS
 - `SectionRegistry` and `BlockRegistry` with support for additional discovery paths via `Section::add()` / `Block::add()`

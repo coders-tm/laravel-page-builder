@@ -177,6 +177,52 @@ class ThemeSettings implements Arrayable, ArrayAccess, Countable, JsonSerializab
     }
 
     /**
+     * Build Google Fonts <link> tags for every google_font setting in the theme schema.
+     *
+     * Uses saved values when available, falling back to setting defaults.
+     * Returns an empty string when no google_font settings are configured.
+     */
+    public function fontElements(): string
+    {
+        $fonts = [];
+
+        foreach ($this->schema() as $group) {
+            foreach ($group['settings'] ?? [] as $setting) {
+                if (($setting['type'] ?? '') !== 'google_font') {
+                    continue;
+                }
+
+                $key = $setting['key'] ?? null;
+                $family = $key ? $this->getString($key, (string) ($setting['default'] ?? '')) : (string) ($setting['default'] ?? '');
+                $family = trim($family);
+
+                if ($family !== '') {
+                    $fonts[] = $family;
+                }
+            }
+        }
+
+        $fonts = array_unique($fonts);
+
+        if (empty($fonts)) {
+            return '';
+        }
+
+        $query = implode('&', array_map(
+            static fn (string $f) => 'family='.rawurlencode($f).':wght@400;500;600;700',
+            $fonts
+        ));
+
+        $href = 'https://fonts.googleapis.com/css2?'.$query.'&display=swap';
+
+        return implode("\n", [
+            '<link rel="preconnect" href="https://fonts.googleapis.com">',
+            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
+            '<link href="'.e($href).'" rel="stylesheet">',
+        ]);
+    }
+
+    /**
      * Return the schema and current values array formatted for the editor.
      *
      * @return array{schema: array, values: array<string, mixed>}

@@ -897,3 +897,216 @@ test('countable and array access interfaces work', function () {
     expect($data['title'])->toBe('Home Page');
     expect(isset($data['non_existent']))->toBeFalse();
 });
+
+test('mergeLayout merges partial header overrides into existing layout', function () {
+    $data = PageData::fromArray([
+        ...sampleData(),
+        'layout' => [
+            'type' => 'page',
+            'header' => [
+                'sections' => [
+                    'header' => [
+                        'type' => 'header',
+                        'settings' => ['logo' => '/default.png', 'sticky' => true],
+                        'blocks' => [],
+                        'order' => [],
+                    ],
+                ],
+                'order' => ['header'],
+            ],
+            'footer' => ['sections' => [], 'order' => []],
+        ],
+    ]);
+
+    $data->mergeLayout([
+        'header' => [
+            'sections' => [
+                'header' => [
+                    'settings' => ['sticky' => false],
+                ],
+            ],
+        ],
+    ]);
+
+    $header = $data->layoutSection('header');
+    // sticky overridden to false
+    expect($header['settings']['sticky'])->toBeFalse();
+    // logo preserved from original
+    expect($header['settings']['logo'])->toBe('/default.png');
+    // source set to page
+    expect($data->layoutSource())->toBe('page');
+});
+
+test('mergeLayout adds new section from overrides', function () {
+    $data = PageData::fromArray([
+        ...sampleData(),
+        'layout' => [
+            'type' => 'page',
+            'header' => [
+                'sections' => [
+                    'header' => [
+                        'type' => 'header',
+                        'settings' => [],
+                        'blocks' => [],
+                        'order' => [],
+                    ],
+                ],
+                'order' => ['header'],
+            ],
+            'footer' => ['sections' => [], 'order' => []],
+        ],
+    ]);
+
+    $data->mergeLayout([
+        'header' => [
+            'sections' => [
+                'announcement' => [
+                    'type' => 'announcement',
+                    'settings' => ['text' => 'Sale!'],
+                    'blocks' => [],
+                    'order' => [],
+                ],
+            ],
+            'order' => ['announcement', 'header'],
+        ],
+    ]);
+
+    expect($data->layoutSection('announcement'))->not->toBeNull();
+    expect($data->layoutSection('announcement')['settings']['text'])->toBe('Sale!');
+
+    $headerZone = $data->layoutHeader();
+    expect($headerZone['order'])->toBe(['announcement', 'header']);
+});
+
+test('mergeLayout handles empty overrides gracefully', function () {
+    $data = PageData::fromArray([
+        ...sampleData(),
+        'layout' => 'page',
+    ]);
+
+    $originalLayout = $data->layout();
+    $data->mergeLayout([]);
+
+    expect($data->layout())->toBe($originalLayout);
+});
+
+test('mergeLayout works on page with no existing layout', function () {
+    $data = PageData::fromArray(sampleData());
+
+    $data->mergeLayout([
+        'type' => 'page',
+        'header' => [
+            'sections' => [
+                'header' => [
+                    'type' => 'header',
+                    'settings' => ['logo' => '/new-logo.png'],
+                    'blocks' => [],
+                    'order' => [],
+                ],
+            ],
+            'order' => ['header'],
+        ],
+        'footer' => ['sections' => [], 'order' => []],
+    ]);
+
+    expect($data->layoutType())->toBe('page');
+    expect($data->layoutSource())->toBe('page');
+    expect($data->layoutSection('header'))->not->toBeNull();
+    expect($data->layoutSection('header')['settings']['logo'])->toBe('/new-logo.png');
+});
+
+test('mergeLayout footer overrides preserve header sections', function () {
+    $data = PageData::fromArray([
+        ...sampleData(),
+        'layout' => [
+            'type' => 'page',
+            'header' => [
+                'sections' => [
+                    'header' => [
+                        'type' => 'header',
+                        'settings' => ['logo' => '/default.png'],
+                        'blocks' => [],
+                        'order' => [],
+                    ],
+                ],
+                'order' => ['header'],
+            ],
+            'footer' => [
+                'sections' => [
+                    'footer' => [
+                        'type' => 'footer',
+                        'settings' => ['tagline' => 'Default'],
+                        'blocks' => [],
+                        'order' => [],
+                    ],
+                ],
+                'order' => ['footer'],
+            ],
+        ],
+    ]);
+
+    $data->mergeLayout([
+        'footer' => [
+            'sections' => [
+                'footer' => [
+                    'settings' => ['tagline' => 'Custom'],
+                ],
+            ],
+        ],
+    ]);
+
+    // Footer overridden
+    expect($data->layoutSection('footer')['settings']['tagline'])->toBe('Custom');
+    // Header preserved
+    expect($data->layoutSection('header')['settings']['logo'])->toBe('/default.png');
+});
+
+test('mergeLayout type override changes layout type', function () {
+    $data = PageData::fromArray([
+        ...sampleData(),
+        'layout' => 'page',
+    ]);
+
+    $data->mergeLayout([
+        'type' => 'simple',
+    ]);
+
+    expect($data->layoutType())->toBe('simple');
+    expect($data->layoutView())->toBe('layouts.simple');
+});
+
+test('mergeLayout multiple section settings are deep merged', function () {
+    $data = PageData::fromArray([
+        ...sampleData(),
+        'layout' => [
+            'type' => 'page',
+            'header' => [
+                'sections' => [
+                    'header' => [
+                        'type' => 'header',
+                        'settings' => ['logo' => '/default.png', 'sticky' => true, 'menu' => 'main'],
+                        'blocks' => [],
+                        'order' => [],
+                    ],
+                ],
+                'order' => ['header'],
+            ],
+            'footer' => ['sections' => [], 'order' => []],
+        ],
+    ]);
+
+    $data->mergeLayout([
+        'header' => [
+            'sections' => [
+                'header' => [
+                    'settings' => ['sticky' => false],
+                ],
+            ],
+        ],
+    ]);
+
+    $header = $data->layoutSection('header');
+    expect($header['settings']['logo'])->toBe('/default.png');
+    expect($header['settings']['sticky'])->toBeFalse();
+    expect($header['settings']['menu'])->toBe('main');
+});

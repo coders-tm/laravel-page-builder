@@ -1,7 +1,19 @@
 @extends('layouts.page')
 
+@layout([
+    'header' => [
+        'sections' => [
+            'header' => [
+                'settings' => [
+                    'sticky' => false,
+                ],
+            ],
+        ],
+    ],
+])
+
 @section('content')
-<main>
-    <p>Custom blade page body</p>
-</main>
+    <main class="h-100">
+        <p>Custom blade page body</p>
+    </main>
 @endsection

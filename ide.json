@@ -1,28 +1,38 @@
 {
-    "$schema": "https://laravel-ide.com/schema/laravel-ide-v2.json",
+  "$schema": "https://laravel-ide.com/schema/laravel-ide-v2.json",
 
-    "blade": {
-        "directives": [
-            {
-                "name": "blocks",
-                "prefix": "<?php /** @var \\Coderstm\\PageBuilder\\Components\\Section|\\Coderstm\\PageBuilder\\Components\\Block $",
-                "suffix": " */ ?>"
-            },
-            {
-                "name": "schema",
-                "prefix": "<?php /* @schema(",
-                "suffix": ") */ ?>"
-            },
-            {
-                "name": "sections",
-                "prefix": "<?php echo \\Coderstm\\PageBuilder\\Rendering\\BladeDirectives::renderLayoutSection($__pb_layout ?? null, ",
-                "suffix": "); ?>"
-            },
-            {
-                "name": "pbEditorClass",
-                "prefix": "<?php echo \\Coderstm\\PageBuilder\\PageBuilder::class(); /* ",
-                "suffix": " */ ?>"
-            }
-        ]
-    }
+  "blade": {
+    "directives": [
+      {
+        "name": "blocks",
+        "prefix": "<?php /** @var \\Coderstm\\PageBuilder\\Components\\Section|\\Coderstm\\PageBuilder\\Components\\Block $",
+        "suffix": " */ ?>"
+      },
+      {
+        "name": "schema",
+        "prefix": "<?php /* @schema(",
+        "suffix": ") */ ?>"
+      },
+      {
+        "name": "sections",
+        "prefix": "<?php echo \\Coderstm\\PageBuilder\\Rendering\\BladeDirectives::renderLayoutSection($__pb_layout ?? null, ",
+        "suffix": "); ?>"
+      },
+      {
+        "name": "layout",
+        "prefix": "<?php \\Coderstm\\PageBuilder\\Rendering\\BladeDirectives::storePendingOverrides(",
+        "suffix": "); ?>"
+      },
+      {
+        "name": "editor",
+        "prefix": "<?php echo \\Coderstm\\PageBuilder\\PageBuilder::class(); /* ",
+        "suffix": " */ ?>"
+      },
+      {
+        "name": "fonts",
+        "prefix": "<?php echo \\Coderstm\\PageBuilder\\Rendering\\BladeDirectives::renderFonts(); /* ",
+        "suffix": " */ ?>"
+      }
+    ]
+  }
 }

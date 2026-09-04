@@ -32,7 +32,7 @@ final class PageData implements Arrayable, ArrayAccess, Countable, Jsonable, Jso
     public function __construct(
         private readonly array $sections = [],
         private readonly array $order = [],
-        private readonly array $layout = [],
+        private array $layout = [],
         private readonly string $title = '',
         array|PageMeta $meta = [],
         private readonly ?string $wrapper = null,
@@ -246,6 +246,42 @@ final class PageData implements Arrayable, ArrayAccess, Countable, Jsonable, Jso
     public function layout(): array
     {
         return $this->layout;
+    }
+
+    /**
+     * Merge a partial layout override into the existing layout config.
+     *
+     * The override is applied as the highest-priority layer (same as page-specific
+     * overrides in page.json), allowing custom Blade pages to tweak header/footer
+     * sections via @extends('layout', ['layout' => [...]]).
+     *
+     * @param  array<string, mixed>  $overrides  Partial layout config to merge
+     */
+    public function mergeLayout(array $overrides): void
+    {
+        if (empty($overrides)) {
+            return;
+        }
+
+        $current = $this->layout;
+        $default = [];
+        $shared = [];
+        $stored = $overrides;
+
+        if (! empty($current)) {
+            // Treat existing layout as the base (default + shared layers)
+            $default = [
+                'type' => $current['type'] ?? 'page',
+                'header' => $current['header'] ?? [],
+                'footer' => $current['footer'] ?? [],
+            ];
+        }
+
+        $this->layout = self::mergeLayouts($default, $shared, $stored);
+
+        if (! empty($this->layout)) {
+            $this->layout['source'] = 'page';
+        }
     }
 
     /**

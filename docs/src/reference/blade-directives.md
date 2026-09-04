@@ -86,21 +86,89 @@ Renders layout zones (header, footer, etc.) from the page JSON data. This is a *
 @sections('footer')
 ```
 
-## @pbEditorClass
+## @layout
+
+Stores a partial layout config override for custom Blade pages. The overrides are applied to `$__pb_layout` by the next `@sections()` call, allowing you to tweak header/footer sections without a full page JSON.
+
+### Syntax
+
+```blade
+@layout(['header' => [...], 'footer' => [...]])
+```
+
+### Usage
+
+```blade
+{{-- In a custom Blade page (pages/{slug}.blade.php) --}}
+@extends('layouts.page')
+
+@layout([
+    'header' => [
+        'sections' => [
+            'header' => [
+                'settings' => ['sticky' => false],
+            ],
+        ],
+    ],
+])
+
+@section('content')
+<main>
+    <p>Custom blade page body</p>
+</main>
+@endsection
+```
+
+### How It Works
+
+1. `@layout([...])` stores the partial config as pending overrides
+2. The next `@sections('key')` call applies the overrides to `$__pb_layout` via `PageData::mergeLayout()`
+3. The merged layout is used for rendering
+
+The partial config uses the same structure as page JSON's `layout` object. Only the keys you specify are overridden — everything else inherits from the default/shared layout.
+
+### Troubleshooting
+
+**`@layout` must be placed after a blank line following `@extends`.**
+
+Blade's compiler requires `@extends` to be the first statement in the view. Placing `@layout` immediately after `@extends` without a blank line causes `@extends` to be silently dropped, resulting in an empty rendered output.
+
+```blade
+{{-- CORRECT --}}
+@extends('layouts.page')
+
+@layout([...])
+
+@section('content')
+...
+@endsection
+```
+
+```blade
+{{-- WRONG — @extends will be dropped --}}
+@extends('layouts.page')
+@layout([...])
+
+@section('content')
+...
+@endsection
+```
+
+## @editor
 
 Renders the `<html>` class attribute with editor mode classes.
 
 ### Syntax
 
 ```blade
-@pbEditorClass
+@editor
 ```
 
 ### Usage
 
 ```blade
 {{-- In a layout file --}}
-<html {!! @pbEditorClass !!}>
+<html {!! @editor !!}>
 <head>
     <title>{{ $page->title }}</title>
 </head>
@@ -124,14 +192,14 @@ When editor is inactive:
 <html></html>
 ```
 
-## @pbThemeFont
+## @fonts
 
 Renders Google Font links for theme typography settings.
 
 ### Syntax
 
 ```blade
-@pbThemeFont
+@fonts
 ```
 
 ### Usage
@@ -141,7 +209,7 @@ Renders Google Font links for theme typography settings.
 <html>
 <head>
     <title>{{ $page->title }}</title>
-    @pbThemeFont
+    @fonts
 </head>
 <body>
     {{-- Content --}}
@@ -238,13 +306,13 @@ In layout Blade files, these variables are available:
 
 ```blade
 {{-- resources/views/layouts/page.blade.php --}}
-<html @pbEditorClass('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html @editor('dark') lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $meta_title ?? ($title ?? '') . ' | ' . config('app.name') }}</title>
     <meta name="description" content="{{ $meta_description ?? '' }}">
-    @pbThemeFont
+    @fonts
 </head>
 <body class="page-layout">
 
@@ -294,7 +362,7 @@ In layout Blade files, these variables are available:
 
 ## Tips
 
-1. **Always include @pbEditorClass** — In layout `<html>` tag
+1. **Always include @editor** — In layout `<html>` tag
 2. **Always include editorAttributes()** — On sections and blocks
 3. **Use @blocks for nesting** — In container blocks and sections
 4. **Use @sections for zones** — In layout files
