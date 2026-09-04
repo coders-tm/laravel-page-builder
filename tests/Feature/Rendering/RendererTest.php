@@ -98,7 +98,7 @@ test('render block', function () {
     $html = $this->renderer->renderBlock($block);
 
     $this->assertStringContainsString('Hello World', $html);
-    $this->assertStringContainsString('text-block', $html);
+    $this->assertStringContainsString('text-left', $html);
 });
 test('render block returns comment for unknown view', function () {
     $block = new Block([

@@ -11,28 +11,25 @@ beforeEach(function () {
         ->get('/shop', [WebPageController::class, 'pages'])
         ->defaults('slug', 'shop');
 
-    $this->themeBase = sys_get_temp_dir().'/pb-multi-theme-http-'.uniqid();
-
     foreach (['alpha', 'beta'] as $theme) {
-        $pagesDir = "{$this->themeBase}/{$theme}/views/pages";
-        File::makeDirectory($pagesDir, 0755, true);
+        $pagesDir = base_path("themes/{$theme}/views/pages");
+        File::ensureDirectoryExists($pagesDir);
 
         File::put("{$pagesDir}/shop.json", json_encode([
             'sections' => [
-                'banner-1' => [
-                    'type' => 'banner',
-                    'settings' => ['text' => strtoupper($theme).' Shop Content'],
+                'hero-1' => [
+                    'type' => 'hero',
+                    'settings' => ['title' => strtoupper($theme).' Shop Content'],
                 ],
             ],
-            'order' => ['banner-1'],
+            'order' => ['hero-1'],
         ]));
     }
-
-    $this->app['config']->set('theme.base_path', $this->themeBase);
 });
 
 afterEach(function () {
-    File::deleteDirectory($this->themeBase);
+    File::deleteDirectory(base_path('themes/alpha'));
+    File::deleteDirectory(base_path('themes/beta'));
 });
 
 test('theme alpha returns alpha page content', function () {
@@ -62,11 +59,11 @@ test('each theme returns its own content not the others', function () {
 test('second request for same theme reflects disk updates', function () {
     $this->get('/shop?theme=alpha')->assertSee('ALPHA Shop Content');
 
-    File::put("{$this->themeBase}/alpha/views/pages/shop.json", json_encode([
+    File::put(base_path('themes/alpha/views/pages/shop.json'), json_encode([
         'sections' => [
-            'banner-1' => ['type' => 'banner', 'settings' => ['text' => 'Alpha Updated On Disk']],
+            'hero-1' => ['type' => 'hero', 'settings' => ['title' => 'Alpha Updated On Disk']],
         ],
-        'order' => ['banner-1'],
+        'order' => ['hero-1'],
     ]));
 
     $this->get('/shop?theme=alpha')
