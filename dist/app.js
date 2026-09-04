@@ -19217,8 +19217,8 @@ const vT = (a) => {
 }
 
 /* Dim disabled sections and blocks in editor preview */
-.pb-disabled-section,
-.pb-disabled-block {
+[pb-disabled-section],
+[pb-disabled-block] {
     display: none;
 }
 `, ike = `
@@ -20081,12 +20081,20 @@ const vT = (a) => {
             if (msg.kind === 'section') {
                 var sectionEl = getSectionEl(msg.sectionId);
                 if (sectionEl) {
-                    sectionEl.classList.toggle('pb-disabled-section', isDisabled);
+                    if (isDisabled) {
+                        sectionEl.setAttribute('pb-disabled-section', '');
+                    } else {
+                        sectionEl.removeAttribute('pb-disabled-section');
+                    }
                 }
             } else if (msg.kind === 'block') {
                 var blockEl = getBlockEl(msg.blockId);
                 if (blockEl) {
-                    blockEl.classList.toggle('pb-disabled-block', isDisabled);
+                    if (isDisabled) {
+                        blockEl.setAttribute('pb-disabled-block', '');
+                    } else {
+                        blockEl.removeAttribute('pb-disabled-block');
+                    }
                 }
             }
             return;
@@ -20117,9 +20125,9 @@ const vT = (a) => {
             try {
                 var sectionMeta = JSON.parse(sectionAttr);
                 if (sectionMeta.disabled) {
-                    rootEl.classList.add('pb-disabled-section');
+                    rootEl.setAttribute('pb-disabled-section', '');
                 } else {
-                    rootEl.classList.remove('pb-disabled-section');
+                    rootEl.removeAttribute('pb-disabled-section');
                 }
             } catch (e) {}
         }
@@ -20129,9 +20137,9 @@ const vT = (a) => {
             try {
                 var blockMeta = JSON.parse(bEl.getAttribute('data-editor-block'));
                 if (blockMeta.disabled) {
-                    bEl.classList.add('pb-disabled-block');
+                    bEl.setAttribute('pb-disabled-block', '');
                 } else {
-                    bEl.classList.remove('pb-disabled-block');
+                    bEl.removeAttribute('pb-disabled-block');
                 }
             } catch (e) {}
         });
@@ -23649,7 +23657,7 @@ function gLe() {
     ] }, s.name || `group-${u}`)) })
   ] });
 }
-const XT = h.memo(gLe), vLe = "1.4.6", hLe = "laravel-page-builder", bLe = vLe, yLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", _Le = "Dipak Sarkar", Px = "dipak@coderstm.com", wLe = "https://github.com/coders-tm/laravel-page-builder", SLe = "Source-Available Non-Commercial";
+const XT = h.memo(gLe), vLe = "1.4.7", hLe = "laravel-page-builder", bLe = vLe, yLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", _Le = "Dipak Sarkar", Px = "dipak@coderstm.com", wLe = "https://github.com/coders-tm/laravel-page-builder", SLe = "Source-Available Non-Commercial";
 function ZT({ isOpen: a, onClose: e }) {
   return /* @__PURE__ */ y.jsx(Vf, { open: a, onOpenChange: (l) => !l && e(), children: /* @__PURE__ */ y.jsxs(Hc, { className: "w-[calc(100%-2rem)] max-w-md gap-0 rounded-xl p-0", children: [
     /* @__PURE__ */ y.jsxs(jc, { className: "flex flex-col items-center px-6 pt-6 pb-0 text-center sm:text-center", children: [
@@ -25369,7 +25377,8 @@ class YLe {
           section_type: r.type,
           settings: r.settings || {},
           blocks: r.blocks || {},
-          order: r.order || []
+          order: r.order || [],
+          disabled: r.disabled || !1
         }), s = (t.order || []).filter(
           (u) => {
             var f, d;
@@ -25486,7 +25495,8 @@ class YLe {
             section_type: i.type,
             settings: i.settings || {},
             blocks: i.blocks || {},
-            order: i.order || []
+            order: i.order || [],
+            disabled: i.disabled || !1
           });
           this.messageBus.send("update-section-html", {
             sectionId: o,
