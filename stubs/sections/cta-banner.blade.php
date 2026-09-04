@@ -1,14 +1,3 @@
-<?php declare(strict_types=1);
-
-/*
- * This file is part of the Laravel Page Builder package.
- *
- * (c) Dipak Sarkar <dipak@coderstm.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 @schema([
     'name' => 'CTA Banner',
     'settings' => [
@@ -58,7 +47,8 @@
                 </span>
             @endif
 
-            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight sm:leading-tight lg:leading-tight">
+            <h2
+                class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight sm:leading-tight lg:leading-tight">
                 {{ $section->settings->title }}
             </h2>
 

@@ -43,6 +43,6 @@ jobs:
       - name: Execute tests
         run: |
           vendor/bin/testbench workbench:build
-          vendor/bin/testbench package:test
+          vendor/bin/testbench package:test --no-coverage
         env:
           CACHE_DRIVER: array

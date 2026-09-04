@@ -5,7 +5,9 @@ declare(strict_types=1);
 
 $marker = 'This file is part of the Laravel Page Builder package.';
 
-$phpHeader = '<?php declare(strict_types=1);
+$phpHeader = '<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -48,6 +50,10 @@ $jsExtensions = ['ts', 'tsx', 'js', 'jsx'];
 function addLicenseHeader(string $path, string $header, string $marker, array $extensions): bool
 {
     if (!is_file($path)) {
+        return false;
+    }
+
+    if (str_ends_with($path, '.blade.php')) {
         return false;
     }
 
