@@ -1,0 +1,122 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$licenseHeader = '<?php declare(strict_types=1);
+
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+';
+
+$marker = 'This file is part of the Laravel Page Builder package.';
+
+$directories = [
+    __DIR__ . '/../src',
+    __DIR__ . '/../tests',
+    __DIR__ . '/../routes',
+];
+
+$excludedDirs = ['workbench', 'vendor', 'node_modules'];
+
+function addLicenseHeader(string $path, string $licenseHeader, string $marker): bool
+{
+    if (!is_file($path) || pathinfo($path, PATHINFO_EXTENSION) !== 'php') {
+        return false;
+    }
+
+    $content = file_get_contents($path);
+    if ($content === false) {
+        return false;
+    }
+
+    if (str_contains($content, $marker)) {
+        return false;
+    }
+
+    if (substr($content, 0, 3) === "\xEF\xBB\xBF") {
+        $content = substr($content, 3);
+    }
+
+    $content = preg_replace('/^<\?php\s*/', '', $content);
+    $content = preg_replace('/^declare\s*\(\s*strict_types\s*=\s*1\s*\)\s*;\s*/', '', $content);
+
+    $maxIterations = 10;
+    for ($i = 0; $i < $maxIterations; $i++) {
+        $original = $content;
+        $content = preg_replace('/^\/\*.*?\*\/\s*/s', '', $content);
+        $content = preg_replace('/^declare\s*\(\s*strict_types\s*=\s*1\s*\)\s*;\s*/', '', $content);
+        $content = preg_replace('/^\s+/', '', $content);
+        if ($content === $original) {
+            break;
+        }
+    }
+
+    file_put_contents($path, $licenseHeader . $content);
+
+    return true;
+}
+
+function isExcluded(string $path, array $excludedDirs): bool
+{
+    $realPath = realpath($path);
+    if ($realPath === false) {
+        return false;
+    }
+
+    foreach ($excludedDirs as $dir) {
+        if (str_contains($realPath, '/' . $dir . '/') || str_ends_with($realPath, '/' . $dir)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+$args = array_slice($argv, 1);
+
+if (count($args) > 0) {
+    $updated = 0;
+    foreach ($args as $file) {
+        $file = realpath($file) ?: $file;
+        if (isExcluded($file, $excludedDirs)) {
+            continue;
+        }
+        if (addLicenseHeader($file, $licenseHeader, $marker)) {
+            $updated++;
+        }
+    }
+    echo "Updated: $updated files\n";
+    exit(0);
+}
+
+$updated = 0;
+foreach ($directories as $directory) {
+    if (!is_dir($directory)) {
+        continue;
+    }
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS)
+    );
+
+    foreach ($iterator as $file) {
+        $path = $file->getPathname();
+        if (isExcluded($path, $excludedDirs)) {
+            continue;
+        }
+        if (addLicenseHeader($path, $licenseHeader, $marker)) {
+            echo "Updated: $path\n";
+            $updated++;
+        }
+    }
+}
+
+echo "Done! Updated: $updated files\n";

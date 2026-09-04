@@ -14,7 +14,7 @@
     "json"
   ],
   "homepage": "https://github.com/coders-tm/laravel-page-builder",
-  "license": "MIT",
+  "license": "proprietary",
   "authors": [
     {
       "name": "Dipak Sarkar",
@@ -97,6 +97,7 @@
     ],
     "lint": "@php vendor/bin/phpstan analyse",
     "format": "@php vendor/bin/pint --ansi",
+    "license": "@php bin/add-license-header",
     "test": "@php vendor/bin/pest"
   }
 }

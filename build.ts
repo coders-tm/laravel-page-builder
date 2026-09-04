@@ -66,10 +66,6 @@ function main(): void {
     console.log("\n[build] Step 3: Building package...")
     runCommand("npx vite build")
 
-    console.log(`\n[build] Step 4: Committing build version message: build: v${newVersion}...`)
-    runCommand("git add -A")
-    runCommand(`git commit -m "build: v${newVersion}"`)
-
     console.log(`\n[build] Successfully built package and committed version v${newVersion}!`)
   } catch (error) {
     console.error("\n[build] Build process failed:", error)
