@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -12,6 +14,7 @@
 namespace PageBuilder\Rendering;
 
 use Illuminate\Support\Facades\Blade;
+use PageBuilder\Contracts\RendererInterface;
 use PageBuilder\PageBuilder;
 use PageBuilder\Registry\LayoutParser;
 use PageBuilder\Services\ThemeSettings;
@@ -93,7 +96,7 @@ PHP;
             $expr = trim($expression);
 
             return $expr === ''
-                ? "<?php echo \\PageBuilder\\PageBuilder::classAttribute(); ?>"
+                ? '<?php echo \\PageBuilder\\PageBuilder::classAttribute(); ?>'
                 : "<?php echo \\PageBuilder\\PageBuilder::classAttribute({$expr}); ?>";
         });
 
@@ -156,7 +159,7 @@ PHP;
         }
 
         // Reuse existing Renderer::renderRawSection() — same path as body sections
-        $renderer = app(\PageBuilder\Contracts\RendererInterface::class);
+        $renderer = app(RendererInterface::class);
 
         return $renderer->renderRawSection($key, $raw, PageBuilder::editor(), [
             '__pb_layout' => $layout,

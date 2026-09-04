@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -47,7 +49,7 @@ class PageRenderer
                 continue;
             }
 
-            if (! empty($sectionData['disabled'])) {
+            if (! empty($sectionData['disabled']) && ! $editor) {
                 continue;
             }
 

@@ -11,7 +11,7 @@
 
 @schema([
     'name' => 'Hero',
-    'settings' => [['id' => 'badge_text', 'type' => 'text', 'label' => 'Header Badge', 'default' => 'Welcome Home — Next-Gen Package'], ['id' => 'hero_image', 'type' => 'image_picker', 'label' => 'Hero Image', 'default' => '/statics/hero.png'], ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Build High-Performance Page Builders in Minutes with'], ['id' => 'title_highlight', 'type' => 'text', 'label' => 'Title Highlight', 'default' => 'Laravel & Blade'], ['id' => 'subtitle', 'type' => 'textarea', 'label' => 'Subtitle', 'default' => 'Hello World']],
+    'settings' => [['id' => 'badge_text', 'type' => 'text', 'label' => 'Header Badge', 'default' => 'Welcome Home — Next-Gen Package'], ['id' => 'hero_image', 'type' => 'image_picker', 'label' => 'Hero Image', 'default' => '/statics/hero.png'], ['id' => 'title', 'type' => 'textarea', 'label' => 'Title', 'default' => 'Build High-Performance Page Builders in Minutes with'], ['id' => 'title_highlight', 'type' => 'text', 'label' => 'Title Highlight', 'default' => 'Laravel & Blade'], ['id' => 'subtitle', 'type' => 'textarea', 'label' => 'Subtitle', 'default' => 'Hello World']],
     'blocks' => [
         [
             'type' => 'hero-badge-pill',

@@ -78,6 +78,7 @@ export class PreviewManager {
         settings: sec.settings || {},
         blocks: sec.blocks || {},
         order: sec.order || [],
+        disabled: sec.disabled || false,
       })
 
       const pageOrder = (currentPage.order || []).filter(
@@ -210,6 +211,7 @@ export class PreviewManager {
           settings: sec.settings || {},
           blocks: sec.blocks || {},
           order: sec.order || [],
+          disabled: sec.disabled || false,
         })
 
         this.messageBus.send("update-section-html", {

@@ -28,8 +28,8 @@ export const EDITOR_CSS = `
 }
 
 /* Dim disabled sections and blocks in editor preview */
-.pb-disabled-section,
-.pb-disabled-block {
+[pb-disabled-section],
+[pb-disabled-block] {
     display: none;
 }
 `
@@ -894,12 +894,20 @@ export const EDITOR_JS = `
             if (msg.kind === 'section') {
                 var sectionEl = getSectionEl(msg.sectionId);
                 if (sectionEl) {
-                    sectionEl.classList.toggle('pb-disabled-section', isDisabled);
+                    if (isDisabled) {
+                        sectionEl.setAttribute('pb-disabled-section', '');
+                    } else {
+                        sectionEl.removeAttribute('pb-disabled-section');
+                    }
                 }
             } else if (msg.kind === 'block') {
                 var blockEl = getBlockEl(msg.blockId);
                 if (blockEl) {
-                    blockEl.classList.toggle('pb-disabled-block', isDisabled);
+                    if (isDisabled) {
+                        blockEl.setAttribute('pb-disabled-block', '');
+                    } else {
+                        blockEl.removeAttribute('pb-disabled-block');
+                    }
                 }
             }
             return;
@@ -930,9 +938,9 @@ export const EDITOR_JS = `
             try {
                 var sectionMeta = JSON.parse(sectionAttr);
                 if (sectionMeta.disabled) {
-                    rootEl.classList.add('pb-disabled-section');
+                    rootEl.setAttribute('pb-disabled-section', '');
                 } else {
-                    rootEl.classList.remove('pb-disabled-section');
+                    rootEl.removeAttribute('pb-disabled-section');
                 }
             } catch (e) {}
         }
@@ -942,9 +950,9 @@ export const EDITOR_JS = `
             try {
                 var blockMeta = JSON.parse(bEl.getAttribute('data-editor-block'));
                 if (blockMeta.disabled) {
-                    bEl.classList.add('pb-disabled-block');
+                    bEl.setAttribute('pb-disabled-block', '');
                 } else {
-                    bEl.classList.remove('pb-disabled-block');
+                    bEl.removeAttribute('pb-disabled-block');
                 }
             } catch (e) {}
         });

@@ -42,6 +42,7 @@ export function usePreviewSync(currentPage: any, messageBus: IMessageBus | null)
           settings: sec.settings || {},
           blocks: sec.blocks || {},
           order: sec.order || [],
+          disabled: sec.disabled || false,
         })
 
         messageBus.send("update-section-html", {

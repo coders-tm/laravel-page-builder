@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -47,6 +49,82 @@ test('for block returns attributes when editor on', function () {
     $this->assertStringContainsString('data-editor-block=', $result);
     $this->assertStringContainsString('"block-1"', $result);
 });
+test('for section includes pb-disabled-section attribute when disabled', function () {
+    PageBuilder::enableEditor();
+
+    $section = makeSection('hero-1', 'hero', disabled: true);
+    $result = EditorAttributes::forSection($section);
+
+    $this->assertStringContainsString('pb-disabled-section', $result);
+    $this->assertStringContainsString('data-section-id="hero-1"', $result);
+});
+
+test('for section does not include pb-disabled-section when enabled', function () {
+    PageBuilder::enableEditor();
+
+    $section = makeSection('hero-1', 'hero', disabled: false);
+    $result = EditorAttributes::forSection($section);
+
+    $this->assertStringNotContainsString('pb-disabled-section', $result);
+    $this->assertStringContainsString('data-section-id="hero-1"', $result);
+});
+
+test('for block includes pb-disabled-block attribute when disabled', function () {
+    PageBuilder::enableEditor();
+
+    $block = new \PageBuilder\Components\Block([
+        'id' => 'block-1',
+        'type' => 'text',
+        'disabled' => true,
+        'settings' => new \PageBuilder\Components\Settings([], []),
+        'blocks' => new \PageBuilder\Collections\BlockCollection,
+    ]);
+    $result = EditorAttributes::forBlock($block);
+
+    $this->assertStringContainsString('pb-disabled-block', $result);
+    $this->assertStringContainsString('data-block-id="block-1"', $result);
+});
+
+test('for block does not include pb-disabled-block when enabled', function () {
+    PageBuilder::enableEditor();
+
+    $block = new \PageBuilder\Components\Block([
+        'id' => 'block-1',
+        'type' => 'text',
+        'disabled' => false,
+        'settings' => new \PageBuilder\Components\Settings([], []),
+        'blocks' => new \PageBuilder\Collections\BlockCollection,
+    ]);
+    $result = EditorAttributes::forBlock($block);
+
+    $this->assertStringNotContainsString('pb-disabled-block', $result);
+    $this->assertStringContainsString('data-block-id="block-1"', $result);
+});
+
+test('for section includes disabled flag in JSON meta when disabled', function () {
+    PageBuilder::enableEditor();
+
+    $section = makeSection('hero-1', 'hero', disabled: true);
+    $result = EditorAttributes::forSection($section);
+
+    $this->assertStringContainsString('"disabled":true', $result);
+});
+
+test('for block includes disabled flag in JSON meta when disabled', function () {
+    PageBuilder::enableEditor();
+
+    $block = new \PageBuilder\Components\Block([
+        'id' => 'block-1',
+        'type' => 'text',
+        'disabled' => true,
+        'settings' => new \PageBuilder\Components\Settings([], []),
+        'blocks' => new \PageBuilder\Collections\BlockCollection,
+    ]);
+    $result = EditorAttributes::forBlock($block);
+
+    $this->assertStringContainsString('"disabled":true', $result);
+});
+
 test('auto inject live text when editor off', function () {
     PageBuilder::disableEditor();
 

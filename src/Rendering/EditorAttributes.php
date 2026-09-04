@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -40,10 +42,13 @@ class EditorAttributes
             'disabled' => $section->disabled ?: null,
         ], fn ($v) => $v !== null), JSON_HEX_APOS | JSON_HEX_QUOT);
 
+        $disabledAttr = $section->disabled ? ' pb-disabled-section' : '';
+
         return trim(sprintf(
-            'data-editor-section=\'%s\' data-section-id="%s"',
+            'data-editor-section=\'%s\' data-section-id="%s"%s',
             $meta,
             htmlspecialchars($section->id, ENT_QUOTES),
+            $disabledAttr,
         ));
     }
 
@@ -64,10 +69,13 @@ class EditorAttributes
             'disabled' => $block->disabled ?: null,
         ], fn ($v) => $v !== null), JSON_HEX_APOS | JSON_HEX_QUOT);
 
+        $disabledAttr = $block->disabled ? ' pb-disabled-block' : '';
+
         return trim(sprintf(
-            'data-block-id="%s" data-editor-block=\'%s\'',
+            'data-block-id="%s" data-editor-block=\'%s\'%s',
             htmlspecialchars($block->id, ENT_QUOTES),
             $meta,
+            $disabledAttr,
         ));
     }
 

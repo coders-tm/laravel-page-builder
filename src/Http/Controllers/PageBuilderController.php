@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -115,6 +117,7 @@ class PageBuilderController extends Controller
             'settings' => $request->input('settings', []),
             'blocks' => $request->input('blocks', []),
             'order' => $request->input('order', []),
+            'disabled' => $request->boolean('disabled'),
         ];
 
         $html = $this->renderer->renderRawSection($sectionId, $sectionData, editor: true, data: $extraData);

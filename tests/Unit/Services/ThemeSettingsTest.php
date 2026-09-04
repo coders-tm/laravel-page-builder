@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -172,4 +174,3 @@ test('fontElements returns google font link tags based on schema and saved value
     expect($html)->toContain('family=Roboto');
     expect($html)->toContain('<link rel="preconnect" href="https://fonts.googleapis.com">');
 });
-

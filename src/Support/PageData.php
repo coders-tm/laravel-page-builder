@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -16,6 +18,7 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use PageBuilder\PageBuilder;
 
 /**
  * Immutable Data Transfer Object representing parsed page builder page data.
@@ -355,7 +358,7 @@ final class PageData implements Arrayable, ArrayAccess, Countable, Jsonable, Jso
             return null;
         }
 
-        if (($raw['disabled'] ?? false) === true) {
+        if (($raw['disabled'] ?? false) === true && ! PageBuilder::editor()) {
             return null;
         }
 

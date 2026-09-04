@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -9,9 +11,14 @@
  * file that was distributed with this source code.
  */
 
+use PageBuilder\PageBuilder;
 use PageBuilder\Support\LayoutConfig;
 use PageBuilder\Support\PageData;
 use PageBuilder\Support\PageMeta;
+
+afterEach(function () {
+    PageBuilder::disableEditor();
+});
 
 function sampleData(): array
 {
@@ -211,6 +218,42 @@ test('layout section returns null when disabled', function () {
 
     // disabled-section is in the header zone with disabled: true
     expect($data->layoutSection('disabled-section'))->toBeNull();
+});
+
+test('layout section returns disabled section in editor mode', function () {
+    PageBuilder::enableEditor();
+
+    $data = PageData::fromArray(sampleDataWithLayout());
+
+    // disabled-section is in the header zone with disabled: true
+    // In editor mode, it should be returned (not null)
+    $result = $data->layoutSection('disabled-section');
+
+    expect($result)->not->toBeNull();
+    expect($result['type'])->toBe('promo');
+    expect($result['settings']['text'])->toBe('Promo text');
+});
+
+test('layout section returns enabled section in editor mode', function () {
+    PageBuilder::enableEditor();
+
+    $data = PageData::fromArray(sampleDataWithLayout());
+
+    $result = $data->layoutSection('header');
+
+    expect($result)->not->toBeNull();
+    expect($result['type'])->toBe('header');
+});
+
+test('layout section returns enabled section in production mode', function () {
+    PageBuilder::disableEditor();
+
+    $data = PageData::fromArray(sampleDataWithLayout());
+
+    $result = $data->layoutSection('header');
+
+    expect($result)->not->toBeNull();
+    expect($result['type'])->toBe('header');
 });
 test('layout section normalises missing blocks and order', function () {
     $data = PageData::fromArray(sampleDataWithLayout());

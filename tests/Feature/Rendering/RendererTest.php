@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -70,6 +72,40 @@ test('hydrate section skips disabled blocks', function () {
 
     expect($section->blocks->count())->toBe(1);
     expect($section->blocks->first()->id)->toBe('b1');
+});
+
+test('hydrate section includes disabled blocks in editor mode', function () {
+    PageBuilder::enableEditor();
+
+    $section = $this->renderer->hydrateSection('test-1', [
+        'type' => 'test',
+        'settings' => [],
+        'blocks' => [
+            'b1' => ['type' => 'text', 'settings' => [], 'disabled' => false],
+            'b2' => ['type' => 'text', 'settings' => [], 'disabled' => true],
+        ],
+        'order' => ['b1', 'b2'],
+    ], editor: true);
+
+    expect($section->blocks->count())->toBe(2);
+    expect($section->blocks->first()->id)->toBe('b1');
+    expect($section->blocks->last()->id)->toBe('b2');
+    expect($section->blocks->last()->disabled)->toBeTrue();
+});
+
+test('hydrate section marks disabled flag on blocks in editor mode', function () {
+    PageBuilder::enableEditor();
+
+    $section = $this->renderer->hydrateSection('test-1', [
+        'type' => 'test',
+        'settings' => [],
+        'blocks' => [
+            'b1' => ['type' => 'text', 'settings' => [], 'disabled' => true],
+        ],
+        'order' => ['b1'],
+    ], editor: true);
+
+    expect($section->blocks->first()->disabled)->toBeTrue();
 });
 test('render section', function () {
     $section = $this->renderer->hydrateSection('s1', [

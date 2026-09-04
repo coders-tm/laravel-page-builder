@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -9,11 +11,15 @@
  * file that was distributed with this source code.
  */
 
+use PageBuilder\PageBuilder;
 use PageBuilder\Services\PageRenderer;
 use PageBuilder\Support\PageData;
 
 beforeEach(function () {
     $this->pageRenderer = $this->app->make(PageRenderer::class);
+});
+afterEach(function () {
+    PageBuilder::disableEditor();
 });
 test('render by slug', function () {
     $this->get('/')->assertSee('Build High-Performance Page Builders');
@@ -150,4 +156,72 @@ test('render empty page', function () {
     ]);
 
     expect($html)->toBeEmpty();
+});
+
+test('render page renders disabled sections in editor mode', function () {
+    PageBuilder::enableEditor();
+
+    $html = $this->pageRenderer->renderPage([
+        'sections' => [
+            's1' => [
+                'type' => 'banner',
+                'settings' => ['text' => 'Visible'],
+                'blocks' => [],
+            ],
+            's2' => [
+                'type' => 'banner',
+                'settings' => ['text' => 'Disabled Section'],
+                'blocks' => [],
+                'disabled' => true,
+            ],
+        ],
+        'order' => ['s1', 's2'],
+    ], editor: true);
+
+    $this->assertStringContainsString('Visible', $html);
+    $this->assertStringContainsString('Disabled Section', $html);
+});
+
+test('render page includes pb-disabled-section attribute on disabled sections in editor mode', function () {
+    PageBuilder::enableEditor();
+
+    $html = $this->pageRenderer->renderPage([
+        'sections' => [
+            's1' => [
+                'type' => 'banner',
+                'settings' => ['text' => 'Disabled Content'],
+                'blocks' => [],
+                'disabled' => true,
+            ],
+        ],
+        'order' => ['s1'],
+    ], editor: true);
+
+    $this->assertStringContainsString('pb-disabled-section', $html);
+    $this->assertStringContainsString('Disabled Content', $html);
+});
+
+test('render page skips disabled sections in production mode', function () {
+    PageBuilder::disableEditor();
+
+    $html = $this->pageRenderer->renderPage([
+        'sections' => [
+            's1' => [
+                'type' => 'banner',
+                'settings' => ['text' => 'Visible'],
+                'blocks' => [],
+            ],
+            's2' => [
+                'type' => 'banner',
+                'settings' => ['text' => 'Should Not Appear'],
+                'blocks' => [],
+                'disabled' => true,
+            ],
+        ],
+        'order' => ['s1', 's2'],
+    ], editor: false);
+
+    $this->assertStringContainsString('Visible', $html);
+    $this->assertStringNotContainsString('Should Not Appear', $html);
+    $this->assertStringNotContainsString('pb-disabled-section', $html);
 });

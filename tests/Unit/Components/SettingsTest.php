@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Laravel Page Builder package.
@@ -107,12 +109,12 @@ test('array access set throws', function () {
     $settings = new Settings([], []);
 
     $settings['title'] = 'value';
-})->throws(\BadMethodCallException::class, 'Settings is immutable');
+})->throws(BadMethodCallException::class, 'Settings is immutable');
 test('array access unset throws', function () {
     $settings = new Settings(['title' => 'Hello'], []);
 
     unset($settings['title']);
-})->throws(\BadMethodCallException::class, 'Settings is immutable');
+})->throws(BadMethodCallException::class, 'Settings is immutable');
 test('to array', function () {
     $settings = new Settings(
         ['title' => 'Custom'],
