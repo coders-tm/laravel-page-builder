@@ -5,7 +5,16 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
+ * Icon data generated from Material Design Icons.
+ * Material Design Icons are licensed under the Apache License 2.0.
+ * Copyright (c) 2024 Google Inc. — https://fonts.google.com/icons
+ * License: https://www.apache.org/licenses/LICENSE-2.0
  */
+
+// AUTO-GENERATED — do not edit manually.
+// Re-generate with: yarn generate:icons
+
 export type MdIcon = { label: string; value: string; group?: string };
 
 const MD_ICONS: MdIcon[] = [

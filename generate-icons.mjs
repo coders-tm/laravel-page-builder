@@ -113,11 +113,22 @@ function toTitleCase(str) {
 
     const outPath = path.join(outDir, "fa-icons.ts");
     const lines = [
+        "/*",
+        " * This file is part of the Laravel Page Builder package.",
+        " *",
+        " * (c) Dipak Sarkar <dipak@coderstm.com>",
+        " *",
+        " * For the full copyright and license information, please view the LICENSE",
+        " * file that was distributed with this source code.",
+        " *",
+        " * Icon data generated from Font Awesome Free.",
+        " * Font Awesome Free is licensed under CC BY 4.0 (icons) and SIL OFL 1.1 (fonts).",
+        " * Copyright (c) 2024 Fonticons, Inc. — https://fontawesome.com",
+        " * License: https://creativecommons.org/licenses/by/4.0/",
+        " */",
+        "",
         "// AUTO-GENERATED — do not edit manually.",
         "// Re-generate with: yarn generate:icons",
-        "//",
-        "// Source: @fortawesome/free-{solid,regular,brands}-svg-icons",
-        `// Total: ${entries.length} entries`,
         "",
         "export type FaIcon = { label: string; value: string; group?: string };",
         "",
@@ -212,12 +223,22 @@ function toTitleCase(str) {
     });
 
     const lines = [
+        "/*",
+        " * This file is part of the Laravel Page Builder package.",
+        " *",
+        " * (c) Dipak Sarkar <dipak@coderstm.com>",
+        " *",
+        " * For the full copyright and license information, please view the LICENSE",
+        " * file that was distributed with this source code.",
+        " *",
+        " * Icon data generated from Material Design Icons.",
+        " * Material Design Icons are licensed under the Apache License 2.0.",
+        " * Copyright (c) 2024 Google Inc. — https://fonts.google.com/icons",
+        " * License: https://www.apache.org/licenses/LICENSE-2.0",
+        " */",
+        "",
         "// AUTO-GENERATED — do not edit manually.",
         "// Re-generate with: yarn generate:icons",
-        "//",
-        `// Source: @material-design-icons/svg (${
-            entries.length
-        } entries across ${Object.keys(variantMap).length} variants)`,
         "",
         "export type MdIcon = { label: string; value: string; group?: string };",
         "",

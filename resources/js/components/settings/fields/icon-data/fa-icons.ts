@@ -5,7 +5,16 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
+ * Icon data generated from Font Awesome Free.
+ * Font Awesome Free is licensed under CC BY 4.0 (icons) and SIL OFL 1.1 (fonts).
+ * Copyright (c) 2024 Fonticons, Inc. — https://fontawesome.com
+ * License: https://creativecommons.org/licenses/by/4.0/
  */
+
+// AUTO-GENERATED — do not edit manually.
+// Re-generate with: yarn generate:icons
+
 export type FaIcon = { label: string; value: string; group?: string };
 
 const FA_ICONS: FaIcon[] = [
