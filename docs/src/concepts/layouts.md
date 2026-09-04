@@ -316,8 +316,11 @@ $layoutSettings = app(LayoutSettings::class);
 // Get all layout configs
 $all = $layoutSettings->all();
 
-// Get a specific layout
+// Get a specific layout as raw array
 $pageLayout = $layoutSettings->get('page');
+
+// Get a specific layout as a type-safe LayoutConfig DTO
+$layoutConfig = $layoutSettings->getConfig('page');
 
 // Save a layout config
 $layoutSettings->save('page', [

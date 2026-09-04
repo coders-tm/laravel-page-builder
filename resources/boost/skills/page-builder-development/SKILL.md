@@ -96,32 +96,37 @@ High-level orchestrators for page loading, rendering, and persistence.
 | `WrapperParser`            | Parses CSS-selector wrapper strings (e.g. `div#id.class`) into HTML elements     |
 | `PageRegistry`             | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                   |
 | `PageService`              | Route registration + page resolution (Blade → JSON → template → 404)             |
-| `ThemeSettings`            | Global theme settings persistence (under `_pagebuilder.theme`)                   |
-| `LayoutSettings`           | Shared layout config persistence (under `_pagebuilder.layouts`)                  |
+| `SettingsStore`            | Low-level `settings.json` file I/O, caching, and key preservation service        |
+| `ThemeSettings`            | Type-safe theme settings management via `SettingsStoreInterface`                 |
+| `LayoutSettings`           | Type-safe shared layout config management via `SettingsStoreInterface`           |
 | `Theme`                    | Active theme management wrapper                                                  |
 
 ### Key Classes
 
-| Class                      | Path                                       | Purpose                                                         |
-| -------------------------- | ------------------------------------------ | --------------------------------------------------------------- |
-| `SectionSchema`            | `src/Schema/SectionSchema.php`             | Immutable section definition                                    |
-| `BlockSchema`              | `src/Schema/BlockSchema.php`               | Immutable block definition                                      |
-| `SettingSchema`            | `src/Schema/SettingSchema.php`             | Immutable setting definition                                    |
-| `SectionRegistry`          | `src/Registry/SectionRegistry.php`         | Discovers and provides section schemas                          |
-| `BlockRegistry`            | `src/Registry/BlockRegistry.php`           | Discovers and provides block schemas                            |
-| `SchemaExtractor`          | `src/Registry/SchemaExtractor.php`         | Parses `@schema()` from Blade files                             |
-| `Renderer`                 | `src/Rendering/Renderer.php`               | Core hydration and rendering engine                             |
-| `Section`                  | `src/Components/Section.php`               | Runtime section instance                                        |
-| `Block`                    | `src/Components/Block.php`                 | Runtime block instance                                          |
-| `Settings`                 | `src/Components/Settings.php`              | Schema-aware settings bag                                       |
-| `PageData`                 | `src/Support/PageData.php`                 | Immutable page JSON value object (includes `wrapper`)           |
-| `PageStorage`              | `src/Services/PageStorage.php`             | Page JSON file I/O + layout splitting                           |
-| `PageRenderer`             | `src/Services/PageRenderer.php`            | Full-page render orchestrator (applies wrapper)                 |
-| `TemplateStorage`          | `src/Services/TemplateStorage.php`         | Template JSON file I/O (theme-aware)                            |
-| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php` | Resolves `{{ $page->attr }}` in template data                   |
-| `WrapperParser`            | `src/Support/WrapperParser.php`            | Parses CSS-selector wrapper strings into HTML                   |
-| `ThemeSettings`            | `src/Services/ThemeSettings.php`           | Theme settings persistence (under `_pagebuilder.theme`)         |
-| `LayoutSettings`           | `src/Services/LayoutSettings.php`          | Shared layout config persistence (under `_pagebuilder.layouts`) |
+| Class                      | Path                                       | Purpose                                                            |
+| -------------------------- | ------------------------------------------ | ------------------------------------------------------------------ |
+| `SectionSchema`            | `src/Schema/SectionSchema.php`             | Immutable section definition                                       |
+| `BlockSchema`              | `src/Schema/BlockSchema.php`               | Immutable block definition                                         |
+| `SettingSchema`            | `src/Schema/SettingSchema.php`             | Immutable setting definition                                       |
+| `SectionRegistry`          | `src/Registry/SectionRegistry.php`         | Discovers and provides section schemas                             |
+| `BlockRegistry`            | `src/Registry/BlockRegistry.php`           | Discovers and provides block schemas                               |
+| `SchemaExtractor`          | `src/Registry/SchemaExtractor.php`         | Parses `@schema()` from Blade files                                |
+| `Renderer`                 | `src/Rendering/Renderer.php`               | Core hydration and rendering engine                                |
+| `Section`                  | `src/Components/Section.php`               | Runtime section instance                                           |
+| `Block`                    | `src/Components/Block.php`                 | Runtime block instance                                             |
+| `Settings`                 | `src/Components/Settings.php`              | Schema-aware settings bag                                          |
+| `PageData`                 | `src/Support/PageData.php`                 | Type-safe page JSON value object DTO (with `PageMeta` & `wrapper`) |
+| `PageMeta`                 | `src/Support/PageMeta.php`                 | Immutable SEO metadata Value Object                                |
+| `LayoutConfig`             | `src/Support/LayoutConfig.php`             | Type-safe layout zone Value Object DTO                             |
+| `SettingsStore`            | `src/Services/SettingsStore.php`           | Atomic settings JSON file persistence                              |
+| `SettingsStoreInterface`   | `src/Contracts/SettingsStoreInterface.php` | Storage contract for settings.json                                 |
+| `PageStorage`              | `src/Services/PageStorage.php`             | Page JSON file I/O + layout splitting                              |
+| `PageRenderer`             | `src/Services/PageRenderer.php`            | Full-page render orchestrator (applies wrapper)                    |
+| `TemplateStorage`          | `src/Services/TemplateStorage.php`         | Template JSON file I/O (theme-aware)                               |
+| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php` | Resolves `{{ $page->attr }}` in template data                      |
+| `WrapperParser`            | `src/Support/WrapperParser.php`            | Parses CSS-selector wrapper strings into HTML                      |
+| `ThemeSettings`            | `src/Services/ThemeSettings.php`           | Type-safe theme settings service                                   |
+| `LayoutSettings`           | `src/Services/LayoutSettings.php`          | Type-safe layout settings service                                  |
 
 ---
 

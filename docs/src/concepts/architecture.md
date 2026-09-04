@@ -119,8 +119,9 @@ High-level services for page management and theme configuration.
 - `PageRenderer` — Loads page JSON, renders all enabled sections in order
 - `PageStorage` — Reads/writes page JSON files to disk, handles layout splitting
 - `PageRegistry` — Cached page manifest for fast lookups
-- `ThemeSettings` — Global theme settings persistence and access
-- `LayoutSettings` — Shared layout configuration persistence and access
+- `SettingsStore` — Core JSON persistence service for `settings.json`
+- `ThemeSettings` — Global theme settings persistence and type-safe access
+- `LayoutSettings` — Shared layout configuration persistence and DTO access
 
 ```php
 use PageBuilder\Facades\Page;

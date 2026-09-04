@@ -9,12 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`SettingsStoreInterface` & `SettingsStore`** — Abstract storage layer handling low-level `settings.json` file operations, atomic updates, caching, and preservation of root keys outside `_pagebuilder`.
+- **`LayoutConfig` DTO** — Type-safe Value Object for structured layout header/footer zone management (`header()`, `footer()`, `headerSections()`, `footerSections()`, `headerOrder()`, `footerOrder()`).
+- **`PageMeta` DTO** — Immutable Value Object representing page SEO metadata (`title`, `meta_title`, `meta_description`, `meta_keywords`) with strict typed accessors (`title()`, `metaTitle()`, `metaDescription()`, `metaKeywords()`, `isEmpty()`).
 - **Shared Layout Settings** — Layout configurations can now be shared across multiple pages via the `LayoutSettings` service. Shared layouts are stored in `settings.json` under `_pagebuilder.layouts.{type}`, eliminating the need to duplicate layout configs across page JSON files.
-- **LayoutSettings Service** — New service for managing shared layout configurations with `all()`, `get()`, `save()`, `delete()`, and `flush()` methods.
+- **LayoutSettings Service** — New service for managing shared layout configurations with `all()`, `get()`, `getConfig()`, `save()`, `delete()`, and `flush()` methods.
 - **Polymorphic Layout Format** — Page JSON `layout` field now supports two formats: string (inherits shared layout) or object (page-specific override).
 - **Layout Source Tracking** — API responses include a `source` field (`"shared"` or `"page"`) to indicate whether a layout is inherited or page-specific.
 - **Layout Splitting in PageStorage** — `PageStorage::save()` now handles layout splitting automatically based on the existing page.json's layout value.
 - **3-Layer Layout Merge** — Layout resolution now merges three layers: default (from LayoutParser), shared (from LayoutSettings), and page-specific (from page JSON).
+
+### Changed
+
+- **Refactored `ThemeSettings`** — Modernized service using `SettingsStoreInterface` with strict typed accessors (`getString()`, `getInt()`, `getFloat()`, `getBool()`, `getArray()`, `has()`) and Laravel contracts (`ArrayAccess`, `Arrayable`, `JsonSerializable`, `Countable`).
+- **Refactored `LayoutSettings`** — Modernized service using `SettingsStoreInterface` and `LayoutConfig` DTO.
+- **Refactored `PageData`** — Converted to a strongly typed OOP DTO with `PageMeta` and `LayoutConfig` integration, implementing `Arrayable`, `Jsonable`, `JsonSerializable`, `Countable`, and `ArrayAccess`.
 
 ### Changed
 

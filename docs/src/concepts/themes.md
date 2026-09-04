@@ -177,13 +177,13 @@ The schema for these settings is defined in `config/pagebuilder.php` under `them
 
 ### Accessing Theme Settings
 
-`$theme` is a `ThemeSettings` instance shared with all Blade views:
+`$theme` is a `ThemeSettings` instance shared with all Blade views, providing type-safe getters (`getString`, `getInt`, `getBool`, `getArray`, `getFloat`):
 
 ```blade
 <style>
     :root {
-        --color-primary: {{ $theme->get('colors.primary', '#6366f1') }};
-        --font-body: {{ $theme->get('fonts.body', 'Inter, sans-serif') }};
+        --color-primary: {{ $theme->getString('colors.primary', '#6366f1') }};
+        --font-body: {{ $theme->getString('fonts.body', 'Inter, sans-serif') }};
     }
 </style>
 ```
