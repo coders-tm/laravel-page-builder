@@ -86,7 +86,10 @@
     ],
     "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
     "prepare": "@php vendor/bin/testbench package:discover --ansi",
-    "build": "@php vendor/bin/testbench workbench:build --ansi",
+    "build": [
+      "@php vendor/bin/testbench workbench:build --ansi",
+      "@php vendor/bin/testbench workbench:setup-theme --ansi"
+    ],
     "serve": [
       "Composer\\Config::disableProcessTimeout",
       "@build",

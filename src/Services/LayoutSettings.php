@@ -10,27 +10,46 @@ use PageBuilder\Registry\LayoutParser;
 /**
  * Manages shared layout configurations stored in settings.json.
  *
- * Layout configs live under the `_pagebuilder.layouts` key, keyed by
- * layout type (e.g. "page", "simple"). Each layout contains header/footer
- * zones with sections and render order.
+ * Layout configurations live under the `_pagebuilder.layouts` key within
+ * the settings file, keyed by layout type (e.g., "page", "simple").
+ * Each layout definition contains header and footer zones with sections
+ * and their rendering order.
  *
- * The `layout` field in page JSON can be either:
- *  - A string (layout type) — meaning "use shared layout from here"
- *  - An object (full layout) — meaning "page-specific override"
+ * The `layout` property in page JSON documents can be either:
+ *  - A string (layout type) — indicating "use shared layout from here"
+ *  - An object (full layout definition) — indicating a "page-specific layout override"
  */
 class LayoutSettings
 {
-    protected string $valuesPath;
+    /**
+     * The root JSON storage key for PageBuilder data.
+     *
+     * @var string
+     */
+    public const CONFIG_KEY = '_pagebuilder';
 
+    /**
+     * The cached raw `_pagebuilder` settings data.
+     *
+     * @var array<string, mixed>|null
+     */
     protected ?array $cached = null;
 
-    public function __construct()
+    /**
+     * The file path of the currently cached settings file.
+     */
+    protected ?string $cachedPath = null;
+
+    /**
+     * Get the resolved path to the settings JSON file.
+     */
+    protected function valuesPath(): string
     {
-        $this->valuesPath = config('pagebuilder.theme_settings_path');
+        return config('pagebuilder.theme_settings_path') ?? resource_path('settings.json');
     }
 
     /**
-     * Get all layout configs.
+     * Get all shared layout configurations.
      *
      * @return array<string, array{header: array, footer: array}>
      */
@@ -40,9 +59,9 @@ class LayoutSettings
     }
 
     /**
-     * Get a specific layout config by type.
+     * Get a specific layout configuration by its layout type.
      *
-     * @return array{header: array, footer: array}|[]
+     * @return array{header: array, footer: array}|array{}
      */
     public function get(string $layoutType): array
     {
@@ -50,10 +69,12 @@ class LayoutSettings
     }
 
     /**
-     * Save/overwrite a specific layout config.
+     * Save or overwrite a layout configuration for the given layout type.
      *
-     * Flushes the LayoutParser cache after saving since layout
-     * config changes may affect rendering.
+     * Automatically flushes the LayoutParser cache after saving to ensure
+     * updated layout structures take immediate effect during rendering.
+     *
+     * @param  array<string, mixed>  $config
      */
     public function save(string $layoutType, array $config): bool
     {
@@ -70,7 +91,9 @@ class LayoutSettings
     }
 
     /**
-     * Delete a specific layout config.
+     * Delete a specific layout configuration by layout type.
+     *
+     * Flushes the LayoutParser cache after removal.
      */
     public function delete(string $layoutType): bool
     {
@@ -87,68 +110,74 @@ class LayoutSettings
     }
 
     /**
-     * Load the raw `_pagebuilder` data from settings.json.
+     * Load the raw `_pagebuilder` root data array from disk.
      *
      * @return array<string, mixed>
      */
     private function loadRaw(): array
     {
-        if ($this->cached !== null) {
+        $path = $this->valuesPath();
+
+        if ($this->cached !== null && $this->cachedPath === $path) {
             return $this->cached;
         }
 
-        if (! File::exists($this->valuesPath)) {
+        if (! File::exists($path)) {
             $this->cached = [];
+            $this->cachedPath = $path;
 
             return [];
         }
 
-        $data = json_decode(File::get($this->valuesPath), true);
+        $data = json_decode(File::get($path), true);
 
         if (! is_array($data)) {
             $this->cached = [];
+            $this->cachedPath = $path;
 
             return [];
         }
 
-        $this->cached = $data['_pagebuilder'] ?? [];
+        $this->cached = $data[self::CONFIG_KEY] ?? [];
+        $this->cachedPath = $path;
 
         return $this->cached;
     }
 
     /**
-     * Persist `_pagebuilder` data to settings.json, preserving other keys.
+     * Persist `_pagebuilder` data to settings.json while preserving all other root keys.
+     *
+     * @param  array<string, mixed>  $data
      */
     private function persist(array $data): bool
     {
-        $dir = dirname($this->valuesPath);
+        $valuesPath = $this->valuesPath();
 
-        if (! File::isDirectory($dir)) {
-            File::makeDirectory($dir, 0755, true);
-        }
+        File::ensureDirectoryExists(dirname($valuesPath), 0755, true);
 
         $existing = [];
-        if (File::exists($this->valuesPath)) {
-            $existing = json_decode(File::get($this->valuesPath), true);
+        if (File::exists($valuesPath)) {
+            $existing = json_decode(File::get($valuesPath), true);
             if (! is_array($existing)) {
                 $existing = [];
             }
         }
 
-        $existing['_pagebuilder'] = $data;
+        $existing[self::CONFIG_KEY] = $data;
 
         $json = json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        $result = File::put($this->valuesPath, $json) !== false;
+        $result = File::put($valuesPath, $json) !== false;
 
         if ($result) {
             $this->cached = $data;
+            $this->cachedPath = $valuesPath;
         }
 
         return $result;
     }
 
     /**
-     * Invalidate the cached layout data.
+     * Invalidate the in-memory cached layout data.
      */
     public function flush(): void
     {

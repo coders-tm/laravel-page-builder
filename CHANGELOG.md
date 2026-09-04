@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Shared Layout Settings** — Layout configurations can now be shared across multiple pages via the `LayoutSettings` service. Shared layouts are stored in `settings.json` under `_pagebuilder.layouts.{type}`, eliminating the need to duplicate layout configs across page JSON files.
+- **LayoutSettings Service** — New service for managing shared layout configurations with `all()`, `get()`, `save()`, `delete()`, and `flush()` methods.
+- **Polymorphic Layout Format** — Page JSON `layout` field now supports two formats: string (inherits shared layout) or object (page-specific override).
+- **Layout Source Tracking** — API responses include a `source` field (`"shared"` or `"page"`) to indicate whether a layout is inherited or page-specific.
+- **Layout Splitting in PageStorage** — `PageStorage::save()` now handles layout splitting automatically based on the existing page.json's layout value.
+- **3-Layer Layout Merge** — Layout resolution now merges three layers: default (from LayoutParser), shared (from LayoutSettings), and page-specific (from page JSON).
+
+### Changed
+
+- **PageStorage now depends on LayoutSettings** — Constructor injection added for layout splitting functionality.
+- **PageBuilderController simplified** — Layout splitting logic removed from controller, now handled by PageStorage.
+
+### Fixed
+
+- **Layout order fallback** — `layoutHeader()` and `layoutFooter()` now populate order from section keys when the stored order is empty, ensuring the editor layer panel displays layout sections correctly.
+
 ## [1.3.8] - 2026-05-07
 
 ### Added

@@ -1,5 +1,7 @@
 {
-  "pagebuilder": {
-    "colors.primary": "hsl(161 84% 39%)"
+  "_pagebuilder": {
+    "theme": {
+      "colors.primary": "hsl(161 84% 39%)"
+    }
   }
 }

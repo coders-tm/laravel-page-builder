@@ -116,7 +116,9 @@ test('delete returns true for non-existent layout', function () {
 
 test('save preserves other keys in settings.json', function () {
     File::put($this->valuesPath, json_encode([
-        'pagebuilder' => ['colors.primary' => '#FF0000'],
+        '_pagebuilder' => [
+            'theme' => ['colors.primary' => '#FF0000'],
+        ],
         'other_key' => 'keep-me',
     ]));
 
@@ -128,7 +130,7 @@ test('save preserves other keys in settings.json', function () {
     $this->layoutSettings->save('page', $config);
 
     $raw = json_decode(File::get($this->valuesPath), true);
-    expect($raw['pagebuilder'])->toBe(['colors.primary' => '#FF0000']);
+    expect($raw['_pagebuilder']['theme'])->toBe(['colors.primary' => '#FF0000']);
     expect($raw['other_key'])->toBe('keep-me');
     expect($raw['_pagebuilder']['layouts']['page'])->toBe($config);
 });

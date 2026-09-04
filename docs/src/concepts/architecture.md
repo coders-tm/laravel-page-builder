@@ -117,9 +117,10 @@ $html = Page::render('home', ['title' => 'My Home Page']);
 High-level services for page management and theme configuration.
 
 - `PageRenderer` — Loads page JSON, renders all enabled sections in order
-- `PageStorage` — Reads/writes page JSON files to disk
+- `PageStorage` — Reads/writes page JSON files to disk, handles layout splitting
 - `PageRegistry` — Cached page manifest for fast lookups
 - `ThemeSettings` — Global theme settings persistence and access
+- `LayoutSettings` — Shared layout configuration persistence and access
 
 ```php
 use PageBuilder\Facades\Page;
@@ -177,8 +178,9 @@ flowchart LR
 | `Settings`        | Components | Settings value object                |
 | `Renderer`        | Rendering  | Core rendering engine                |
 | `PageRenderer`    | Services   | Full page rendering                  |
-| `PageStorage`     | Services   | JSON file read/write                 |
+| `PageStorage`     | Services   | JSON file read/write + layout split  |
 | `ThemeSettings`   | Services   | Theme settings persistence           |
+| `LayoutSettings`  | Services   | Shared layout config persistence     |
 
 ## Facades
 

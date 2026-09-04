@@ -90,35 +90,38 @@ High-level orchestrators for page loading, rendering, and persistence.
 | Class                      | Responsibility                                                                   |
 | -------------------------- | -------------------------------------------------------------------------------- |
 | `PageRenderer`             | Loads page JSON → hydrates all sections → renders complete HTML; applies wrapper |
-| `PageStorage`              | JSON file I/O for page data (reads/writes from `config('pagebuilder.pages')`)    |
+| `PageStorage`              | JSON file I/O for page data; handles layout splitting (shared vs page-specific)  |
 | `TemplateStorage`          | JSON file I/O for template data (theme-aware, `config('pagebuilder.templates')`) |
 | `TemplateVariableResolver` | Resolves `{{ $page->attr }}` placeholders in template section settings           |
 | `WrapperParser`            | Parses CSS-selector wrapper strings (e.g. `div#id.class`) into HTML elements     |
 | `PageRegistry`             | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                   |
 | `PageService`              | Route registration + page resolution (Blade → JSON → template → 404)             |
-| `ThemeSettings`            | Global theme settings persistence (JSON file)                                    |
+| `ThemeSettings`            | Global theme settings persistence (under `_pagebuilder.theme`)                   |
+| `LayoutSettings`           | Shared layout config persistence (under `_pagebuilder.layouts`)                  |
 | `Theme`                    | Active theme management wrapper                                                  |
 
 ### Key Classes
 
-| Class                      | Path                                       | Purpose                                               |
-| -------------------------- | ------------------------------------------ | ----------------------------------------------------- |
-| `SectionSchema`            | `src/Schema/SectionSchema.php`             | Immutable section definition                          |
-| `BlockSchema`              | `src/Schema/BlockSchema.php`               | Immutable block definition                            |
-| `SettingSchema`            | `src/Schema/SettingSchema.php`             | Immutable setting definition                          |
-| `SectionRegistry`          | `src/Registry/SectionRegistry.php`         | Discovers and provides section schemas                |
-| `BlockRegistry`            | `src/Registry/BlockRegistry.php`           | Discovers and provides block schemas                  |
-| `SchemaExtractor`          | `src/Registry/SchemaExtractor.php`         | Parses `@schema()` from Blade files                   |
-| `Renderer`                 | `src/Rendering/Renderer.php`               | Core hydration and rendering engine                   |
-| `Section`                  | `src/Components/Section.php`               | Runtime section instance                              |
-| `Block`                    | `src/Components/Block.php`                 | Runtime block instance                                |
-| `Settings`                 | `src/Components/Settings.php`              | Schema-aware settings bag                             |
-| `PageData`                 | `src/Support/PageData.php`                 | Immutable page JSON value object (includes `wrapper`) |
-| `PageStorage`              | `src/Services/PageStorage.php`             | Page JSON file I/O                                    |
-| `PageRenderer`             | `src/Services/PageRenderer.php`            | Full-page render orchestrator (applies wrapper)       |
-| `TemplateStorage`          | `src/Services/TemplateStorage.php`         | Template JSON file I/O (theme-aware)                  |
-| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php` | Resolves `{{ $page->attr }}` in template data         |
-| `WrapperParser`            | `src/Support/WrapperParser.php`            | Parses CSS-selector wrapper strings into HTML         |
+| Class                      | Path                                       | Purpose                                                         |
+| -------------------------- | ------------------------------------------ | --------------------------------------------------------------- |
+| `SectionSchema`            | `src/Schema/SectionSchema.php`             | Immutable section definition                                    |
+| `BlockSchema`              | `src/Schema/BlockSchema.php`               | Immutable block definition                                      |
+| `SettingSchema`            | `src/Schema/SettingSchema.php`             | Immutable setting definition                                    |
+| `SectionRegistry`          | `src/Registry/SectionRegistry.php`         | Discovers and provides section schemas                          |
+| `BlockRegistry`            | `src/Registry/BlockRegistry.php`           | Discovers and provides block schemas                            |
+| `SchemaExtractor`          | `src/Registry/SchemaExtractor.php`         | Parses `@schema()` from Blade files                             |
+| `Renderer`                 | `src/Rendering/Renderer.php`               | Core hydration and rendering engine                             |
+| `Section`                  | `src/Components/Section.php`               | Runtime section instance                                        |
+| `Block`                    | `src/Components/Block.php`                 | Runtime block instance                                          |
+| `Settings`                 | `src/Components/Settings.php`              | Schema-aware settings bag                                       |
+| `PageData`                 | `src/Support/PageData.php`                 | Immutable page JSON value object (includes `wrapper`)           |
+| `PageStorage`              | `src/Services/PageStorage.php`             | Page JSON file I/O + layout splitting                           |
+| `PageRenderer`             | `src/Services/PageRenderer.php`            | Full-page render orchestrator (applies wrapper)                 |
+| `TemplateStorage`          | `src/Services/TemplateStorage.php`         | Template JSON file I/O (theme-aware)                            |
+| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php` | Resolves `{{ $page->attr }}` in template data                   |
+| `WrapperParser`            | `src/Support/WrapperParser.php`            | Parses CSS-selector wrapper strings into HTML                   |
+| `ThemeSettings`            | `src/Services/ThemeSettings.php`           | Theme settings persistence (under `_pagebuilder.theme`)         |
+| `LayoutSettings`           | `src/Services/LayoutSettings.php`          | Shared layout config persistence (under `_pagebuilder.layouts`) |
 
 ---
 
@@ -570,11 +573,11 @@ Every page is backed by a JSON document at `config('pagebuilder.pages')/{slug}.j
 
 #### Top-level fields
 
-| Field      | Type     | Required | Description                                    |
-| ---------- | -------- | -------- | ---------------------------------------------- |
-| `sections` | object   | yes      | Map of section instances keyed by unique ID    |
-| `order`    | string[] | yes      | Render order of section IDs                    |
-| `layout`   | object   | no       | Per-page layout slot overrides (header/footer) |
+| Field      | Type             | Required | Description                                        |
+| ---------- | ---------------- | -------- | -------------------------------------------------- |
+| `sections` | object           | yes      | Map of section instances keyed by unique ID        |
+| `order`    | string[]         | yes      | Render order of section IDs                        |
+| `layout`   | string \| object | no       | Layout type (string) or per-page override (object) |
 
 #### Section instance fields
 
@@ -601,32 +604,68 @@ Every page is backed by a JSON document at `config('pagebuilder.pages')/{slug}.j
 
 ### Layout sections (Header / Footer)
 
-The `layout` key holds per-page overrides for structural slots rendered **outside** the main `@yield` area.
+The `layout` key defines structural slots rendered **outside** the main `@yield` area. It supports two formats:
+
+#### String format (shared layout)
+
+```json
+{
+  "layout": "page"
+}
+```
+
+When `layout` is a string, the page **inherits the shared layout** from `LayoutSettings` (stored in `_pagebuilder.layouts` in `settings.json`).
+
+#### Object format (page-specific override)
 
 ```json
 {
   "layout": {
     "type": "page",
-    "sections": {
-      "header": {
-        "type": "site-header",
-        "settings": { "sticky": true },
-        "blocks": {},
-        "order": []
+    "header": {
+      "sections": {
+        "header": {
+          "type": "site-header",
+          "settings": { "sticky": true },
+          "blocks": {},
+          "order": []
+        }
+      }
+    },
+    "footer": {
+      "sections": {
+        "footer": {
+          "type": "site-footer",
+          "settings": {},
+          "blocks": {},
+          "order": []
+        }
       }
     }
   }
 }
 ```
 
+When `layout` is an object, the page has a **page-specific override** stored in the page JSON.
+
 #### Layout section rules
 
-- `layout.sections` is keyed by **position slug** (`"header"`, `"footer"`, etc.), not a random ID.
+- `layout.header.sections` and `layout.footer.sections` are keyed by **position slug** (`"header"`, `"footer"`, etc.), not a random ID.
 - Keys that match `"header"` or carry `position: "top"` render in the **top zone**.
 - All other keys fall to the **bottom zone**.
 - `disabled: true` causes `@sections('key')` to return an empty string.
 - `_name` is supported to override the schema display name in the editor.
 - Layout sections are **not sortable** — their position is determined by the Blade layout.
+
+#### How layout saving works
+
+When saving, `PageStorage` checks the **existing** page.json's layout:
+
+| Existing layout   | Save behavior                                   |
+| ----------------- | ----------------------------------------------- |
+| Not exists        | Save to `LayoutSettings`, store `"page"` string |
+| String (`"page"`) | Save to `LayoutSettings`, store string          |
+| Object (`{...}`)  | Save to page.json, strip `source` key           |
 
 ### Settings resolution priority
 

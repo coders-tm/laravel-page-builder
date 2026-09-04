@@ -66,10 +66,10 @@ test('save persists values to disk', function () {
     expect($this->valuesPath)->toBeFile();
 
     $raw = json_decode(File::get($this->valuesPath), true);
-    expect($raw['pagebuilder'])->toBe($values);
+    expect($raw['_pagebuilder']['theme'])->toBe($values);
 });
 test('values are loaded from disk', function () {
-    File::put($this->valuesPath, json_encode(['pagebuilder' => ['primary_color' => '#ABCDEF']]));
+    File::put($this->valuesPath, json_encode(['_pagebuilder' => ['theme' => ['primary_color' => '#ABCDEF']]]));
 
     $fresh = new ThemeSettings($this->app->make(PageStorage::class));
     expect($fresh->values())->toBe(['primary_color' => '#ABCDEF']);
@@ -108,12 +108,16 @@ test('to array contains schema and values keys', function () {
 test('save preserves other keys', function () {
     File::put($this->valuesPath, json_encode([
         'other_setting' => 'keep-me',
-        'pagebuilder' => ['primary_color' => '#000000'],
+        '_pagebuilder' => [
+            'theme' => ['primary_color' => '#000000'],
+            'layouts' => ['page' => ['header' => [], 'footer' => []]],
+        ],
     ]));
 
     $this->themeSettings->save(['primary_color' => '#FFFFFF']);
 
     $raw = json_decode(File::get($this->valuesPath), true);
     expect($raw['other_setting'])->toBe('keep-me');
-    expect($raw['pagebuilder']['primary_color'])->toBe('#FFFFFF');
+    expect($raw['_pagebuilder']['layouts']['page'])->toBe(['header' => [], 'footer' => []]);
+    expect($raw['_pagebuilder']['theme']['primary_color'])->toBe('#FFFFFF');
 });
