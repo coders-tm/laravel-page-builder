@@ -212,7 +212,7 @@ export default function PreviewCanvas() {
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden bg-gray-100">
       <LoadingBar isProcessing={saving || isReloading} />
-      <div ref={canvasRef} className="flex flex-1 justify-center overflow-hidden p-0 md:p-2">
+      <div ref={canvasRef} className="flex flex-1 justify-center overflow-hidden">
         <div
           className="shrink-0 transition-transform duration-300 ease-in-out"
           style={
