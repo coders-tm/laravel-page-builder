@@ -67,6 +67,7 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
+    copyPublicDir: false,
     assetsDir: "",
     lib: {
       entry: path.resolve(__dirname, "resources/js/main.tsx"),

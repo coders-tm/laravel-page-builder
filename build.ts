@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync } from "fs"
+import { readFileSync, writeFileSync, unlinkSync, existsSync } from "fs"
 import { resolve, dirname } from "path"
 import { execSync } from "child_process"
 import { fileURLToPath } from "url"
@@ -127,6 +127,15 @@ async function main(): Promise<void> {
 
     console.log("\n[build] Step 3: Building package...")
     runCommand("npx vite build")
+
+    const filesToRemove = ["dist/hero.png", "dist/logo-dark.svg"]
+    filesToRemove.forEach((file) => {
+      const filePath = resolve(rootDir, file)
+      if (existsSync(filePath)) {
+        unlinkSync(filePath)
+        console.log(`[build] Removed ${file}`)
+      }
+    })
 
     console.log("\n[build] Step 4: Adding license banners to dist files...")
     prependBanner(resolve(rootDir, "dist/app.js"), licenseBanner)
