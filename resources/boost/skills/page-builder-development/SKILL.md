@@ -87,46 +87,47 @@ Rules:
 
 High-level orchestrators for page loading, rendering, and persistence.
 
-| Class                      | Responsibility                                                                   |
-| -------------------------- | -------------------------------------------------------------------------------- |
-| `PageRenderer`             | Loads page JSON → hydrates all sections → renders complete HTML; applies wrapper |
-| `PageStorage`              | JSON file I/O for page data; handles layout splitting (shared vs page-specific)  |
-| `TemplateStorage`          | JSON file I/O for template data (theme-aware, `config('pagebuilder.templates')`) |
-| `TemplateVariableResolver` | Resolves `{{ $page->attr }}` placeholders in template section settings           |
-| `WrapperParser`            | Parses CSS-selector wrapper strings (e.g. `div#id.class`) into HTML elements     |
-| `PageRegistry`             | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                   |
-| `PageService`              | Route registration + page resolution (Blade → JSON → template → 404)             |
-| `SettingsStore`            | Low-level `settings.json` file I/O, caching, and key preservation service        |
-| `ThemeSettings`            | Type-safe theme settings management via `SettingsStoreInterface`                 |
-| `LayoutSettings`           | Type-safe shared layout config management via `SettingsStoreInterface`           |
-| `Theme`                    | Active theme management wrapper                                                  |
+| Class                      | Responsibility                                                                                     |
+| -------------------------- | -------------------------------------------------------------------------------------------------- |
+| `PageRenderer`             | Loads page JSON → hydrates all sections → renders complete HTML; applies wrapper                   |
+| `PageStorage`              | JSON file I/O for page data; handles layout splitting and **locale-aware** file resolution         |
+| `TemplateStorage`          | JSON file I/O for template data (theme-aware, **locale-aware**, `config('pagebuilder.templates')`) |
+| `TemplateVariableResolver` | Resolves `{{ $page->attr }}` placeholders in template section settings                             |
+| `WrapperParser`            | Parses CSS-selector wrapper strings (e.g. `div#id.class`) into HTML elements                       |
+| `PageRegistry`             | Cached page manifest (`bootstrap/cache/pagebuilder_pages.php`)                                     |
+| `PageService`              | Route registration + page resolution (Blade → JSON → template → 404)                               |
+| `SettingsStore`            | Low-level `settings.json` file I/O, caching, and key preservation service                          |
+| `ThemeSettings`            | Type-safe theme settings management via `SettingsStoreInterface`                                   |
+| `LayoutSettings`           | Type-safe shared layout config management via `SettingsStoreInterface`                             |
+| `Theme`                    | Active theme management wrapper                                                                    |
 
 ### Key Classes
 
-| Class                      | Path                                       | Purpose                                                            |
-| -------------------------- | ------------------------------------------ | ------------------------------------------------------------------ |
-| `SectionSchema`            | `src/Schema/SectionSchema.php`             | Immutable section definition                                       |
-| `BlockSchema`              | `src/Schema/BlockSchema.php`               | Immutable block definition                                         |
-| `SettingSchema`            | `src/Schema/SettingSchema.php`             | Immutable setting definition                                       |
-| `SectionRegistry`          | `src/Registry/SectionRegistry.php`         | Discovers and provides section schemas                             |
-| `BlockRegistry`            | `src/Registry/BlockRegistry.php`           | Discovers and provides block schemas                               |
-| `SchemaExtractor`          | `src/Registry/SchemaExtractor.php`         | Parses `@schema()` from Blade files                                |
-| `Renderer`                 | `src/Rendering/Renderer.php`               | Core hydration and rendering engine                                |
-| `Section`                  | `src/Components/Section.php`               | Runtime section instance                                           |
-| `Block`                    | `src/Components/Block.php`                 | Runtime block instance                                             |
-| `Settings`                 | `src/Components/Settings.php`              | Schema-aware settings bag                                          |
-| `PageData`                 | `src/Support/PageData.php`                 | Type-safe page JSON value object DTO (with `PageMeta` & `wrapper`) |
-| `PageMeta`                 | `src/Support/PageMeta.php`                 | Immutable SEO metadata Value Object                                |
-| `LayoutConfig`             | `src/Support/LayoutConfig.php`             | Type-safe layout zone Value Object DTO                             |
-| `SettingsStore`            | `src/Services/SettingsStore.php`           | Atomic settings JSON file persistence                              |
-| `SettingsStoreInterface`   | `src/Contracts/SettingsStoreInterface.php` | Storage contract for settings.json                                 |
-| `PageStorage`              | `src/Services/PageStorage.php`             | Page JSON file I/O + layout splitting                              |
-| `PageRenderer`             | `src/Services/PageRenderer.php`            | Full-page render orchestrator (applies wrapper)                    |
-| `TemplateStorage`          | `src/Services/TemplateStorage.php`         | Template JSON file I/O (theme-aware)                               |
-| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php` | Resolves `{{ $page->attr }}` in template data                      |
-| `WrapperParser`            | `src/Support/WrapperParser.php`            | Parses CSS-selector wrapper strings into HTML                      |
-| `ThemeSettings`            | `src/Services/ThemeSettings.php`           | Type-safe theme settings service                                   |
-| `LayoutSettings`           | `src/Services/LayoutSettings.php`          | Type-safe layout settings service                                  |
+| Class                      | Path                                        | Purpose                                                            |
+| -------------------------- | ------------------------------------------- | ------------------------------------------------------------------ |
+| `SectionSchema`            | `src/Schema/SectionSchema.php`              | Immutable section definition                                       |
+| `BlockSchema`              | `src/Schema/BlockSchema.php`                | Immutable block definition                                         |
+| `SettingSchema`            | `src/Schema/SettingSchema.php`              | Immutable setting definition                                       |
+| `SectionRegistry`          | `src/Registry/SectionRegistry.php`          | Discovers and provides section schemas                             |
+| `BlockRegistry`            | `src/Registry/BlockRegistry.php`            | Discovers and provides block schemas                               |
+| `SchemaExtractor`          | `src/Registry/SchemaExtractor.php`          | Parses `@schema()` from Blade files                                |
+| `Renderer`                 | `src/Rendering/Renderer.php`                | Core hydration and rendering engine                                |
+| `Section`                  | `src/Components/Section.php`                | Runtime section instance                                           |
+| `Block`                    | `src/Components/Block.php`                  | Runtime block instance                                             |
+| `Settings`                 | `src/Components/Settings.php`               | Schema-aware settings bag                                          |
+| `PageData`                 | `src/Support/PageData.php`                  | Type-safe page JSON value object DTO (with `PageMeta` & `wrapper`) |
+| `PageMeta`                 | `src/Support/PageMeta.php`                  | Immutable SEO metadata Value Object                                |
+| `LayoutConfig`             | `src/Support/LayoutConfig.php`              | Type-safe layout zone Value Object DTO                             |
+| `SettingsStore`            | `src/Services/SettingsStore.php`            | Atomic settings JSON file persistence                              |
+| `SettingsStoreInterface`   | `src/Contracts/SettingsStoreInterface.php`  | Storage contract for settings.json                                 |
+| `PageStorage`              | `src/Services/PageStorage.php`              | Page JSON file I/O + layout splitting                              |
+| `PageRenderer`             | `src/Services/PageRenderer.php`             | Full-page render orchestrator (applies wrapper)                    |
+| `TemplateStorage`          | `src/Services/TemplateStorage.php`          | Template JSON file I/O (theme-aware)                               |
+| `TemplateVariableResolver` | `src/Support/TemplateVariableResolver.php`  | Resolves `{{ $page->attr }}` in template data                      |
+| `WrapperParser`            | `src/Support/WrapperParser.php`             | Parses CSS-selector wrapper strings into HTML                      |
+| `ThemeSettings`            | `src/Services/ThemeSettings.php`            | Type-safe theme settings service                                   |
+| `LayoutSettings`           | `src/Services/LayoutSettings.php`           | Type-safe layout settings service                                  |
+| `SetLangMiddleware`        | `src/Http/Middleware/SetLangMiddleware.php` | Sets page builder language from route param or query string        |
 
 ---
 
@@ -143,6 +144,7 @@ return [
     'middleware'             => ['web'],                               // Route middleware
     'disk'                  => 'public',                               // Storage disk for assets
     'asset_directory'       => 'pagebuilder',                          // Sub-dir on disk
+    'languages'             => [],                                     // Available languages (empty = disabled)
     'theme_settings_schema' => [],                                     // Global theme settings
     'theme_settings_path'   => resource_path('settings.json'),         // Theme settings file
 ];
@@ -174,6 +176,17 @@ Block::get('row');          // → BlockSchema
 Page::findBySlug('home');   // → Page model
 Theme::active();            // → active theme name
 ```
+
+### Language API
+
+```php
+use PageBuilder\PageBuilder;
+
+PageBuilder::setLang('fr');  // Set language for locale-aware file resolution
+PageBuilder::getLang();      // Returns 'fr' or null (default language)
+```
+
+When a language is set, `PageStorage` and `TemplateStorage` resolve locale-specific files first (e.g., `home.fr.json`) before falling back to the default (`home.json`).
 
 ---
 
@@ -526,6 +539,8 @@ Accepted child blocks: `@theme` (any)
 
 Every page is backed by a JSON document at `config('pagebuilder.pages')/{slug}.json`.
 
+When a language is set, locale-specific files are resolved first (e.g., `{slug}.fr.json`) before falling back to the default.
+
 ### Structure
 
 ```json
@@ -727,16 +742,21 @@ $storage->save('home', $pageData->toArray());
 
 Templates are **JSON fallback layouts** for pages that have no per-page JSON file (`pages/{slug}.json`) and no custom Blade view (`pages/{slug}.blade.php`). A single JSON file defines the sections, render order, optional wrapper element, and layout type for any page that uses it.
 
+When a language is set, locale-specific templates are resolved first (e.g., `page.fr.json`) before falling back to the default.
+
 A page selects its template via the `template` column on the `Page` model. When no template is selected, the default `page.json` template is used.
 
 ### Page rendering resolution order
 
 ```
 1. Editor mode              → always renders from page JSON (bypasses all below)
-2. pages/{slug}.blade.php   → custom Blade view wins if it exists
-3. pages/{slug}.json        → stored page builder JSON wins if it exists
-4. templates/{name}.json    → template selected by Page::$template, or page.json default
-5. 404
+2. pages/{slug}.{lang}.blade.php → locale-specific custom Blade view (when lang set)
+3. pages/{slug}.blade.php   → custom Blade view wins if it exists
+4. pages/{slug}.{lang}.json → locale-specific page JSON (when lang set)
+5. pages/{slug}.json        → stored page builder JSON wins if it exists
+6. templates/{name}.{lang}.json → locale-specific template (when lang set)
+7. templates/{name}.json    → template selected by Page::$template, or page.json default
+8. 404
 ```
 
 Templates are **only consulted** when steps 2 and 3 both miss. A template never overrides an existing page JSON.
@@ -847,11 +867,13 @@ Rules:
 
 ### Theme-aware template resolution
 
-`TemplateStorage::load()` checks the active theme path before falling back to the configured templates directory:
+`TemplateStorage::load()` checks the active theme path before falling back to the configured templates directory. When a language is set, locale-specific templates are checked first:
 
 ```
-1. Theme::path('views/templates/{name}.json')   → active theme directory
-2. config('pagebuilder.templates')/{name}.json  → app templates directory
+1. Theme::path('views/templates/{name}.{lang}.json')   → active theme locale
+2. Theme::path('views/templates/{name}.json')           → active theme default
+3. config('pagebuilder.templates')/{name}.{lang}.json   → app templates locale
+4. config('pagebuilder.templates')/{name}.json          → app templates default
 ```
 
 A theme can override the default `page.json` template by providing `views/templates/page.json` inside the theme directory.
@@ -892,6 +914,64 @@ Request /about
         ↓ Renders each section via Renderer
         ↓ If wrapper set → WrapperParser::render($wrapper, $sectionsHtml)
   ↓ view('pagebuilder::page', [...])
+```
+
+---
+
+## Multilanguage
+
+The page builder supports multilanguage page resolution. When a language is set, the system first looks for locale-specific files before falling back to the default.
+
+### File resolution order
+
+| Layer         | Default                  | Locale-specific (e.g. `fr`)                                     |
+| ------------- | ------------------------ | --------------------------------------------------------------- |
+| Page JSON     | `pages/{slug}.json`      | `pages/{slug}.fr.json` → fallback `pages/{slug}.json`           |
+| Custom Blade  | `pages/{slug}.blade.php` | `pages/{slug}.fr.blade.php` → fallback `pages/{slug}.blade.php` |
+| Template JSON | `templates/{name}.json`  | `templates/{name}.fr.json` → fallback `templates/{name}.json`   |
+
+### Configuration
+
+```php
+// config/pagebuilder.php
+'languages' => [
+    ['code' => 'en', 'name' => 'English'],   // first entry = default
+    ['code' => 'fr', 'name' => 'Français'],
+    ['code' => 'es', 'name' => 'Español'],
+],
+```
+
+When `languages` is empty, multilanguage is disabled and no language selector appears in the editor.
+
+### Setting the language
+
+```php
+// From middleware
+PageBuilder::setLang('fr');
+
+// From route parameter
+Route::get('/{slug}', ...)->middleware('lang:fr');
+
+// From query string (via SetLangMiddleware)
+// GET /about?lang=fr
+```
+
+### Editor integration
+
+When languages are configured, the editor header shows a Globe icon. Clicking it opens a popover with available languages. Selecting a language:
+
+1. Updates the URL search params (`?lang=fr`)
+2. Reloads the current page with the new language
+3. Saves to locale-specific JSON files (`{slug}.{lang}.json`)
+
+### Middleware
+
+The `lang` middleware alias is registered automatically:
+
+```php
+Route::middleware(['lang:fr'])->group(function () {
+    // All pages in this group resolve French locale files
+});
 ```
 
 ---

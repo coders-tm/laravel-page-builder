@@ -156,6 +156,76 @@ Reserved URL slugs that cannot be assigned to dynamic pages created in the build
 ],
 ```
 
+## Multilanguage
+
+### languages
+
+- **Type:** `array`
+- **Default:** `[]`
+
+Define available languages for multilanguage page editing. When non-empty, a language selector appears in the editor header. The first entry is treated as the default language. Pages are stored as `{slug}.{code}.json` (e.g., `home.fr.json`).
+
+```php
+'languages' => [
+    ['code' => 'en', 'name' => 'English'],   // default language
+    ['code' => 'fr', 'name' => 'Français'],
+    ['code' => 'es', 'name' => 'Español'],
+],
+```
+
+**Language array fields:**
+
+| Field  | Required | Description                                        |
+| ------ | -------- | -------------------------------------------------- |
+| `code` | Yes      | Language code used in filenames (e.g. `fr`)        |
+| `name` | Yes      | Display name shown in the editor (e.g. `Français`) |
+
+When `languages` is empty, multilanguage is disabled and no language selector appears.
+
+### How it works
+
+When a language is set (e.g. `fr`), the system resolves files in this order:
+
+1. `pages/{slug}.fr.json` — locale-specific page JSON
+2. `pages/{slug}.json` — fallback to default
+
+The same applies to custom Blade views and templates:
+
+1. `pages/{slug}.fr.blade.php` → `pages/{slug}.blade.php`
+2. `templates/page.fr.json` → `templates/page.json`
+
+### Setting the language
+
+```php
+use PageBuilder\PageBuilder;
+
+// Set language for the current request
+PageBuilder::setLang('fr');
+
+// Get the current language (null = default)
+$lang = PageBuilder::getLang();
+
+// Reset to default language
+PageBuilder::setLang(null);
+```
+
+### Middleware
+
+The `lang` middleware alias is registered automatically:
+
+```php
+// Route-level language
+Route::get('/fr/{slug}', [WebPageController::class, 'pages'])
+    ->middleware('lang:fr');
+
+// Group middleware
+Route::middleware(['lang:fr'])->group(function () {
+    // All pages in this group resolve French locale files
+});
+```
+
+The `SetLangMiddleware` reads the language from a route parameter or `?lang=` query parameter.
+
 ## Theme Settings
 
 ### theme_settings_path

@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-05
+
+### Added
+
+- **Multilanguage support** — Pages, templates, and custom Blade views now support locale-specific file resolution. When a language is set, the system first looks for `{slug}.{lang}.json` / `{slug}.{lang}.blade.php` before falling back to the default `{slug}.json` / `{slug}.blade.php`.
+- **`PageBuilder::setLang()` / `getLang()`** — New static methods for setting/getting the current language. Language can be set from middleware, service providers, or controllers.
+- **`SetLangMiddleware`** — New middleware (`lang`) that sets the page builder language from a route parameter or `?lang=` query parameter.
+- **`languages` config option** — New `config('pagebuilder.languages')` array for defining available editor languages. When non-empty, a language selector appears in the editor header.
+- **Language selector in editor header** — Compact Globe icon with popover dropdown for switching languages in the editor. Shows language name, code, and "(Default)" badge for the default language.
+- **Locale-aware `PageStorage`** — `load()`, `loadRaw()`, and `save()` now resolve locale-specific JSON files when a language is set.
+- **Locale-aware `TemplateStorage`** — `load()` now resolves locale-specific template JSON files (e.g., `page.fr.json`) before falling back to the default.
+- **Locale-aware custom Blade views** — `PageService::resolveCustomView()` checks for `pages.{lang}.{slug}` before falling back to `pages.{slug}`.
+- **29 new tests** — Comprehensive test coverage for `setLang`/`getLang`, locale-aware `PageStorage`, locale-aware `TemplateStorage`, and `SetLangMiddleware`.
+
+### Changed
+
+- **`PageBuilderController`** — `page()`, `savePage()`, `renderSection()`, and `renderBlock()` endpoints now read `lang` from the request and set it via `PageBuilder::setLang()`.
+- **`scriptVariables()`** — Now includes `languages` config in the editor frontend config.
+- **Frontend API layer** — `getPage()`, `savePage()`, `renderSection()`, `renderBlock()`, and `getPreviewUrl()` now accept and pass a `lang` parameter.
+- **Frontend navigation** — `NavigationManager` tracks `lang` in URL search params; persists across page switches.
+- **Editor header** — Now includes a language selector (Globe icon) when languages are configured.
+- **Preview canvas** — Preview iframe URL now includes `?lang=` when a language is active.
+
 ## [1.4.6] - 2026-09-04
 
 ### Added

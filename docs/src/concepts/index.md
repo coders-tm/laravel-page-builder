@@ -14,3 +14,4 @@ Learn the fundamental concepts behind Laravel Page Builder.
 - [Layouts](/concepts/layouts) — Page structure and zones
 - [Themes](/concepts/themes) — Theme development
 - [Templates](/concepts/templates) — JSON fallback layouts
+- [Multilanguage](/concepts/multilanguage) — Multilanguage page resolution

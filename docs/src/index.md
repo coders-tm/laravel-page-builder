@@ -43,15 +43,15 @@ features:
   - icon: ⚡
     title: 21+ Field Types
     details: From basic text inputs to advanced color pickers, icon selectors, and custom types.
-  - icon: 🔍
-    title: Editor Mode
-    details: data-editor-* attributes injected only when the editor is active. Clean production HTML.
   - icon: 📦
     title: Publishable Assets
     details: Config, views, migrations, and frontend assets can be published independently.
   - icon: 🚀
     title: Performance Optimized
     details: Schema caching, Blade publishing, and fragment selection for lightning-fast page loads.
+  - icon: 🌐
+    title: Multilanguage Support
+    details: Locale-specific page JSON, templates, and Blade views with automatic fallback. Editor language selector included.
 ---
 
 <style>
