@@ -8,43 +8,47 @@
  */
 import { useState, useCallback, useRef, useEffect } from "react"
 import { useEditorInstance } from "@/core/editorContext"
+import type { Asset } from "@/types/asset"
 
 /**
  * Custom hook for managing assets.
  *
  * Provides a complete API for listing, searching,
- * and uploading assets with pagination.
+ * and uploading assets with infinite scroll pagination.
  *
  * Internally uses AssetService from the Editor instance,
  * so UI components never touch the provider or API directly.
  *
  * @example
- * const { assets, loading, loadAssets, uploadAsset } = useAssets();
+ * const { assets, loading, loadAssets, loadMoreAssets, uploadAsset } = useAssets();
  */
 export function useAssets() {
   const editor = useEditorInstance()
   const assetService = editor.assets
 
-  const [assets, setAssets] = useState([])
+  const [assets, setAssets] = useState<Asset[]>([])
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(20)
   const [total, setTotal] = useState(0)
 
-  const searchTimerRef = useRef(null)
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   /**
-   * Load assets from the service.
+   * Initial load or search query load (replaces assets list).
    */
   const loadAssets = useCallback(
     async (params: { page?: number; search?: string } = {}) => {
       setLoading(true)
+      const targetPage = params.page ?? 1
+      const targetSearch = params.search ?? search
       try {
         const result = await assetService.list({
-          page: params.page ?? page,
-          search: params.search ?? search,
+          page: targetPage,
+          search: targetSearch,
         })
         setAssets(result.data)
         setPage(result.pagination.page)
@@ -56,15 +60,40 @@ export function useAssets() {
         setLoading(false)
       }
     },
-    [assetService, page, search],
+    [assetService, search],
   )
+
+  /**
+   * Load next page for infinite scrolling (appends newly loaded assets).
+   */
+  const loadMoreAssets = useCallback(async () => {
+    const totalPages = Math.ceil(total / perPage)
+    if (loading || loadingMore || page >= totalPages) return
+
+    setLoadingMore(true)
+    const nextPage = page + 1
+    try {
+      const result = await assetService.list({
+        page: nextPage,
+        search,
+      })
+      setAssets((prev) => [...prev, ...result.data])
+      setPage(result.pagination.page)
+      setPerPage(result.pagination.per_page)
+      setTotal(result.pagination.total)
+    } catch (err) {
+      console.error("Failed to load more assets:", err)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [assetService, loading, loadingMore, page, perPage, total, search])
 
   /**
    * Upload a file.
    * Inserts the new asset at the start of the grid on success.
    */
   const uploadAsset = useCallback(
-    async (file) => {
+    async (file: File) => {
       setUploading(true)
       try {
         const asset = await assetService.upload(file)
@@ -85,7 +114,7 @@ export function useAssets() {
    * Navigate to a specific page.
    */
   const selectPage = useCallback(
-    (newPage) => {
+    (newPage: number) => {
       setPage(newPage)
       loadAssets({ page: newPage, search })
     },
@@ -96,9 +125,11 @@ export function useAssets() {
    * Update search term with debounce.
    */
   const updateSearch = useCallback(
-    (query) => {
+    (query: string) => {
       setSearch(query)
-      clearTimeout(searchTimerRef.current)
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current)
+      }
       searchTimerRef.current = setTimeout(() => {
         setPage(1)
         loadAssets({ page: 1, search: query })
@@ -109,18 +140,27 @@ export function useAssets() {
 
   // Cleanup debounce timer
   useEffect(() => {
-    return () => clearTimeout(searchTimerRef.current)
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current)
+      }
+    }
   }, [])
+
+  const hasMore = page < Math.ceil(total / perPage)
 
   return {
     assets,
     loading,
+    loadingMore,
     uploading,
     search,
     page,
     perPage,
     total,
+    hasMore,
     loadAssets,
+    loadMoreAssets,
     uploadAsset,
     selectPage,
     updateSearch,

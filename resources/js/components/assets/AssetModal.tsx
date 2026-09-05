@@ -28,14 +28,14 @@ export default function AssetModal({ isOpen, onClose, onSelect }) {
   const {
     assets,
     loading,
+    loadingMore,
     uploading,
     search,
-    page,
-    perPage,
     total,
+    hasMore,
     loadAssets,
+    loadMoreAssets,
     uploadAsset,
-    selectPage,
     updateSearch,
   } = useAssets()
 
@@ -81,19 +81,15 @@ export default function AssetModal({ isOpen, onClose, onSelect }) {
 
   const handleSelect = (asset) => {
     setSelectedAsset(asset)
-  }
-
-  const handleConfirm = () => {
-    if (selectedAsset) {
-      onSelect(selectedAsset)
-      onClose()
-    }
+    onSelect(asset)
+    onClose()
   }
 
   const handleUpload = async (file) => {
     const asset = await uploadAsset(file)
     if (asset) {
-      setSelectedAsset(asset)
+      onSelect(asset)
+      onClose()
     }
   }
 
@@ -138,45 +134,15 @@ export default function AssetModal({ isOpen, onClose, onSelect }) {
     }
   }
 
-  // Pagination
-  const totalPages = Math.ceil(total / perPage)
-  const hasPrev = page > 1
-  const hasNext = page < totalPages
-
   const footer = (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        {totalPages > 1 && (
-          <>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={!hasPrev}
-              onClick={() => selectPage(page - 1)}
-            >
-              ‹ Prev
-            </Button>
-            <span className="text-xs text-gray-500">
-              {page} / {totalPages}
-            </span>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={!hasNext}
-              onClick={() => selectPage(page + 1)}
-            >
-              Next ›
-            </Button>
-          </>
-        )}
-        {total > 0 && (
-          <span className="ml-1 text-[10px] text-gray-400">
-            {total} asset{total !== 1 ? "s" : ""}
-          </span>
-        )}
-      </div>
-      <Button variant="primary" size="sm" disabled={!selectedAsset} onClick={handleConfirm}>
-        Select
+    <div className="flex w-full items-center justify-between">
+      <span className="text-xs text-gray-400">
+        {total > 0
+          ? `Showing ${assets.length} of ${total} asset${total !== 1 ? "s" : ""}`
+          : "0 assets"}
+      </span>
+      <Button variant="secondary" size="sm" onClick={onClose}>
+        Cancel
       </Button>
     </div>
   )
@@ -188,7 +154,7 @@ export default function AssetModal({ isOpen, onClose, onSelect }) {
         onDragOver={handleModalDragOver}
         onDragLeave={handleModalDragLeave}
         onDrop={handleModalDrop}
-        className="relative min-h-[300px] space-y-3 p-4"
+        className="relative max-h-[65vh] min-h-[300px] space-y-3 overflow-y-auto p-4"
       >
         {/* Modal Drag & Drop Overlay */}
         {isModalDragOver && (
@@ -234,7 +200,7 @@ export default function AssetModal({ isOpen, onClose, onSelect }) {
           />
         </div>
 
-        {/* Asset grid with dropzone card and empty dropzone view */}
+        {/* Asset grid with infinite scroll */}
         <AssetGrid
           assets={assets}
           selectedId={selectedAsset?.id}
@@ -242,6 +208,9 @@ export default function AssetModal({ isOpen, onClose, onSelect }) {
           loading={loading}
           uploading={uploading}
           onUpload={handleUpload}
+          hasMore={hasMore}
+          loadingMore={loadingMore}
+          onLoadMore={loadMoreAssets}
         />
       </div>
     </Modal>
