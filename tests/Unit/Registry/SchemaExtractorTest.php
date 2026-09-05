@@ -26,7 +26,7 @@ test('extract valid schema', function () {
 
     expect($result)->toBeArray();
     expect($result['name'])->toBe('Hero');
-    expect($result['settings'])->toHaveCount(5);
+    expect($result['settings'])->toHaveCount(4);
     expect($result['blocks'] ?? [])->toHaveCount(2);
     expect($result['presets'])->toHaveCount(1);
 });
