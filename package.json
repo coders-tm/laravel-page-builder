@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@inquirer/prompts": "^8.7.1",
     "@material-design-icons/svg": "^0.14.15",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "^26.4.1",

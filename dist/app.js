@@ -16589,7 +16589,7 @@ function ICe() {
               Lf,
               {
                 value: b.slug,
-                className: "relative flex w-full cursor-default items-center rounded-sm py-1.5 pl-3 pr-8 text-sm outline-none select-none focus:bg-blue-50 focus:text-blue-600 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                className: "relative flex w-full cursor-default items-center rounded-sm py-1.5 pr-8 pl-3 text-sm outline-none select-none focus:bg-blue-50 focus:text-blue-600 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
                 children: [
                   /* @__PURE__ */ y.jsx("span", { className: "truncate", children: /* @__PURE__ */ y.jsx(iT, { children: b.title }) }),
                   /* @__PURE__ */ y.jsx("span", { className: "absolute right-2 flex h-3.5 w-3.5 items-center justify-center", children: /* @__PURE__ */ y.jsx(nT, { children: /* @__PURE__ */ y.jsx(i3, { className: "h-4 w-4" }) }) })

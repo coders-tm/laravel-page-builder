@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from "fs"
 import { resolve, dirname } from "path"
 import { execSync } from "child_process"
 import { fileURLToPath } from "url"
+import { select } from "@inquirer/prompts"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -23,7 +24,7 @@ function runCommand(command: string): void {
   execSync(command, { cwd: rootDir, stdio: "inherit" })
 }
 
-function incrementVersion(currentVersion: string): string {
+function bumpVersion(currentVersion: string, type: "patch" | "minor" | "major" = "patch"): string {
   const parts = currentVersion.split(".").map((p) => parseInt(p, 10))
   if (parts.length !== 3 || parts.some(isNaN)) {
     throw new Error(`Invalid version format in package.json: ${currentVersion}`)
@@ -31,14 +32,15 @@ function incrementVersion(currentVersion: string): string {
 
   let [major, minor, patch] = parts
 
-  patch += 1
-  if (patch > 10) {
-    patch = 0
+  if (type === "patch") {
+    patch += 1
+  } else if (type === "minor") {
     minor += 1
-  }
-  if (minor > 10) {
-    minor = 0
+    patch = 0
+  } else if (type === "major") {
     major += 1
+    minor = 0
+    patch = 0
   }
 
   return `${major}.${minor}.${patch}`
@@ -52,18 +54,72 @@ function prependBanner(filePath: string, banner: string): void {
   }
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const pkgPath = resolve(rootDir, "package.json")
   const pkgRaw = readFileSync(pkgPath, "utf-8")
   const pkg = JSON.parse(pkgRaw)
 
-  const oldVersion = pkg.version
-  const newVersion = incrementVersion(oldVersion)
+  const oldVersion: string = pkg.version
 
-  console.log(`[build] Step 1: Incrementing package.json version: ${oldVersion} -> ${newVersion}`)
+  const args = process.argv.slice(2)
+  const isNoVersionFlag = args.includes("--no-bump")
+  const isMinorFlag = args.includes("--minor")
+  const isMajorFlag = args.includes("--major")
 
-  pkg.version = newVersion
-  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8")
+  let selectedOption: "patch" | "minor" | "major" | "skip" = "patch"
+
+  if (isNoVersionFlag) {
+    selectedOption = "skip"
+  } else if (isMinorFlag) {
+    selectedOption = "minor"
+  } else if (isMajorFlag) {
+    selectedOption = "major"
+  } else if (process.stdin.isTTY && args.length === 0) {
+    try {
+      selectedOption = await select({
+        message: "Select version bump option:",
+        choices: [
+          {
+            name: `Patch bump (${oldVersion} -> ${bumpVersion(oldVersion, "patch")})`,
+            value: "patch",
+          },
+          {
+            name: `Minor bump (${oldVersion} -> ${bumpVersion(oldVersion, "minor")})`,
+            value: "minor",
+          },
+          {
+            name: `Major bump (${oldVersion} -> ${bumpVersion(oldVersion, "major")})`,
+            value: "major",
+          },
+          {
+            name: "Skip version bump & tag creation",
+            value: "skip",
+          },
+        ],
+      })
+    } catch {
+      console.log("\n[build] Build cancelled.")
+      process.exit(0)
+    }
+  }
+
+  const shouldBumpVersion = selectedOption !== "skip"
+  const shouldCreateTag = selectedOption !== "skip"
+
+  let newVersion = oldVersion
+
+  if (shouldBumpVersion) {
+    newVersion = bumpVersion(oldVersion, selectedOption as "patch" | "minor" | "major")
+    console.log(
+      `\n[build] Step 1: Incrementing package.json version: ${oldVersion} -> ${newVersion}`,
+    )
+    pkg.version = newVersion
+    writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8")
+  } else {
+    console.log(
+      `\n[build] Step 1: Skipping version increment (keeping current version v${oldVersion})`,
+    )
+  }
 
   try {
     console.log("\n[build] Step 2: Running generate-icons.mjs...")
@@ -76,14 +132,31 @@ function main(): void {
     prependBanner(resolve(rootDir, "dist/app.js"), licenseBanner)
     prependBanner(resolve(rootDir, "dist/app.umd.js"), licenseBanner)
 
-    console.log("\n[build] Step 5: Committing changes...")
-    runCommand("git add -A")
-    runCommand(`git commit -m "chore: bump version to v${newVersion}"`)
+    if (shouldBumpVersion || shouldCreateTag) {
+      console.log("\n[build] Step 5: Committing changes...")
+      runCommand("git add -A")
+      const commitMsg = shouldBumpVersion
+        ? `chore: bump version to v${newVersion}`
+        : `chore: build dist assets for v${newVersion}`
+      runCommand(`git commit -m "${commitMsg}"`)
+    } else {
+      console.log("\n[build] Step 5: Skipping git commit.")
+    }
 
-    console.log("\n[build] Step 6: Creating git tag...")
-    runCommand(`git tag v${newVersion}`)
+    if (shouldCreateTag) {
+      console.log(`\n[build] Step 6: Creating git tag v${newVersion}...`)
+      runCommand(`git tag v${newVersion}`)
+    } else {
+      console.log("\n[build] Step 6: Skipping git tag creation.")
+    }
 
-    console.log(`\n[build] Successfully built, committed, and tagged version v${newVersion}!`)
+    console.log(
+      `\n[build] Successfully built assets!` +
+        (shouldBumpVersion
+          ? ` Version bumped to v${newVersion}.`
+          : ` Version v${oldVersion} unchanged.`) +
+        (shouldCreateTag ? ` Git tag created.` : ""),
+    )
   } catch (error) {
     console.error("\n[build] Build process failed:", error)
     process.exit(1)
