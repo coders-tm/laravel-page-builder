@@ -92,9 +92,9 @@
                             class="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 relative hover:border-indigo-500/40 transition-colors">
                             
                             {{-- Stars --}}
-                            <div class="flex items-center gap-1 text-amber-400 mb-4 text-sm">
+                            <div class="flex items-center gap-0.5 text-amber-400 mb-4">
                                 @for ($i = 0; $i < (int) $block->settings->rating; $i++)
-                                    ★
+                                    <span class="material-icons text-sm">star</span>
                                 @endfor
                             </div>
 

@@ -14,13 +14,13 @@
         [
             'name' => 'Install Call-to-Action Banner',
             'settings' => [
-                'badge' => '⚡ Get Started in Seconds',
+                'badge' => 'Get Started in Seconds',
                 'title' => 'Ready to Supercharge Your Laravel Pages?',
                 'description' => 'Install the package with Composer and enjoy pure Blade section composition.',
                 'command_text' => 'composer require coderstm/laravel-page-builder',
                 'button_label' => 'Read Documentation',
                 'button_url' => 'https://github.com/coders-tm/laravel-page-builder',
-                'secondary_label' => 'Star on GitHub ⭐',
+                'secondary_label' => 'Star on GitHub',
                 'secondary_url' => 'https://github.com/coders-tm/laravel-page-builder',
             ],
         ],
@@ -61,7 +61,7 @@
                 <div
                     class="inline-flex items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-950/90 px-5 py-3 font-mono text-sm text-indigo-300 shadow-inner max-w-xl w-full mx-auto mb-8">
                     <span class="truncate">$ {{ $section->settings->command_text }}</span>
-                    <span class="text-xs text-slate-400 font-sans shrink-0">📋 copy</span>
+                    <span class="inline-flex items-center gap-1 text-xs text-slate-400 font-sans shrink-0"><span class="material-icons text-xs">content_copy</span> copy</span>
                 </div>
             @endif
 

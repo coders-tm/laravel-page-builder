@@ -16,7 +16,7 @@
             'type' => 'feature-card',
             'name' => 'Feature Card',
             'settings' => [
-                ['id' => 'icon', 'type' => 'text', 'label' => 'Icon (Emoji or SVG/Class)', 'default' => '🧩'],
+                ['id' => 'icon', 'type' => 'icon_md', 'label' => 'Icon', 'default' => 'extension'],
                 ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Schema Driven'],
                 ['id' => 'description', 'type' => 'textarea', 'label' => 'Description', 'default' => 'Define section and block settings inside Blade files using @schema().'],
                 ['id' => 'badge_text', 'type' => 'text', 'label' => 'Card Tag / Badge', 'default' => ''],
@@ -37,7 +37,7 @@
                 [
                     'type' => 'feature-card',
                     'settings' => [
-                        'icon' => '🧩',
+                        'icon' => 'code',
                         'title' => 'Inline @schema() Directive',
                         'description' => 'Write your field schema inside the Blade template. No separate YAML files, database migrations, or registration boilerplate.',
                         'badge_text' => 'Zero Config',
@@ -46,7 +46,7 @@
                 [
                     'type' => 'feature-card',
                     'settings' => [
-                        'icon' => '🎨',
+                        'icon' => 'palette',
                         'title' => 'Multi-Theme Shadowing',
                         'description' => 'Shadow built-in sections and blocks effortlessly. Register custom themes with total control over layouts and components.',
                         'badge_text' => 'Multi-Theme',
@@ -55,7 +55,7 @@
                 [
                     'type' => 'feature-card',
                     'settings' => [
-                        'icon' => '📄',
+                        'icon' => 'description',
                         'title' => 'Clean JSON Storage',
                         'description' => 'Pages are stored as clear, deterministic JSON files. Version control your content layouts directly in Git.',
                         'badge_text' => 'Git Friendly',
@@ -64,7 +64,7 @@
                 [
                     'type' => 'feature-card',
                     'settings' => [
-                        'icon' => '⚡',
+                        'icon' => 'bolt',
                         'title' => 'Sub-Millisecond Speed',
                         'description' => 'Hydrated runtime models render straight to Blade views with zero runtime query bloat or heavy client scripts.',
                         'badge_text' => '0.2ms Speed',
@@ -73,7 +73,7 @@
                 [
                     'type' => 'feature-card',
                     'settings' => [
-                        'icon' => '🛠️',
+                        'icon' => 'tune',
                         'title' => '13+ Field Schema Types',
                         'description' => 'Rich text (TipTap), color pickers, range sliders, selects, image pickers, icons, URLs, and nested local blocks.',
                         'badge_text' => 'Rich Input',
@@ -82,7 +82,7 @@
                 [
                     'type' => 'feature-card',
                     'settings' => [
-                        'icon' => '🔒',
+                        'icon' => 'verified_user',
                         'title' => 'Strictly Typed PHP 8.2+',
                         'description' => 'Readonly value objects, layered architecture (Schema -> Registry -> Components -> Renderer -> Services).',
                         'badge_text' => 'PHP 8.2+',
@@ -128,8 +128,10 @@
                             
                             {{-- Top Icon & Badge --}}
                             <div class="flex items-center justify-between mb-5">
-                                <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600/10 border border-indigo-500/20 text-2xl group-hover:scale-110 transition-transform">
-                                    {{ $block->settings->icon }}
+                                <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-600/20 transition-all">
+                                    @if ($block->settings->icon)
+                                        <span class="material-icons text-2xl">{{ $block->settings->icon }}</span>
+                                    @endif
                                 </span>
                                 @if ($block->settings->badge_text)
                                     <span class="rounded-full bg-gray-800 px-2.5 py-0.5 text-xs font-medium text-gray-300">

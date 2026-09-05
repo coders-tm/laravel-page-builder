@@ -13,7 +13,7 @@
                 ['id' => 'value', 'type' => 'text', 'label' => 'Stat Value', 'default' => '0.2ms'],
                 ['id' => 'label', 'type' => 'text', 'label' => 'Stat Label', 'default' => 'Render Speed'],
                 ['id' => 'description', 'type' => 'text', 'label' => 'Short Description', 'default' => 'Average section hydration & render time.'],
-                ['id' => 'icon', 'type' => 'text', 'label' => 'Icon / Symbol', 'default' => '⚡'],
+                ['id' => 'icon', 'type' => 'icon_md', 'label' => 'Icon', 'default' => 'bolt'],
             ],
         ],
     ],
@@ -32,7 +32,7 @@
                         'value' => '< 0.2ms',
                         'label' => 'Render Overhead',
                         'description' => 'Fast Blade view hydration with zero extra SQL queries.',
-                        'icon' => '⚡',
+                        'icon' => 'bolt',
                     ],
                 ],
                 [
@@ -41,7 +41,7 @@
                         'value' => '13+',
                         'label' => 'Setting Types',
                         'description' => 'Rich text, image pickers, colors, sliders, icons, URLs.',
-                        'icon' => '🎛️',
+                        'icon' => 'tune',
                     ],
                 ],
                 [
@@ -50,7 +50,7 @@
                         'value' => '100%',
                         'label' => 'PSR-12 Typed',
                         'description' => 'Readonly value objects & PHP 8.2 strict typing.',
-                        'icon' => '🛡️',
+                        'icon' => 'verified',
                     ],
                 ],
                 [
@@ -59,7 +59,7 @@
                         'value' => '0',
                         'label' => 'DB Overhead',
                         'description' => 'Pure JSON document persistence & theme shadowing.',
-                        'icon' => '📦',
+                        'icon' => 'inventory_2',
                     ],
                 ],
             ],
@@ -91,7 +91,11 @@
                     @if ($block->type === 'stat-item')
                         <div {!! $block->editorAttributes() !!}
                             class="rounded-2xl border border-gray-800 bg-gray-950/70 p-6 text-center shadow-lg hover:border-indigo-500/40 transition-colors">
-                            <div class="text-3xl mb-2">{{ $block->settings->icon }}</div>
+                            <div class="mb-2 flex justify-center">
+                                @if ($block->settings->icon)
+                                    <span class="material-icons text-3xl text-indigo-400">{{ $block->settings->icon }}</span>
+                                @endif
+                            </div>
                             <div class="text-4xl font-extrabold tracking-tight text-white bg-gradient-to-r from-red-400 to-indigo-400 bg-clip-text text-transparent mb-1">
                                 {{ $block->settings->value }}
                             </div>

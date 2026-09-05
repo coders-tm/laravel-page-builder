@@ -5,7 +5,7 @@
         [
             'type' => 'hero-badge-pill',
             'name' => 'Pill Badge',
-            'settings' => [['id' => 'text', 'type' => 'text', 'label' => 'Pill Text', 'default' => 'Blade Native'], ['id' => 'icon', 'type' => 'text', 'label' => 'Icon Class / Emoji', 'default' => '⚡']],
+            'settings' => [['id' => 'text', 'type' => 'text', 'label' => 'Pill Text', 'default' => 'Blade Native'], ['id' => 'icon', 'type' => 'icon_md', 'label' => 'Icon', 'default' => 'bolt']],
         ],
         [
             'type' => 'hero-action',
@@ -17,12 +17,12 @@
         [
             'name' => 'Developer SaaS Hero',
             'settings' => [
-                'badge_text' => '⚡ Next-Gen Laravel Package',
+                'badge_text' => 'Next-Gen Laravel Package',
                 'hero_image' => '/statics/hero.png',
                 'title' => 'Build High-Performance Page Builders in Minutes with <span class="block bg-gradient-to-r from-red-500 via-indigo-400 to-sky-400 bg-clip-text text-transparent mt-1 sm:mt-2">Laravel & Blade</span>',
                 'subtitle' => 'A multi-theme, JSON-driven page builder. Define block schemas directly in your Blade views with zero extra database queries or Javascript bloat.',
             ],
-            'blocks' => [['type' => 'hero-badge-pill', 'settings' => ['text' => 'Blade Native', 'icon' => '🔥']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'JSON Driven', 'icon' => '📦']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'Zero Dependencies', 'icon' => '⚡']], ['type' => 'hero-action', 'settings' => ['label' => 'Explore Documentation', 'url' => '#features', 'style' => 'primary']], ['type' => 'hero-action', 'settings' => ['label' => 'View Github', 'url' => 'https://github.com/coders-tm/laravel-page-builder', 'style' => 'secondary']]],
+            'blocks' => [['type' => 'hero-badge-pill', 'settings' => ['text' => 'Blade Native', 'icon' => 'local_fire_department']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'JSON Driven', 'icon' => 'inventory_2']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'Zero Dependencies', 'icon' => 'bolt']], ['type' => 'hero-action', 'settings' => ['label' => 'Explore Documentation', 'url' => '#features', 'style' => 'primary']], ['type' => 'hero-action', 'settings' => ['label' => 'View Github', 'url' => 'https://github.com/coders-tm/laravel-page-builder', 'style' => 'secondary']]],
         ],
     ],
 ])
@@ -53,7 +53,9 @@
                         @if ($block->type === 'hero-badge-pill')
                             <span {!! $block->editorAttributes() !!}
                                 class="inline-flex items-center gap-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 px-3 py-1 text-xs font-medium text-slate-300">
-                                <span>{{ $block->settings->icon }}</span>
+                                @if ($block->settings->icon)
+                                    <span class="material-icons text-sm text-indigo-400">{{ $block->settings->icon }}</span>
+                                @endif
                                 <span>{{ $block->settings->text }}</span>
                             </span>
                         @endif

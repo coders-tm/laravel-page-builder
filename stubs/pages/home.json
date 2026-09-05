@@ -3,7 +3,7 @@
     "hero_1": {
       "type": "hero",
       "settings": {
-        "badge_text": "⚡ Next-Gen Laravel Package",
+        "badge_text": "Next-Gen Laravel Package",
         "hero_image": "/statics/hero.png",
         "title": "Build High-Performance Page Builders in Minutes with<br/><span class=\"block bg-gradient-to-r from-red-500 via-indigo-400 to-sky-400 bg-clip-text text-transparent mt-1 sm:mt-2\">Laravel & Blade</span>",
         "subtitle": "A multi-theme, JSON-driven page composition system for Laravel. Define block schemas directly inside your Blade views with zero boilerplate, zero database lock-in, and sub-millisecond render speeds."
@@ -13,7 +13,7 @@
           "type": "hero-badge-pill",
           "settings": {
             "text": "Blade Native",
-            "icon": "🔥"
+            "icon": "local_fire_department"
           },
           "blocks": {},
           "order": []
@@ -22,7 +22,7 @@
           "type": "hero-badge-pill",
           "settings": {
             "text": "JSON Driven",
-            "icon": "📦"
+            "icon": "inventory_2"
           },
           "blocks": {},
           "order": []
@@ -31,7 +31,7 @@
           "type": "hero-badge-pill",
           "settings": {
             "text": "Zero DB Overhead",
-            "icon": "⚡"
+            "icon": "bolt"
           },
           "blocks": {},
           "order": []
@@ -71,7 +71,7 @@
         "feat_1": {
           "type": "feature-card",
           "settings": {
-            "icon": "🧩",
+            "icon": "code",
             "title": "Inline @schema() Directive",
             "description": "Declare field schemas directly inside Blade view files. No separate YAML files, database migrations, or complex config maps.",
             "badge_text": "Zero Config"
@@ -82,7 +82,7 @@
         "feat_2": {
           "type": "feature-card",
           "settings": {
-            "icon": "🎨",
+            "icon": "palette",
             "title": "Multi-Theme Shadowing",
             "description": "Theme files automatically shadow built-in package layouts, sections, and blocks with last-registration priority.",
             "badge_text": "Multi-Theme"
@@ -93,7 +93,7 @@
         "feat_3": {
           "type": "feature-card",
           "settings": {
-            "icon": "📄",
+            "icon": "description",
             "title": "Clean JSON Storage",
             "description": "Pages are stored as clear, deterministic JSON files. Version control your content layouts directly in Git.",
             "badge_text": "Git Friendly"
@@ -104,7 +104,7 @@
         "feat_4": {
           "type": "feature-card",
           "settings": {
-            "icon": "⚡",
+            "icon": "bolt",
             "title": "Sub-Millisecond Speed",
             "description": "Hydrated runtime models render straight to Blade views with sub-millisecond execution and zero runtime database queries.",
             "badge_text": "0.2ms Speed"
@@ -115,7 +115,7 @@
         "feat_5": {
           "type": "feature-card",
           "settings": {
-            "icon": "🛠️",
+            "icon": "tune",
             "title": "13+ Field Schema Types",
             "description": "Rich text (TipTap), color pickers, range sliders, dropdown selects, image pickers, icon pickers, URLs, and local blocks.",
             "badge_text": "Rich Inputs"
@@ -126,7 +126,7 @@
         "feat_6": {
           "type": "feature-card",
           "settings": {
-            "icon": "🔒",
+            "icon": "verified_user",
             "title": "Strictly Typed PHP 8.2+",
             "description": "Built using immutable readonly value objects, 5-layer isolation (Schema -> Registry -> Components -> Renderer -> Services).",
             "badge_text": "PHP 8.2+"
@@ -195,7 +195,7 @@
             "value": "< 0.2ms",
             "label": "Render Overhead",
             "description": "Fast Blade view hydration with zero extra SQL queries.",
-            "icon": "⚡"
+            "icon": "bolt"
           },
           "blocks": {},
           "order": []
@@ -206,7 +206,7 @@
             "value": "13+",
             "label": "Setting Types",
             "description": "Rich text, image pickers, colors, sliders, icons, URLs.",
-            "icon": "🎛️"
+            "icon": "tune"
           },
           "blocks": {},
           "order": []
@@ -217,7 +217,7 @@
             "value": "100%",
             "label": "PSR-12 Typed",
             "description": "Readonly value objects & PHP 8.2 strict typing.",
-            "icon": "🛡️"
+            "icon": "verified"
           },
           "blocks": {},
           "order": []
@@ -228,7 +228,7 @@
             "value": "0",
             "label": "DB Lock-in",
             "description": "Pure JSON document persistence & theme shadowing.",
-            "icon": "📦"
+            "icon": "inventory_2"
           },
           "blocks": {},
           "order": []
@@ -406,13 +406,13 @@
     "cta_banner_1": {
       "type": "cta-banner",
       "settings": {
-        "badge": "⚡ Get Started in Seconds",
+        "badge": "Get Started in Seconds",
         "title": "Ready to Supercharge Your Laravel Pages?",
         "description": "Install the package with Composer and enjoy pure Blade section composition.",
         "command_text": "composer require coderstm/laravel-page-builder",
         "button_label": "Read Documentation",
         "button_url": "https://github.com/coders-tm/laravel-page-builder",
-        "secondary_label": "Star on GitHub ⭐",
+        "secondary_label": "Star on GitHub",
         "secondary_url": "https://github.com/coders-tm/laravel-page-builder"
       },
       "blocks": {},

@@ -23957,7 +23957,7 @@ function BLe() {
     ] }, s.name || `group-${u}`)) })
   ] });
 }
-const gR = h.memo(BLe), FLe = "1.5.0", OLe = "laravel-page-builder", ILe = FLe, HLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", jLe = "Dipak Sarkar", Dx = "dipak@coderstm.com", WLe = "https://github.com/coders-tm/laravel-page-builder", VLe = "Source-Available Non-Commercial";
+const gR = h.memo(BLe), FLe = "1.5.1", OLe = "laravel-page-builder", ILe = FLe, HLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", jLe = "Dipak Sarkar", Dx = "dipak@coderstm.com", WLe = "https://github.com/coders-tm/laravel-page-builder", VLe = "Source-Available Non-Commercial";
 function vR({ isOpen: a, onClose: e }) {
   return /* @__PURE__ */ y.jsx(qf, { open: a, onOpenChange: (l) => !l && e(), children: /* @__PURE__ */ y.jsxs(Hc, { className: "w-[calc(100%-2rem)] max-w-md gap-0 rounded-xl p-0", children: [
     /* @__PURE__ */ y.jsxs(jc, { className: "flex flex-col items-center px-6 pt-6 pb-0 text-center sm:text-center", children: [
@@ -27250,7 +27250,7 @@ function fAe({ isOpen: a, onClose: e, onSelect: l }) {
       onDragOver: T,
       onDragLeave: O,
       onDrop: Q,
-      className: "relative min-h-[300px] max-h-[65vh] space-y-3 overflow-y-auto p-4",
+      className: "relative max-h-[65vh] min-h-[300px] space-y-3 overflow-y-auto p-4",
       children: [
         z && /* @__PURE__ */ y.jsxs("div", { className: "pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 rounded-lg bg-blue-600/90 p-6 text-center text-white backdrop-blur-xs transition-all", children: [
           /* @__PURE__ */ y.jsx("div", { className: "flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/30", children: /* @__PURE__ */ y.jsx(Q0, { className: "h-8 w-8 animate-bounce text-white" }) }),
