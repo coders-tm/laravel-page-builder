@@ -1,3 +1,11 @@
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 var nhe = Object.defineProperty;
 var she = (a, e, l) => e in a ? nhe(a, e, { enumerable: !0, configurable: !0, writable: !0, value: l }) : a[e] = l;
 var Ie = (a, e, l) => she(a, typeof e != "symbol" ? e + "" : e, l);
@@ -26962,7 +26970,7 @@ function Xx({
             {
               className: we(
                 "mt-1 text-[11px] font-medium text-gray-600 transition-colors",
-                i ? "text-blue-600 font-semibold" : "group-hover:text-blue-600"
+                i ? "font-semibold text-blue-600" : "group-hover:text-blue-600"
               ),
               children: "Upload"
             }
@@ -27010,7 +27018,7 @@ function Xx({
             {
               className: we(
                 "flex h-12 w-12 items-center justify-center rounded-full transition-all",
-                i ? "bg-blue-500 text-white scale-110" : "bg-blue-50 text-blue-500 group-hover:scale-110"
+                i ? "scale-110 bg-blue-500 text-white" : "bg-blue-50 text-blue-500 group-hover:scale-110"
               ),
               children: /* @__PURE__ */ y.jsx(Y0, { className: "h-6 w-6" })
             }
