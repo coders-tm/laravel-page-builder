@@ -26,6 +26,7 @@ const sidebar: DefaultTheme.SidebarItem[] = [
       { text: "Field Types", link: "/reference/field-types" },
       { text: "Blade Directives", link: "/reference/blade-directives" },
       { text: "API Reference", link: "/reference/api" },
+      { text: "Editor Events", link: "/reference/events" },
     ],
   },
 ]

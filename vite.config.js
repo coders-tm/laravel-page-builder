@@ -42,6 +42,29 @@ export default defineConfig({
       process.env.NODE_ENV || "development"
     ),
   },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./resources/js/__tests__/setup.ts"],
+    alias: {
+      "@": path.resolve(__dirname, "./resources/js"),
+    },
+    coverage: {
+      provider: "v8",
+      include: ["resources/js/**/*.{ts,tsx}"],
+      exclude: [
+        "resources/js/__tests__/**",
+        "resources/js/main.tsx",
+        "resources/js/components/settings/fields/icon-data/**",
+      ],
+      thresholds: {
+        lines: 80,
+        branches: 80,
+        functions: 80,
+        statements: 80,
+      },
+    },
+  },
   build: {
     outDir: "dist",
     assetsDir: "",

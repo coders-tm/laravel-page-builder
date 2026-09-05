@@ -12,13 +12,16 @@
     "lint": "eslint resources/js/ --fix",
     "format": "prettier --write \"resources/js/**/*.{ts,tsx,css}\"",
     "format:check": "prettier --check \"resources/js/**/*.{ts,tsx,css}\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "prepare": "simple-git-hooks",
     "docs:dev": "npm --prefix docs run dev",
     "docs:build": "npm --prefix docs run build",
     "docs:preview": "npm --prefix docs run preview"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+    "pre-commit": "npx lint-staged && npm test"
   },
   "lint-staged": {
     "*.php": "php bin/add-license-header",
@@ -64,16 +67,21 @@
     "@inquirer/prompts": "^8.7.1",
     "@material-design-icons/svg": "^0.14.15",
     "@tailwindcss/postcss": "^4.2.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "^26.4.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "@viteplus/versions": "^1.0.0",
+    "@vitest/coverage-v8": "^5.0.0",
     "autoprefixer": "^10.4.27",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.6",
+    "jsdom": "^29.1.1",
     "lint-staged": "^16.4.0",
     "postcss": "^8.5.8",
     "prettier": "^3.9.6",
@@ -83,6 +91,7 @@
     "tsx": "^4.19.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.69.0",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "vitest": "^5.0.0"
   }
 }

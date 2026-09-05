@@ -1327,6 +1327,78 @@ All rendering must go through `Renderer`. Never call `view()->make()` or `Blade:
 
 ---
 
+## Editor Events & Customization API
+
+The frontend editor features a decoupled `EventBus` architecture allowing full customizability from client-side JavaScript or host application iframe wrappers.
+
+### Accessing the Event API
+
+```javascript
+const builder = PageBuilder.init({ container: '#editor', ...config });
+const editor = builder.getEditor(); // Returns central Editor instance
+
+// Subscribe to events
+const unsubscribe = editor.on('section:added', ({ sectionId, type }) => { ... });
+
+// Single-invocation event
+editor.once('editor:ready', () => { ... });
+
+// Emit custom events
+editor.emit('my:custom-event', { payload: true });
+```
+
+### Event Catalog
+
+| Event Name                  | Payload                                                                                                                                                 | Description                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `section:added`             | `{ sectionId: string, type: string }`                                                                                                                   | Section added to page                          |
+| `section:removed`           | `{ sectionId: string }`                                                                                                                                 | Section removed from page                      |
+| `section:duplicated`        | `{ sectionId: string, newId: string }`                                                                                                                  | Section cloned                                 |
+| `section:reordered`         | `{ order: string[] }`                                                                                                                                   | Section list reordered                         |
+| `section:settings-changed`  | `{ sectionId: string, values: Record<string, any> }`                                                                                                    | Section settings updated                       |
+| `section:toggled`           | `{ sectionId: string, disabled: boolean }`                                                                                                              | Section visibility toggled                     |
+| `section:renamed`           | `{ sectionId: string, name: string }`                                                                                                                   | Section display name changed                   |
+| `block:added`               | `{ sectionId: string, blockId: string, type: string, parentPath: string[] }`                                                                            | Block added                                    |
+| `block:removed`             | `{ sectionId: string, blockId: string, parentPath: string[] }`                                                                                          | Block removed                                  |
+| `block:duplicated`          | `{ sectionId: string, blockId: string, newId: string, parentPath: string[] }`                                                                           | Block cloned                                   |
+| `block:reordered`           | `{ sectionId: string, order: string[], parentPath: string[] }`                                                                                          | Block list reordered                           |
+| `block:settings-changed`    | `{ sectionId: string, blockId: string, values: Record<string, any>, parentPath: string[] }`                                                             | Block settings updated                         |
+| `block:toggled`             | `{ sectionId: string, blockId: string, disabled: boolean, parentPath: string[] }`                                                                       | Block visibility toggled                       |
+| `block:moved`               | `{ fromSectionId: string, toSectionId: string, blockId: string, fromPath: string[], toPath: string[] }`                                                 | Block moved                                    |
+| `selection:section-changed` | `{ sectionId: string \| null }`                                                                                                                         | Section selection changed                      |
+| `selection:block-changed`   | `{ sectionId: string \| null, blockPath: string[] }`                                                                                                    | Block selection changed                        |
+| `selection:cleared`         | `{}`                                                                                                                                                    | Selection cleared                              |
+| `page:loaded`               | `{ slug: string }`                                                                                                                                      | Page JSON loaded                               |
+| `page:saved`                | `{ slug: string }`                                                                                                                                      | Page JSON saved                                |
+| `page:changed`              | `{ slug: string }`                                                                                                                                      | Page slug changed                              |
+| `navigation:changed`        | `{ slug?: string, device: string, selectedSection: string \| null, selectedBlock: string \| null, parentBlockId: string \| null, blockPath: string[] }` | Route/navigation state updated                 |
+| `layout:device-changed`     | `{ device: string }`                                                                                                                                    | Viewport changed (`desktop`/`tablet`/`mobile`) |
+| `editor:ready`              | `{}`                                                                                                                                                    | Editor initialized                             |
+| `editor:destroyed`          | `{}`                                                                                                                                                    | Editor destroyed                               |
+
+### High-level PageBuilder Listeners & Direct Route Integration
+
+```javascript
+// High-level wrapper callbacks
+builder.onPageChange(({ slug }) => {
+    document.title = `Editing: ${slug}`;
+});
+
+// Direct route exit handling (redirecting & preserving query params)
+builder.onExit(() => {
+    const url = new URL(window.location.href);
+    const preserved = config.preservedParams || [];
+    const newParams = new URLSearchParams();
+    url.searchParams.forEach((v, k) => preserved.includes(k) && newParams.set(k, v));
+    url.search = newParams.toString();
+    window.location.href = url.toString();
+});
+
+builder.onChange((data) => { ... });
+```
+
+---
+
 ## Key API Endpoints
 
 | Purpose                  | Method | Endpoint                      |

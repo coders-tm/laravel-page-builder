@@ -29,6 +29,7 @@ workbench:
     - create-sqlite-db
     - db-wipe
     - migrate-fresh
+    - storage:link
   assets:
     - laravel-assets
   sync:

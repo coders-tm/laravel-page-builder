@@ -20,17 +20,7 @@
     <script type="module">
         const config = @json($config);
 
-        const editor = PageBuilder.init({
-            container: '#editor',
-            ...config,
-        });
-
-        // Listen for editor exit event, when using the editor in an iframe
-        editor.onExit(() => {
-            window.parent.postMessage({
-                type: 'pagebuilder:exit'
-            }, '*');
-
+        function onExitEditor(event) {
             // remove all query params except preserved_params
             const url = new URL(window.location.href);
             const preserved = config.preservedParams || [];
@@ -44,17 +34,15 @@
 
             url.search = newParams.toString();
             window.location.href = url.toString();
+        }
+
+        const editor = PageBuilder.init({
+            container: '#editor',
+            ...config,
         });
 
-        // Listen for page change event, when using the editor in an iframe
-        editor.onPageChange(({
-            slug
-        }) => {
-            window.parent.postMessage({
-                type: 'pagebuilder:page-change',
-                slug
-            }, '*');
-        });
+        // Listen for editor exit event
+        editor.onExit(onExitEditor);
     </script>
 </body>
 
