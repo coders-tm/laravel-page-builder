@@ -1,6 +1,6 @@
 @schema([
     'name' => 'Hero',
-    'settings' => [['id' => 'badge_text', 'type' => 'text', 'label' => 'Header Badge', 'default' => 'Welcome Home — Next-Gen Package'], ['id' => 'hero_image', 'type' => 'image_picker', 'label' => 'Hero Image', 'default' => '/statics/hero.png'], ['id' => 'title', 'type' => 'textarea', 'label' => 'Title', 'default' => 'Build High-Performance Page Builders in Minutes with'], ['id' => 'title_highlight', 'type' => 'text', 'label' => 'Title Highlight', 'default' => 'Laravel & Blade'], ['id' => 'subtitle', 'type' => 'textarea', 'label' => 'Subtitle', 'default' => 'Hello World']],
+    'settings' => [['id' => 'badge_text', 'type' => 'text', 'label' => 'Header Badge', 'default' => 'Welcome Home — Next-Gen Package'], ['id' => 'hero_image', 'type' => 'image_picker', 'label' => 'Hero Image', 'default' => '/statics/hero.png'], ['id' => 'title', 'type' => 'textarea', 'label' => 'Title', 'default' => 'Build High-Performance Page Builders in Minutes with <span class="block bg-gradient-to-r from-red-500 via-indigo-400 to-sky-400 bg-clip-text text-transparent mt-1 sm:mt-2">Laravel & Blade</span>'], ['id' => 'subtitle', 'type' => 'textarea', 'label' => 'Subtitle', 'default' => 'Hello World']],
     'blocks' => [
         [
             'type' => 'hero-badge-pill',
@@ -19,8 +19,7 @@
             'settings' => [
                 'badge_text' => '⚡ Next-Gen Laravel Package',
                 'hero_image' => '/statics/hero.png',
-                'title' => 'Build High-Performance Page Builders in Minutes with',
-                'title_highlight' => 'Laravel & Blade',
+                'title' => 'Build High-Performance Page Builders in Minutes with <span class="block bg-gradient-to-r from-red-500 via-indigo-400 to-sky-400 bg-clip-text text-transparent mt-1 sm:mt-2">Laravel & Blade</span>',
                 'subtitle' => 'A multi-theme, JSON-driven page builder. Define block schemas directly in your Blade views with zero extra database queries or Javascript bloat.',
             ],
             'blocks' => [['type' => 'hero-badge-pill', 'settings' => ['text' => 'Blade Native', 'icon' => '🔥']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'JSON Driven', 'icon' => '📦']], ['type' => 'hero-badge-pill', 'settings' => ['text' => 'Zero Dependencies', 'icon' => '⚡']], ['type' => 'hero-action', 'settings' => ['label' => 'Explore Documentation', 'url' => '#features', 'style' => 'primary']], ['type' => 'hero-action', 'settings' => ['label' => 'View Github', 'url' => 'https://github.com/coders-tm/laravel-page-builder', 'style' => 'secondary']]],
@@ -64,11 +63,7 @@
                 {{-- Headline --}}
                 <h1
                     class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-slate-100 leading-tight sm:leading-tight lg:leading-tight">
-                    {{ $section->settings->title }}
-                    <span
-                        class="block bg-gradient-to-r from-red-500 via-indigo-400 to-sky-400 bg-clip-text text-transparent mt-1 sm:mt-2">
-                        {{ $section->settings->title_highlight }}
-                    </span>
+                    {!! $section->settings->title !!}
                 </h1>
 
                 {{-- Subtitle --}}

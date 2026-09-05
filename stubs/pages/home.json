@@ -5,8 +5,7 @@
       "settings": {
         "badge_text": "⚡ Next-Gen Laravel Package",
         "hero_image": "/statics/hero.png",
-        "title": "Build High-Performance Page Builders in Minutes with",
-        "title_highlight": "Laravel & Blade",
+        "title": "Build High-Performance Page Builders in Minutes with<br/><span class=\"block bg-gradient-to-r from-red-500 via-indigo-400 to-sky-400 bg-clip-text text-transparent mt-1 sm:mt-2\">Laravel & Blade</span>",
         "subtitle": "A multi-theme, JSON-driven page composition system for Laravel. Define block schemas directly inside your Blade views with zero boilerplate, zero database lock-in, and sub-millisecond render speeds."
       },
       "blocks": {

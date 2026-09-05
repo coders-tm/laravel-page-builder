@@ -8,8 +8,9 @@
  */
 import React from "react"
 import type { Asset } from "@/types/asset"
-import { Loader2, Image as ImageIcon, Check } from "lucide-react"
+import { Loader2, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
+import UploadZone from "@/components/assets/UploadZone"
 
 /**
  * Grid of asset thumbnails.
@@ -18,17 +19,23 @@ import { cn } from "@/lib/utils"
  * @param selectedId - Currently selected asset ID
  * @param onSelect - Called with asset when clicked
  * @param loading - Whether assets are loading
+ * @param uploading - Whether an asset is uploading
+ * @param onUpload - Callback when uploading files
  */
 export default function AssetGrid({
   assets = [],
   selectedId = null,
   onSelect,
   loading = false,
+  uploading = false,
+  onUpload,
 }: {
   assets?: Asset[]
   selectedId?: string | null
   onSelect: (asset: Asset) => void
   loading?: boolean
+  uploading?: boolean
+  onUpload?: (file: File) => void
 }) {
   if (loading) {
     return (
@@ -42,9 +49,10 @@ export default function AssetGrid({
   }
 
   if (assets.length === 0) {
-    return (
+    return onUpload ? (
+      <UploadZone onUpload={onUpload} uploading={uploading} variant="full" />
+    ) : (
       <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-        <ImageIcon className="mb-2 h-8 w-8" strokeWidth={1.5} />
         <span className="text-xs">No assets found</span>
       </div>
     )
@@ -52,6 +60,8 @@ export default function AssetGrid({
 
   return (
     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+      {onUpload && <UploadZone onUpload={onUpload} uploading={uploading} variant="card" />}
+
       {assets.map((asset) => {
         const isSelected = asset.id === selectedId
         return (
