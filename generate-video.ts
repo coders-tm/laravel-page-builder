@@ -17,7 +17,7 @@ function waitForEnter(promptText: string): Promise<void> {
   })
 }
 
-const BASE_URL = "http://127.0.0.1:8000"
+const BASE_URL = "https://pagebuilder.test"
 const TYPING_DELAY = 15
 const PAUSE_AFTER_FIELD = 200
 const PAUSE_AFTER_SECTION = 300

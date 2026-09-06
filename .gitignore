@@ -13,6 +13,7 @@ composer.lock
 Thumbs.db
 hot
 workbench/storage
+/videos
 
 # Code coverage
 /coverage

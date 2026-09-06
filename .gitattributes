@@ -28,7 +28,15 @@ testbench.yaml export-ignore
 UPGRADE.md export-ignore
 AGENTS.md export-ignore
 components.json export-ignore
-vite.config.js export-ignore
+build.ts export-ignore
+eslint.config.js export-ignore
+generate-video.ts export-ignore
+playwright.config.ts export-ignore
 postcss.config.js export-ignore
 tailwind.config.js export-ignore
 tsconfig.json export-ignore
+vite.config.ts export-ignore
+/*.js export-ignore
+/*.ts export-ignore
+/*.mjs export-ignore
+
