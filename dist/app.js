@@ -1,3 +1,11 @@
+/*
+ * This file is part of the Laravel Page Builder package.
+ *
+ * (c) Dipak Sarkar <dipak@coderstm.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 var nhe = Object.defineProperty;
 var she = (a, e, l) => e in a ? nhe(a, e, { enumerable: !0, configurable: !0, writable: !0, value: l }) : a[e] = l;
 var Ie = (a, e, l) => she(a, typeof e != "symbol" ? e + "" : e, l);
@@ -19992,6 +20000,18 @@ const RT = (a) => {
 
     document.addEventListener('click', function(e) {
         if (!inspectorEnabled) return;
+        var ghostEl = e.target.closest('[data-pb-ghost]');
+        if (ghostEl) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.parent.postMessage({
+                type: 'add-section',
+                position: 'after',
+                targetId: 'ghost-section'
+            }, '*');
+            return;
+        }
+
         var blockEl = e.target.closest('[data-editor-block]');
         var sectionEl = e.target.closest('[data-editor-section]');
         var liveTextEl = e.target.closest('[data-live-text-setting]');
@@ -20190,6 +20210,45 @@ const RT = (a) => {
             return;
         }
 
+        function createGhostElement() {
+            var ghost = document.createElement('div');
+            ghost.setAttribute('data-pb-ghost', 'true');
+            ghost.setAttribute('data-section-id', 'ghost-section');
+            ghost.setAttribute('data-editor-section', JSON.stringify({
+                id: 'ghost-section',
+                type: 'ghost-section',
+                name: 'Add Section'
+            }));
+            ghost.className = 'pb-ghost-placeholder my-12 mx-auto max-w-4xl p-12 border-2 border-dashed border-gray-300 dark:border-slate-700 rounded-2xl bg-gray-50/50 dark:bg-slate-900/40 text-center flex flex-col items-center justify-center gap-3 cursor-pointer';
+            ghost.innerHTML =
+                '<div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400">' +
+                '<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>' +
+                '</div>' +
+                '<div class="text-gray-900 dark:text-white font-semibold text-base">Empty Page</div>' +
+                '<div class="text-gray-500 dark:text-slate-400 text-sm">Click here to add your first section</div>';
+            return ghost;
+        }
+
+        function ensureGhostElement(containerHint, nextSibHint) {
+            if (document.querySelector('[data-pb-ghost]')) return;
+            var ghost = createGhostElement();
+            var footer = document.querySelector('[data-section-id="footer"], footer');
+
+            if (containerHint && nextSibHint && containerHint.contains(nextSibHint)) {
+                containerHint.insertBefore(ghost, nextSibHint);
+            } else if (containerHint) {
+                if (footer && footer.parentElement === containerHint) {
+                    containerHint.insertBefore(ghost, footer);
+                } else {
+                    containerHint.appendChild(ghost);
+                }
+            } else if (footer && footer.parentElement) {
+                footer.parentElement.insertBefore(ghost, footer);
+            } else {
+                (document.querySelector('main') || document.body).appendChild(ghost);
+            }
+        }
+
         /**
          * Returns the DOM container that holds page sections.
          *
@@ -20207,6 +20266,10 @@ const RT = (a) => {
                     }
                 }
             }
+            var ghost = document.querySelector('[data-pb-ghost]');
+            if (ghost && ghost.parentElement) {
+                return ghost.parentElement;
+            }
             return document.querySelector('main') || document.body;
         }
 
@@ -20220,28 +20283,20 @@ const RT = (a) => {
             if (newEl) {
                 applyDisabledStyles(newEl);
 
+                var ghost = document.querySelector('[data-pb-ghost]');
+
                 if (existing) {
                     // In-place update — preserve DOM position exactly.
                     existing.replaceWith(newEl);
                 } else {
-                    // New section: insert at the correct position using the
-                    // page order hint provided alongside the HTML.
-                    // msg.pageOrder is the full ordered array of page section IDs
-                    // (same value that reorder-sections will receive immediately
-                    // after this message). We find our position in that list and
-                    // look for the nearest existing successor to insert before,
-                    // falling back to appending at the end of the container.
                     var container = getContainer(msg.pageOrder);
                     var inserted = false;
 
                     if (msg.pageOrder && msg.pageOrder.length > 0) {
                         var myIdx = msg.pageOrder.indexOf(msg.sectionId);
                         if (myIdx !== -1) {
-                            // Walk forward through the ordered list to find a
-                            // successor that is already in the container DOM.
                             for (var oi = myIdx + 1; oi < msg.pageOrder.length; oi++) {
                                 var successorEl = getSectionEl(msg.pageOrder[oi]);
-                                // Make sure the successor is in the same container.
                                 if (successorEl && successorEl.parentElement === container) {
                                     container.insertBefore(newEl, successorEl);
                                     inserted = true;
@@ -20252,8 +20307,17 @@ const RT = (a) => {
                     }
 
                     if (!inserted) {
-                        container.appendChild(newEl);
+                        if (ghost && ghost.parentElement) {
+                            ghost.parentElement.insertBefore(newEl, ghost);
+                            inserted = true;
+                        } else {
+                            container.appendChild(newEl);
+                        }
                     }
+                }
+
+                if (ghost) {
+                    ghost.remove();
                 }
 
                 if (currentSelectedSectionId === msg.sectionId) {
@@ -20381,9 +20445,33 @@ const RT = (a) => {
 
         if (msg.type === 'remove-section') {
             var el = getSectionEl(msg.sectionId);
-            // Only remove it if it exists (layout sections simply won't be
-            // in msg.sectionId since the store guards against that).
-            if (el) el.remove();
+            if (el) {
+                var parent = el.parentElement;
+                var nextSib = el.nextElementSibling;
+                el.remove();
+
+                var remainingPageSections = document.querySelectorAll('[data-section-id]');
+                var pageCount = 0;
+                remainingPageSections.forEach(function(sec) {
+                    if (!sec.hasAttribute('data-pb-ghost')) {
+                        var secId = sec.getAttribute('data-section-id');
+                        if (secId !== 'header' && secId !== 'footer') {
+                            try {
+                                var meta = JSON.parse(sec.getAttribute('data-editor-section') || '{}');
+                                if (!meta.layout && meta.type !== 'header' && meta.type !== 'footer' && meta.type !== 'ghost-section') {
+                                    pageCount++;
+                                }
+                            } catch(e) {
+                                pageCount++;
+                            }
+                        }
+                    }
+                });
+
+                if (pageCount === 0) {
+                    ensureGhostElement(parent, nextSib);
+                }
+            }
         }
 
         if (msg.type === 'remove-block') {
@@ -20401,15 +20489,10 @@ const RT = (a) => {
         }
 
         if (msg.type === 'replace-all-sections') {
-            // keepIds contains only page-section IDs.
-            // Remove stale page sections that are no longer in the snapshot,
-            // but NEVER remove layout sections (header, footer, etc.) which
-            // are rendered by the Blade layout template.
             var keepIds = msg.order || [];
             var keepSet = {};
             keepIds.forEach(function(id) { keepSet[id] = true; });
 
-            // Also build a set of layout section IDs so we can protect them.
             var layoutIds = msg.layoutIds || [];
             var layoutSet = {};
             layoutIds.forEach(function(id) { layoutSet[id] = true; });
@@ -20418,10 +20501,14 @@ const RT = (a) => {
             var allSections = container.querySelectorAll('[data-section-id]');
             allSections.forEach(function(el) {
                 var id = el.getAttribute('data-section-id');
-                if (!keepSet[id] && !layoutSet[id]) {
+                if (!keepSet[id] && !layoutSet[id] && !el.hasAttribute('data-pb-ghost')) {
                     el.remove();
                 }
             });
+
+            if (keepIds.length === 0) {
+                ensureGhostElement(container, null);
+            }
         }
 
         if (msg.type === 'reload-preview') {
@@ -23954,7 +24041,7 @@ function BLe() {
     ] }, s.name || `group-${u}`)) })
   ] });
 }
-const gR = h.memo(BLe), FLe = "1.5.1", OLe = "laravel-page-builder", ILe = FLe, HLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", jLe = "Dipak Sarkar", Dx = "dipak@coderstm.com", WLe = "https://github.com/coders-tm/laravel-page-builder", VLe = "Source-Available Non-Commercial";
+const gR = h.memo(BLe), FLe = "1.5.2", OLe = "laravel-page-builder", ILe = FLe, HLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", jLe = "Dipak Sarkar", Dx = "dipak@coderstm.com", WLe = "https://github.com/coders-tm/laravel-page-builder", VLe = "Source-Available Non-Commercial";
 function vR({ isOpen: a, onClose: e }) {
   return /* @__PURE__ */ y.jsx(qf, { open: a, onOpenChange: (l) => !l && e(), children: /* @__PURE__ */ y.jsxs(Hc, { className: "w-[calc(100%-2rem)] max-w-md gap-0 rounded-xl p-0", children: [
     /* @__PURE__ */ y.jsxs(jc, { className: "flex flex-col items-center px-6 pt-6 pb-0 text-center sm:text-center", children: [
@@ -27347,7 +27434,7 @@ function pAe({ value: a, onChange: e, label: l, info: t }) {
             {
               type: "button",
               onClick: () => o(!0),
-              className: "rounded-md bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 cursor-pointer",
+              className: "cursor-pointer rounded-md bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50",
               children: "Change"
             }
           ),
@@ -27356,7 +27443,7 @@ function pAe({ value: a, onChange: e, label: l, info: t }) {
             {
               type: "button",
               onClick: s,
-              className: "rounded-md bg-white p-1.5 text-gray-500 shadow-sm transition-colors hover:bg-red-50 hover:text-red-500 cursor-pointer",
+              className: "cursor-pointer rounded-md bg-white p-1.5 text-gray-500 shadow-sm transition-colors hover:bg-red-50 hover:text-red-500",
               title: "Remove image",
               children: /* @__PURE__ */ y.jsx(Vr, { className: "h-3.5 w-3.5" })
             }

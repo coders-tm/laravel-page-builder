@@ -149,13 +149,39 @@ test('render page skips missing section ids', function () {
 
     $this->assertStringContainsString('Only One', $html);
 });
-test('render empty page', function () {
+test('render empty page in production mode returns empty string', function () {
+    PageBuilder::disableEditor();
+
+    $html = $this->pageRenderer->renderPage([
+        'sections' => [],
+        'order' => [],
+    ], editor: false);
+
+    expect($html)->toBeEmpty();
+    $this->assertStringNotContainsString('data-pb-ghost', $html);
+});
+
+test('render empty page in editor mode renders ghost element placeholder', function () {
+    $html = $this->pageRenderer->renderPage([
+        'sections' => [],
+        'order' => [],
+    ], editor: true);
+
+    $this->assertStringContainsString('data-pb-ghost="true"', $html);
+    $this->assertStringContainsString('ghost-section', $html);
+    $this->assertStringContainsString('Empty Page', $html);
+});
+
+test('render empty page when PageBuilder editor is enabled renders ghost element placeholder', function () {
+    PageBuilder::enableEditor();
+
     $html = $this->pageRenderer->renderPage([
         'sections' => [],
         'order' => [],
     ]);
 
-    expect($html)->toBeEmpty();
+    $this->assertStringContainsString('data-pb-ghost="true"', $html);
+    $this->assertStringContainsString('ghost-section', $html);
 });
 
 test('render page renders disabled sections in editor mode', function () {

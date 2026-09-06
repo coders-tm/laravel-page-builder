@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace PageBuilder\Services;
 
 use PageBuilder\Contracts\RendererInterface;
+use PageBuilder\PageBuilder;
+use PageBuilder\Rendering\EditorAttributes;
 use PageBuilder\Support\PageData;
 use PageBuilder\Support\WrapperParser;
 
@@ -58,6 +60,10 @@ class PageRenderer
 
         if ($wrapper = $pageData->wrapper()) {
             $html = $this->wrapperParser->render($wrapper, $html);
+        }
+
+        if ($html === '' && ($editor || PageBuilder::editor())) {
+            $html = EditorAttributes::ghostElement();
         }
 
         return $html;

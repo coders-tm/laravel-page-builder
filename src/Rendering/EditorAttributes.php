@@ -27,6 +27,29 @@ use PageBuilder\PageBuilder;
 class EditorAttributes
 {
     /**
+     * Get HTML for the ghost section placeholder when a page has no sections in editor mode.
+     */
+    public static function ghostElement(): string
+    {
+        $meta = json_encode([
+            'id' => 'ghost-section',
+            'type' => 'ghost-section',
+            'name' => 'Add Section',
+        ], JSON_HEX_APOS | JSON_HEX_QUOT);
+
+        return sprintf(
+            '<div data-pb-ghost="true" data-editor-section=\'%s\' data-section-id="ghost-section" class="pb-ghost-placeholder my-12 mx-auto max-w-4xl p-12 border-2 border-dashed border-gray-300 dark:border-slate-700 rounded-2xl bg-gray-50/50 dark:bg-slate-900/40 text-center flex flex-col items-center justify-center gap-3 cursor-pointer">
+                <div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </div>
+                <div class="text-gray-900 dark:text-white font-semibold text-base">Empty Page</div>
+                <div class="text-gray-500 dark:text-slate-400 text-sm">Click here to add your first section</div>
+            </div>',
+            $meta
+        );
+    }
+
+    /**
      * Get editor attributes for a section.
      */
     public static function forSection(Section $section): string

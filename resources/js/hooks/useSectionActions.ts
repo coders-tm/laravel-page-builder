@@ -228,7 +228,7 @@ export function useSectionActions({
   const openAddMenu = useCallback(
     (position: string | null = null, targetId: string | null = null) => {
       let insertIndex: number | null = null
-      if (targetId && currentPage?.order) {
+      if (targetId && targetId !== "ghost-section" && currentPage?.order) {
         const idx = currentPage.order.indexOf(targetId)
         if (idx !== -1) {
           insertIndex = position === "after" ? idx + 1 : idx
