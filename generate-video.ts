@@ -1,6 +1,21 @@
-import { chromium, type Browser, type Page, type Frame, type Locator } from "playwright"
+import { chromium, type BrowserContext, type Page, type Frame, type Locator } from "playwright"
 import { resolve } from "path"
+import { homedir } from "os"
 import { mkdir } from "fs/promises"
+import { createInterface } from "readline"
+
+function waitForEnter(promptText: string): Promise<void> {
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+  return new Promise((res) => {
+    rl.question(promptText, () => {
+      rl.close()
+      res()
+    })
+  })
+}
 
 const BASE_URL = "https://pagebuilder.test"
 const TYPING_DELAY = 15
@@ -148,6 +163,8 @@ async function injectCursorOverlay(page: Page): Promise<void> {
 
     const cursor = document.createElement("div")
     cursor.id = "playwright-mouse-pointer"
+    const centerX = window.innerWidth ? Math.round(window.innerWidth / 2) : 960
+    const centerY = window.innerHeight ? Math.round(window.innerHeight / 2) : 540
     cursor.style.cssText = `
       position: fixed;
       top: 0;
@@ -156,7 +173,7 @@ async function injectCursorOverlay(page: Page): Promise<void> {
       height: 40px;
       z-index: 99999999;
       pointer-events: none;
-      transform: translate3d(100px, 100px, 0);
+      transform: translate3d(${centerX}px, ${centerY}px, 0);
       transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1);
     `
 
@@ -564,15 +581,13 @@ async function debugPage(page: Page): Promise<void> {
 
 async function main(): Promise<void> {
   const outputDir = resolve(process.cwd(), "videos")
+  const userDataDir = resolve(homedir(), ".video-profile")
   await mkdir(outputDir, { recursive: true })
 
-  console.log("Launching Chromium (visible)...")
-  const browser: Browser = await chromium.launch({
+  console.log("Launching Chromium with persistent context (~/.video-profile)...")
+  const context: BrowserContext = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
     args: ["--no-sandbox", "--start-maximized"],
-  })
-
-  const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
     recordVideo: {
       dir: outputDir,
@@ -580,13 +595,85 @@ async function main(): Promise<void> {
     },
   })
 
-  const page = await context.newPage()
+  await context.addInitScript(() => {
+    const initCursor = () => {
+      if (document.getElementById("playwright-mouse-pointer")) return
+      const cursor = document.createElement("div")
+      cursor.id = "playwright-mouse-pointer"
+      const centerX = window.innerWidth ? Math.round(window.innerWidth / 2) : 960
+      const centerY = window.innerHeight ? Math.round(window.innerHeight / 2) : 540
+      cursor.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 40px;
+        height: 40px;
+        z-index: 99999999;
+        pointer-events: none;
+        transform: translate3d(${centerX}px, ${centerY}px, 0);
+        transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1);
+      `
+      cursor.innerHTML = `
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));">
+          <path d="M5.5 3.5L18.5 11.5L12 13.5L9 19.5L5.5 3.5Z" fill="#1b1e24ff" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <div id="playwright-mouse-ripple" style="
+          position: absolute;
+          top: -6px;
+          left: -6px;
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          border: 2.5px solid #3579d9ff;
+          background: rgba(59, 130, 246, 0.3);
+          transform: scale(0);
+          opacity: 0;
+          pointer-events: none;
+          transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+        "></div>
+      `
+      if (document.body) {
+        document.body.appendChild(cursor)
+      } else {
+        document.addEventListener("DOMContentLoaded", () => {
+          if (!document.getElementById("playwright-mouse-pointer")) {
+            document.body.appendChild(cursor)
+          }
+        })
+      }
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initCursor)
+    } else {
+      initCursor()
+    }
+  })
+
+  const page = context.pages().length > 0 ? context.pages()[0] : await context.newPage()
+  await page.mouse.move(960, 540)
 
   page.on("console", (msg) => {
     if (msg.type() === "error") {
       console.log("Browser error:", msg.text())
     }
   })
+
+  if (process.argv.includes("--login")) {
+    console.log("\n🔑 LOGIN MODE ACTIVE")
+    console.log("Navigating to https://github.com/login ...")
+    await page.goto("https://github.com/login", { waitUntil: "domcontentloaded" })
+    await page.mouse.move(960, 540)
+    await injectCursorOverlay(page)
+    console.log("\n👉 Please log in to GitHub in the open browser window.")
+    console.log(
+      "Once logged in, press ENTER in this terminal to save your session to ~/.video-profile and exit.\n",
+    )
+
+    await waitForEnter("Press ENTER after completing login: ")
+    console.log("✅ GitHub session saved to ~/.video-profile")
+    await context.close()
+    return
+  }
 
   // Load the editor
   console.log(`Navigating to ${BASE_URL}/?editor=true...`)
@@ -721,7 +808,6 @@ async function main(): Promise<void> {
 
   const videoPath = await page.video()?.path()
   await context.close()
-  await browser.close()
 
   console.log("\nDone!")
   if (videoPath) {
