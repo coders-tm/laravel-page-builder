@@ -24,8 +24,7 @@ class InstallPageBuilder extends Command
      * @var string
      */
     protected $signature = 'pagebuilder:install
-                            {--force : Overwrite existing files}
-                            {--migrate : Run database migrations after publishing}';
+                            {--force : Overwrite existing files}';
 
     /**
      * The console command description.
@@ -46,16 +45,27 @@ class InstallPageBuilder extends Command
         $this->publishConfig($force);
         $this->publishAssets($force);
         $this->scaffoldThemeViews($force);
-
-        if ($this->option('migrate')) {
-            $this->components->info('Running migrations...');
-            $this->call('migrate');
-        }
+        $this->runMigrations();
 
         $this->newLine();
         $this->components->info('Page Builder installed successfully.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Run the package migrations.
+     */
+    private function runMigrations(): void
+    {
+        $migrationPath = realpath(__DIR__.'/../../database/migrations') ?: __DIR__.'/../../database/migrations';
+
+        $this->components->task('Running migrations', function () use ($migrationPath) {
+            $this->callSilently('migrate', [
+                '--path' => $migrationPath,
+                '--realpath' => true,
+            ]);
+        });
     }
 
     /**

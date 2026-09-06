@@ -181,5 +181,3 @@ test('injectDataImageSetting handles malformed strings safely without throwing e
 
     expect($result)->toBeString();
 });
-
-

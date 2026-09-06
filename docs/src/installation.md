@@ -28,22 +28,23 @@ php artisan pagebuilder:install
 This single command:
 
 1. Publishes `config/pagebuilder.php`
-2. Scaffolds default starter views into your app:
+2. Publishes frontend assets and static files
+3. Scaffolds default starter views into your app:
    - `resources/views/layouts/page.blade.php` — base HTML layout
    - `resources/views/sections/` — announcement, header, hero, rich-text, content, page-content, footer
    - `resources/views/blocks/` — row, column, text
    - `resources/views/templates/` — page.json
+4. Automatically runs the Page Builder database migrations
 
 ### Options
 
-| Flag        | Description                                            |
-| ----------- | ------------------------------------------------------ |
-| `--force`   | Overwrite files that already exist                     |
-| `--migrate` | Run `php artisan migrate` immediately after publishing |
+| Flag      | Description                        |
+| --------- | ---------------------------------- |
+| `--force` | Overwrite files that already exist |
 
 ```bash
-# Overwrite existing files and run migrations in one step
-php artisan pagebuilder:install --force --migrate
+# Overwrite existing files during installation
+php artisan pagebuilder:install --force
 ```
 
 ## Publish the Config
@@ -55,14 +56,6 @@ php artisan vendor:publish --tag=pagebuilder-config
 ```
 
 This creates `config/pagebuilder.php` in your application. See [Configuration](/configuration) for all available options.
-
-## Run Migrations
-
-If you didn't use `--migrate`, run migrations manually:
-
-```bash
-php artisan migrate
-```
 
 ## Verify Installation
 
