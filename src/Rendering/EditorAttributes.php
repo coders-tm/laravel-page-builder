@@ -96,6 +96,78 @@ class EditorAttributes
         return static::injectBlocksLiveText($html, $section->blocks);
     }
 
+    /**
+     * Auto-inject data-image-setting attributes into rendered HTML for
+     * section and block settings that contain image URLs or paths.
+     */
+    public static function autoInjectImageSettings(string $html, Section $section): string
+    {
+        // Section-level settings
+        foreach ($section->settings->all() as $key => $value) {
+            if (is_string($value)) {
+                $html = static::injectDataImageSetting($html, $value, "{$section->id}.{$key}");
+            }
+        }
+
+        // Block-level settings
+        return static::injectBlocksImageSettings($html, $section->blocks);
+    }
+
+    /** Recursively inject image settings for blocks and their children. */
+    protected static function injectBlocksImageSettings(string $html, mixed $blocks): string
+    {
+        foreach ($blocks as $blockId => $block) {
+            foreach ($block->settings->all() as $key => $value) {
+                if (is_string($value)) {
+                    $html = static::injectDataImageSetting($html, $value, "{$blockId}.{$key}");
+                }
+            }
+
+            if ($block->blocks && count($block->blocks) > 0) {
+                $html = static::injectBlocksImageSettings($html, $block->blocks);
+            }
+        }
+
+        return $html;
+    }
+
+    /** Inject a data-image-setting attribute for a specific image setting value into matching <img> tags. */
+    public static function injectDataImageSetting(string $html, string $imageVal, string $path): string
+    {
+        $imageVal = trim($imageVal);
+        if (strlen($imageVal) < 2) {
+            return $html;
+        }
+
+        $parsedPath = parse_url($imageVal, PHP_URL_PATH);
+        $urlPath = is_string($parsedPath) ? $parsedPath : $imageVal;
+        $basename = basename($urlPath);
+        $extension = strtolower(pathinfo($urlPath, PATHINFO_EXTENSION));
+
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'avif'];
+        $isImageExt = in_array($extension, $imageExtensions, true);
+        $isImagePath = str_contains($imageVal, '/') || str_contains($imageVal, 'statics') || str_contains($imageVal, 'assets') || str_contains($imageVal, 'storage') || str_contains($imageVal, 'public');
+
+        if (! $isImageExt && ! $isImagePath) {
+            return $html;
+        }
+
+        $searchTerm = (! empty($basename) && strlen($basename) > 2) ? $basename : $imageVal;
+        $escapedSearch = preg_quote($searchTerm, '/');
+
+        $pattern = '/<img\b(?![^>]*\bdata-image-setting=)([^>]*\bsrc=["\'][^"\']*'.$escapedSearch.'[^"\']*["\'][^>]*)>/iu';
+
+        $replaced = preg_replace_callback($pattern, function ($matches) use ($path) {
+            return '<img data-image-setting="'.htmlspecialchars($path, ENT_QUOTES).'"'.$matches[1].'>';
+        }, $html, 1, $count);
+
+        if ($count > 0 && $replaced !== null) {
+            return $replaced;
+        }
+
+        return $html;
+    }
+
     /** Recursively inject live text settings for blocks and their children. */
     protected static function injectBlocksLiveText(string $html, mixed $blocks): string
     {

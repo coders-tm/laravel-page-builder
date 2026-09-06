@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 use PageBuilder\Collections\BlockCollection;
 use PageBuilder\Components\Block;
+use PageBuilder\Components\Section;
 use PageBuilder\Components\Settings;
 use PageBuilder\PageBuilder;
 use PageBuilder\Rendering\EditorAttributes;
@@ -156,3 +157,29 @@ test('auto inject live text when editor on', function () {
     expect($result)->toBeString();
     $this->assertStringContainsString('data-live-text-setting=', $result);
 });
+
+test('auto inject image settings injects data-image-setting into matching img tag', function () {
+    PageBuilder::enableEditor();
+
+    $section = new Section([
+        'id' => 'hero-1',
+        'type' => 'hero',
+        'settings' => new Settings(['hero_image' => '/statics/hero.png'], []),
+        'blocks' => new BlockCollection,
+    ]);
+    $html = '<div><img src="/statics/hero.png" alt="Hero" /></div>';
+
+    $result = EditorAttributes::autoInjectImageSettings($html, $section);
+
+    expect($result)->toContain('data-image-setting="hero-1.hero_image"');
+    expect($result)->toContain('src="/statics/hero.png"');
+});
+
+test('injectDataImageSetting handles malformed strings safely without throwing exception', function () {
+    $html = '<div><img src="http://:80" /></div>';
+    $result = EditorAttributes::injectDataImageSetting($html, 'http://:80', 'hero-1.test');
+
+    expect($result)->toBeString();
+});
+
+

@@ -17,7 +17,11 @@ interface ImageFieldProps {
 }
 
 function ImageField({ setting, value, onChange }: ImageFieldProps) {
-  return <ImagePicker value={value} onChange={onChange} label={setting.label} info={setting.info} />
+  return (
+    <div data-setting-id={setting.id}>
+      <ImagePicker value={value} onChange={onChange} label={setting.label} info={setting.info} />
+    </div>
+  )
 }
 
 export default memo(ImageField)

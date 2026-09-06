@@ -60,14 +60,16 @@ export default function ImagePicker({ value, onChange, label, info }) {
           />
           <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 opacity-0 transition-colors group-hover:bg-black/30 group-hover:opacity-100">
             <button
+              type="button"
               onClick={() => setModalOpen(true)}
-              className="rounded-md bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+              className="cursor-pointer rounded-md bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
             >
               Change
             </button>
             <button
+              type="button"
               onClick={handleRemove}
-              className="rounded-md bg-white p-1.5 text-gray-500 shadow-sm transition-colors hover:bg-red-50 hover:text-red-500"
+              className="cursor-pointer rounded-md bg-white p-1.5 text-gray-500 shadow-sm transition-colors hover:bg-red-50 hover:text-red-500"
               title="Remove image"
             >
               <X className="h-3.5 w-3.5" />
@@ -77,6 +79,7 @@ export default function ImagePicker({ value, onChange, label, info }) {
       ) : (
         /* ── No image ── */
         <button
+          type="button"
           onClick={() => setModalOpen(true)}
           className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-gray-200 py-5 transition-colors hover:border-gray-300 hover:bg-gray-50/50"
         >

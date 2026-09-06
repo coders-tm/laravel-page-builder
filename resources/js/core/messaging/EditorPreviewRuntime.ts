@@ -8,15 +8,16 @@
  */
 export const EDITOR_CSS = `
 /* Disable pointer events on links/buttons in design mode so clicks hit our section boundaries */
-.pb-design-mode a[href]:not([data-live-text-setting]),
-.pb-design-mode button:not([data-pb-allow]):not([data-live-text-setting]),
-.pb-design-mode form:not([data-live-text-setting]),
+.pb-design-mode a[href]:not([data-live-text-setting]):not([data-image-setting]),
+.pb-design-mode button:not([data-pb-allow]):not([data-live-text-setting]):not([data-image-setting]),
+.pb-design-mode form:not([data-live-text-setting]):not([data-image-setting]),
 [data-editor-section] iframe,
 [data-editor-block] iframe {
     pointer-events: none !important;
 }
 
-[data-live-text-setting] {
+[data-live-text-setting],
+[data-image-setting] {
     pointer-events: auto !important;
 }
 
@@ -450,7 +451,9 @@ export const EDITOR_JS = `
         var blockEl = e.target.closest('[data-editor-block]');
         var sectionEl = e.target.closest('[data-editor-section]');
         var liveTextEl = e.target.closest('[data-live-text-setting]');
+        var imageSettingEl = e.target.closest('[data-image-setting]');
         var settingPath = liveTextEl ? liveTextEl.getAttribute('data-live-text-setting') : null;
+        var imageSettingPath = imageSettingEl ? imageSettingEl.getAttribute('data-image-setting') : null;
 
         if (blockEl) {
             blockEl = findVisibleBlockAt(e.clientX, e.clientY, blockEl);
@@ -488,7 +491,8 @@ export const EDITOR_JS = `
                 path: path.join(','),
                 block: blockMeta,
                 section: sectionMeta,
-                focusSetting: settingPath
+                focusSetting: imageSettingPath || settingPath,
+                openImageModal: !!imageSettingPath
             }, '*');
             return;
         }
@@ -512,7 +516,8 @@ export const EDITOR_JS = `
                 type: 'section-selected',
                 sectionId: meta.id,
                 section: meta,
-                focusSetting: settingPath
+                focusSetting: imageSettingPath || settingPath,
+                openImageModal: !!imageSettingPath
             }, '*');
         }
     });

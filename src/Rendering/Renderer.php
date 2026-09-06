@@ -104,6 +104,7 @@ class Renderer implements RendererInterface
 
         if (PageBuilder::editor()) {
             $html = EditorAttributes::autoInjectLiveText($html, $section);
+            $html = EditorAttributes::autoInjectImageSettings($html, $section);
         }
 
         return $html;

@@ -360,7 +360,7 @@ export default function BlockItem({
   }, [isDragging, isDraggingGlobal, clearInsertTimer])
 
   return (
-    <div ref={setNodeRef} style={style} className="flex flex-col">
+    <div ref={setNodeRef} style={style} data-block-id={blockId} className="flex flex-col">
       <div
         onClick={() => onSelectBlock(sectionId, currentPath)}
         onMouseEnter={handleMouseEnter}

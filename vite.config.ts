@@ -1,35 +1,37 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-import fs from "fs";
+import { defineConfig, Plugin } from "vitest/config"
+import react from "@vitejs/plugin-react"
+import path from "path"
+import fs from "fs"
+import type { AddressInfo } from "net"
 
-function hotFilePlugin() {
+function hotFilePlugin(): Plugin {
   return {
     name: "hot-file",
     configureServer(server) {
       server.httpServer?.once("listening", () => {
-        const address = server.httpServer?.address();
-        const isAddressInfo = (x) => typeof x === "object";
+        const address = server.httpServer?.address()
+        const isAddressInfo = (x: unknown): x is AddressInfo =>
+          typeof x === "object" && x !== null && "address" in x && "port" in x
         if (isAddressInfo(address)) {
-          let host = address.address;
+          let host = address.address
           if (host === "::" || host === "::1") {
-            host = "localhost";
+            host = "localhost"
           } else if (host.includes(":")) {
-            host = `[${host}]`;
+            host = `[${host}]`
           }
           if (!fs.existsSync("dist")) {
-            fs.mkdirSync("dist");
+            fs.mkdirSync("dist")
           }
-          fs.writeFileSync("dist/hot", `http://${host}:${address.port}`);
+          fs.writeFileSync("dist/hot", `http://${host}:${address.port}`)
         }
-      });
+      })
     },
     buildStart() {
       if (fs.existsSync("dist/hot")) {
-        fs.rmSync("dist/hot");
+        fs.rmSync("dist/hot")
       }
     },
-  };
+  }
 }
 
 export default defineConfig({
@@ -38,9 +40,7 @@ export default defineConfig({
     cors: true,
   },
   define: {
-    "process.env.NODE_ENV": JSON.stringify(
-      process.env.NODE_ENV || "development"
-    ),
+    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),
   },
   test: {
     environment: "jsdom",
@@ -79,9 +79,9 @@ export default defineConfig({
       output: {
         assetFileNames: (assetInfo) => {
           if (assetInfo && assetInfo.name && assetInfo.name.endsWith(".css")) {
-            return "app.css";
+            return "app.css"
           }
-          return "[name].[ext]";
+          return "[name].[ext]"
         },
       },
     },
@@ -91,4 +91,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./resources/js"),
     },
   },
-});
+})

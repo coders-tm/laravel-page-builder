@@ -60,7 +60,7 @@ export class InteractionManager {
   /**
    * Scroll to and focus a setting field in the sidebar.
    */
-  focusSetting(settingPath: string): void {
+  focusSetting(settingPath: string, options?: { openImageModal?: boolean }): void {
     if (!settingPath) return
 
     const parts = settingPath.split(".")
@@ -74,9 +74,17 @@ export class InteractionManager {
       if (!wrapper) return false
 
       wrapper.scrollIntoView({ behavior: "smooth", block: "center" })
-      const input = wrapper.querySelector('input, [contenteditable="true"], textarea')
-      if (input) {
-        ;(input as HTMLElement).focus()
+
+      if (options?.openImageModal) {
+        const button = wrapper.querySelector("button")
+        if (button) {
+          ;(button as HTMLElement).click()
+        }
+      } else {
+        const input = wrapper.querySelector('input, [contenteditable="true"], textarea')
+        if (input) {
+          ;(input as HTMLElement).focus()
+        }
       }
       return true
     }

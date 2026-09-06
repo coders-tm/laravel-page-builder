@@ -17,7 +17,7 @@ function waitForEnter(promptText: string): Promise<void> {
   })
 }
 
-const BASE_URL = "https://pagebuilder.test"
+const BASE_URL = "http://127.0.0.1:8000"
 const TYPING_DELAY = 15
 const PAUSE_AFTER_FIELD = 200
 const PAUSE_AFTER_SECTION = 300
@@ -37,6 +37,7 @@ interface IconEdit {
 interface SectionEdit {
   sectionId: string
   label: string
+  imagePath?: string
   edits: LiveTextEdit[]
   icons?: IconEdit[]
 }
@@ -45,6 +46,7 @@ const SECTIONS: SectionEdit[] = [
   {
     sectionId: "hero_1",
     label: "Hero",
+    imagePath: resolve(process.cwd(), "public/hero-1.png"),
     edits: [
       { liveSettingId: "hero_1.badge_text", newValue: "Ship Pages 10x Faster" },
       {
@@ -459,34 +461,23 @@ async function changeIcon(
   const blockId = settingId.includes(".") ? settingId.split(".")[0] : settingId
   const settingKey = settingId.includes(".") ? settingId.split(".").pop()! : settingId
 
-  // Step 1: Click the block element in the iframe to select it in the editor sidebar
-  const blockSelector = `[data-block-id="${blockId}"], [data-live-text-setting="${settingId}"]`
-  const blockElement = frame.locator(blockSelector).first()
-  if (await blockElement.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await scrollToElement(frame, blockSelector)
+  // Select block via preview iframe to open block settings in sidebar
+  const iframeBlockElement = frame.locator(`[data-block-id="${blockId}"]`).first()
+  if (await iframeBlockElement.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await scrollToElement(frame, `[data-block-id="${blockId}"]`)
     await frame.waitForTimeout(200)
-    await clickFrameElementWithCursor(page, frame, blockSelector)
-    await page.waitForTimeout(400)
+    await clickFrameElementWithCursor(page, frame, `[data-block-id="${blockId}"]`)
+    await page.waitForTimeout(500)
   }
 
-  // Step 2: Find the icon picker button in the sidebar for this block
-  const iconButtonSelectors = [
-    `div[data-setting-id="${settingId}"] button[aria-haspopup="dialog"]`,
-    `div[data-setting-id="${settingKey}"] button[aria-haspopup="dialog"]`,
-    `div[data-setting-id$="${settingKey}"] button[aria-haspopup="dialog"]`,
-    `button:has(span.material-icons)`,
-  ]
+  // Find the icon picker button in the sidebar for this block
+  const iconButton = page
+    .locator(
+      `div[data-setting-id="${settingKey}"] button, div[data-setting-id="${settingId}"] button, button:has(span.material-icons)`,
+    )
+    .first()
 
-  let iconButton: Locator | null = null
-  for (const sel of iconButtonSelectors) {
-    const btn = page.locator(sel).first()
-    if (await btn.isVisible({ timeout: 1500 }).catch(() => false)) {
-      iconButton = btn
-      break
-    }
-  }
-
-  if (!iconButton) {
+  if (!(await iconButton.isVisible({ timeout: 4000 }).catch(() => false))) {
     console.log(`  Could not find icon button for ${settingId}`)
     return
   }
@@ -494,9 +485,9 @@ async function changeIcon(
   await clickElementWithCursor(page, iconButton)
   await page.waitForTimeout(PAUSE_AFTER_ICON)
 
-  // Wait for icon picker modal to open
-  const modal = page.locator('[role="dialog"]').first()
-  await modal.waitFor({ state: "visible", timeout: 5000 })
+  // Wait for icon picker popover/modal to open
+  const modal = page.locator('[role="dialog"], [data-radix-popper-content-wrapper]').first()
+  await modal.waitFor({ state: "visible", timeout: 5000 }).catch(() => {})
 
   // Find search input in modal and type icon name
   const searchInput = modal
@@ -508,16 +499,17 @@ async function changeIcon(
     await page.waitForTimeout(500)
   }
 
-  // Click on the first icon result
+  // Click on the first icon result button
   const iconResult = modal
-    .locator(`button:has-text("${iconName}"), [data-icon="${iconName}"]`)
+    .locator(
+      `button[title*="${iconName}"], button:has-text("${iconName}"), [data-icon="${iconName}"]`,
+    )
     .first()
   if (await iconResult.isVisible({ timeout: 2000 }).catch(() => false)) {
     await clickElementWithCursor(page, iconResult)
   } else {
-    // Try clicking any icon button in the grid
     const anyIcon = modal
-      .locator('button[class*="icon"], .icon-grid button, [role="gridcell"]')
+      .locator('button[class*="IconCell"], button:has(span.material-icons), button')
       .first()
     if (await anyIcon.isVisible({ timeout: 2000 }).catch(() => false)) {
       await clickElementWithCursor(page, anyIcon)
@@ -526,14 +518,96 @@ async function changeIcon(
 
   await page.waitForTimeout(PAUSE_AFTER_ICON)
 
-  // Close modal if still open (click outside or close button)
-  const closeButton = modal.locator('button[aria-label="Close"], button:has(svg.lucide-x)').first()
-  if (await closeButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await clickElementWithCursor(page, closeButton)
-  }
-
+  // Close popover
+  await page.keyboard.press("Escape").catch(() => {})
   await page.waitForTimeout(300)
   console.log(`  Changed icon for "${settingId}" to "${iconName}"`)
+}
+
+async function uploadSectionImage(page: Page, imagePath: string): Promise<void> {
+  console.log(`  Uploading section image: ${imagePath}`)
+
+  await page.waitForTimeout(500)
+
+  // Find image picker in settings panel
+  const imageField = page
+    .locator(
+      'div[data-setting-id*="image"], div[data-setting-id*="hero_image"], div:has(label:has-text("Hero Image")), div:has(label:has-text("Image"))',
+    )
+    .first()
+
+  if (await imageField.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await imageField.scrollIntoViewIfNeeded().catch(() => {})
+    await page.waitForTimeout(300)
+  }
+
+  // Force the hover overlay container to be visible so Playwright can click Change / Select button
+  await page.evaluate(() => {
+    const buttons = Array.from(document.querySelectorAll("button"))
+    const targetBtn = buttons.find(
+      (b) => b.textContent?.trim() === "Change" || b.textContent?.trim() === "Select image",
+    )
+    if (targetBtn && targetBtn.parentElement) {
+      targetBtn.parentElement.style.opacity = "1"
+      targetBtn.parentElement.style.backgroundColor = "rgba(0, 0, 0, 0.4)"
+      targetBtn.parentElement.style.visibility = "visible"
+      targetBtn.parentElement.style.pointerEvents = "auto"
+    }
+  })
+  await page.waitForTimeout(300)
+
+  const changeBtn = page
+    .locator('button:has-text("Change"), button:has-text("Select image")')
+    .first()
+
+  let clicked = false
+  if (await changeBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await clickElementWithCursor(page, changeBtn)
+    clicked = true
+  } else {
+    clicked = await page
+      .evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll("button"))
+        const targetBtn = buttons.find(
+          (b) => b.textContent?.trim() === "Change" || b.textContent?.trim() === "Select image",
+        )
+        if (targetBtn) {
+          targetBtn.click()
+          return true
+        }
+        return false
+      })
+      .catch(() => false)
+  }
+
+  await page.waitForTimeout(800)
+
+  const modal = page.locator('div[role="dialog"]').first()
+  await modal.waitFor({ state: "visible", timeout: 5000 }).catch(() => {})
+
+  if (await modal.isVisible().catch(() => false)) {
+    console.log("  AssetModal opened successfully!")
+
+    const uploadBtn = modal.locator('button:has-text("Upload")').first()
+    if (await uploadBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      const box = await uploadBtn.boundingBox()
+      if (box) {
+        await moveCursorTo(page, box.x + box.width / 2, box.y + box.height / 2)
+        await page.waitForTimeout(300)
+      }
+    }
+
+    const fileInput = modal.locator('input[type="file"]').first()
+    if ((await fileInput.count()) > 0) {
+      await fileInput.setInputFiles(imagePath)
+      console.log(`  File uploaded programmatically via setInputFiles: ${imagePath}`)
+      await page.waitForTimeout(2500)
+    } else {
+      console.log("  Could not find file input in AssetModal")
+    }
+  } else {
+    console.log("  AssetModal dialog did not open")
+  }
 }
 
 async function savePage(page: Page): Promise<void> {
@@ -692,7 +766,7 @@ async function main(): Promise<void> {
   const previewFrame = await getPreviewFrame(page)
 
   // Click on hero section in sidebar first
-  const heroSection = page.locator('div[data-section-id="hero_1"]').first()
+  const heroSection = page.locator('div[data-section-id="hero_1"] > div').first()
   if (await heroSection.isVisible()) {
     await clickElementWithCursor(page, heroSection)
     await page.waitForTimeout(500)
@@ -704,10 +778,19 @@ async function main(): Promise<void> {
     console.log(`\n[${i + 1}/${SECTIONS.length}] Editing section: ${section.label}`)
 
     // Click section in sidebar to open its settings
-    const sectionRow = page.locator(`div[data-section-id="${section.sectionId}"]`).first()
+    const sectionRow = page.locator(`div[data-section-id="${section.sectionId}"] > div`).first()
     if (await sectionRow.isVisible()) {
       await clickElementWithCursor(page, sectionRow)
       await page.waitForTimeout(500)
+    }
+
+    // Upload section image if specified
+    if (section.imagePath) {
+      try {
+        await uploadSectionImage(page, section.imagePath)
+      } catch (err) {
+        console.error(`  Error uploading image for section "${section.sectionId}":`, err)
+      }
     }
 
     // Edit each live text setting (in preview iframe)

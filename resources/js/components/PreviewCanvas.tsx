@@ -128,7 +128,11 @@ export default function PreviewCanvas() {
           if (inspectorEnabled && sectionId) {
             editor.selectSection(sectionId)
             if (event.data.focusSetting) {
-              setTimeout(() => editor.interaction.focusSetting(event.data.focusSetting), 100)
+              const openImageModal = !!event.data.openImageModal
+              setTimeout(
+                () => editor.interaction.focusSetting(event.data.focusSetting, { openImageModal }),
+                100,
+              )
             }
           }
           break
@@ -152,7 +156,11 @@ export default function PreviewCanvas() {
               }
             }
             if (event.data.focusSetting) {
-              setTimeout(() => editor.interaction.focusSetting(event.data.focusSetting), 50)
+              const openImageModal = !!event.data.openImageModal
+              setTimeout(
+                () => editor.interaction.focusSetting(event.data.focusSetting, { openImageModal }),
+                50,
+              )
             }
           }
           break
