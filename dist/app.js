@@ -24041,7 +24041,7 @@ function BLe() {
     ] }, s.name || `group-${u}`)) })
   ] });
 }
-const gR = h.memo(BLe), FLe = "1.5.4", OLe = "laravel-page-builder", ILe = FLe, HLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", jLe = "Dipak Sarkar", Dx = "dipak@coderstm.com", WLe = "https://github.com/coders-tm/laravel-page-builder", VLe = "Source-Available Non-Commercial";
+const gR = h.memo(BLe), FLe = "1.5.5", OLe = "laravel-page-builder", ILe = FLe, HLe = "A section-based page builder for Laravel using JSON layouts, sections, blocks, and themes.", jLe = "Dipak Sarkar", Dx = "dipak@coderstm.com", WLe = "https://github.com/coders-tm/laravel-page-builder", VLe = "Source-Available Non-Commercial";
 function vR({ isOpen: a, onClose: e }) {
   return /* @__PURE__ */ y.jsx(qf, { open: a, onOpenChange: (l) => !l && e(), children: /* @__PURE__ */ y.jsxs(Hc, { className: "w-[calc(100%-2rem)] max-w-md gap-0 rounded-xl p-0", children: [
     /* @__PURE__ */ y.jsxs(jc, { className: "flex flex-col items-center px-6 pt-6 pb-0 text-center sm:text-center", children: [
