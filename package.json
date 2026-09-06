@@ -18,7 +18,8 @@
     "prepare": "simple-git-hooks",
     "docs:dev": "npm --prefix docs run dev",
     "docs:build": "npm --prefix docs run build",
-    "docs:preview": "npm --prefix docs run preview"
+    "docs:preview": "npm --prefix docs run preview",
+    "generate-video": "npx tsx generate-video.ts"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged && npm test"
@@ -83,6 +84,7 @@
     "eslint-plugin-react-refresh": "^0.5.6",
     "jsdom": "^29.1.1",
     "lint-staged": "^16.4.0",
+    "playwright": "^1.63.0",
     "postcss": "^8.5.8",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
