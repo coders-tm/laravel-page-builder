@@ -17,6 +17,11 @@
 .gitignore export-ignore
 .editorconfig export-ignore
 .styleci.yml export-ignore
+.npmrc export-ignore
+.prettierignore export-ignore
+.prettierrc.json export-ignore
+.bladeformatterrc.json export-ignore
+ide.json export-ignore
 CHANGELOG.md export-ignore
 package.json export-ignore
 package-lock.json export-ignore
